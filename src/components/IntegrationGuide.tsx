@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CheckCircle2, RefreshCw, AlertTriangle, ArrowLeft, Download } from 'lucide-react';
+import { CheckCircle2, RefreshCw, AlertTriangle, ArrowLeft, Download, BookOpen } from 'lucide-react';
 import type { ConnectionDiagnostic } from '../types/ollama';
 import { formatBytes, normalizeBaseUrl } from '../services/ollamaClient';
 import { CodeSnippetBlock } from './CodeSnippetBlock';
@@ -215,14 +215,25 @@ curl ${endpoint}/api/chat -d '{
               </p>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={onBackToChat}
-            className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-[#6B1D2F]/18 dark:border-[#F3E7D8]/16 bg-[#FAF5EC]/75 dark:bg-[#230D14]/75 px-3.5 text-xs font-medium text-[#4D1422] dark:text-[#F5ECE0] hover:bg-[#FCF8F2] dark:hover:bg-[#2F121B] transition-colors whitespace-nowrap shrink-0"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            <span>Back to Chat</span>
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <a
+              href="/guide.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-[#6B1D2F]/18 dark:border-[#F3E7D8]/16 bg-[#FAF5EC]/75 dark:bg-[#230D14]/75 px-3.5 text-xs font-medium text-[#4D1422] dark:text-[#F5ECE0] hover:bg-[#FCF8F2] dark:hover:bg-[#2F121B] transition-colors whitespace-nowrap shrink-0"
+            >
+              <BookOpen className="h-3.5 w-3.5 text-[#6B1D2F] dark:text-[#E6B8A2]" />
+              <span>Visual Guide (HTML)</span>
+            </a>
+            <button
+              type="button"
+              onClick={onBackToChat}
+              className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-[#6B1D2F]/18 dark:border-[#F3E7D8]/16 bg-[#FAF5EC]/75 dark:bg-[#230D14]/75 px-3.5 text-xs font-medium text-[#4D1422] dark:text-[#F5ECE0] hover:bg-[#FCF8F2] dark:hover:bg-[#2F121B] transition-colors whitespace-nowrap shrink-0"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              <span>Back to Chat</span>
+            </button>
+          </div>
         </div>
 
         {/* Section 1: Live Connection Diagnostics */}

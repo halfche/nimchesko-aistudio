@@ -1,0 +1,760 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>nimchesko AI studio — Multilingual User &amp; Deployment Guide</title>
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <style>
+      :root {
+        --bg: #f6efe4;
+        --bg-radial-1: rgba(107, 29, 47, 0.11);
+        --bg-radial-2: rgba(183, 134, 72, 0.13);
+        --surface: rgba(252, 248, 242, 0.86);
+        --surface-soft: rgba(250, 245, 236, 0.74);
+        --border: rgba(107, 29, 47, 0.16);
+        --text: #2b0f17;
+        --text-muted: #6e4a53;
+        --accent: #6b1d2f;
+        --accent-hover: #541524;
+        --accent-contrast: #faf5ec;
+        --code-bg: rgba(43, 15, 23, 0.06);
+        --shadow: 0 12px 36px rgba(77, 20, 34, 0.08);
+      }
+
+      html.dark {
+        --bg: #14070b;
+        --bg-radial-1: rgba(140, 37, 62, 0.24);
+        --bg-radial-2: rgba(230, 184, 162, 0.08);
+        --surface: rgba(30, 10, 17, 0.86);
+        --surface-soft: rgba(35, 13, 20, 0.74);
+        --border: rgba(243, 231, 216, 0.14);
+        --text: #f5ece0;
+        --text-muted: #ceb8ae;
+        --accent: #8c253e;
+        --accent-hover: #a02d49;
+        --accent-contrast: #faf5ec;
+        --code-bg: rgba(245, 236, 224, 0.08);
+        --shadow: 0 14px 40px rgba(0, 0, 0, 0.44);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Vazirmatn", "Tahoma", sans-serif;
+        color: var(--text);
+        background-color: var(--bg);
+        background-image:
+          radial-gradient(circle at 12% 10%, var(--bg-radial-1), transparent 42%),
+          radial-gradient(circle at 88% 18%, var(--bg-radial-2), transparent 40%);
+        line-height: 1.68;
+        transition: background-color 0.2s ease, color 0.2s ease;
+      }
+
+      .container {
+        max-width: 1020px;
+        margin: 0 auto;
+        padding: 20px 18px 64px;
+      }
+
+      .topbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 18px;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        background: var(--surface);
+        backdrop-filter: blur(16px);
+        box-shadow: var(--shadow);
+        position: sticky;
+        top: 12px;
+        z-index: 20;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 700;
+        font-size: 1rem;
+        letter-spacing: -0.01em;
+      }
+
+      .brand svg {
+        color: var(--accent);
+        flex-shrink: 0;
+      }
+
+      html.dark .brand svg {
+        color: #e6b8a2;
+      }
+
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .lang-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        padding: 4px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: var(--surface-soft);
+      }
+
+      .lang-btn,
+      .theme-btn,
+      .action-link {
+        border: 1px solid transparent;
+        border-radius: 9px;
+        padding: 6px 10px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        cursor: pointer;
+        background: transparent;
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: all 0.15s ease;
+      }
+
+      .lang-btn:hover,
+      .theme-btn:hover {
+        color: var(--text);
+        background: var(--code-bg);
+      }
+
+      .lang-btn.active {
+        background: var(--accent);
+        color: var(--accent-contrast);
+      }
+
+      .theme-btn {
+        border: 1px solid var(--border);
+        background: var(--surface-soft);
+        color: var(--text);
+      }
+
+      .action-link {
+        background: var(--accent);
+        color: var(--accent-contrast);
+        padding: 8px 14px;
+      }
+
+      .action-link:hover {
+        background: var(--accent-hover);
+      }
+
+      .hero {
+        margin-top: 24px;
+        padding: 28px;
+        border-radius: 22px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        backdrop-filter: blur(16px);
+        box-shadow: var(--shadow);
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 20px;
+        align-items: center;
+      }
+
+      @media (max-width: 720px) {
+        .hero {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .motifs {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: var(--accent);
+        opacity: 0.88;
+      }
+
+      html.dark .motifs {
+        color: #e6b8a2;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: clamp(1.5rem, 3vw, 2.05rem);
+        letter-spacing: -0.02em;
+      }
+
+      .subtitle {
+        margin: 0;
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        max-width: 64ch;
+      }
+
+      .grid {
+        margin-top: 22px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(285px, 1fr));
+        gap: 16px;
+      }
+
+      .card {
+        padding: 20px 22px;
+        border-radius: 18px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        backdrop-filter: blur(14px);
+        box-shadow: var(--shadow);
+      }
+
+      .card h2 {
+        margin: 0 0 10px;
+        font-size: 1.05rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--accent);
+      }
+
+      html.dark .card h2 {
+        color: #e6b8a2;
+      }
+
+      .card p,
+      .card li {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        margin: 6px 0;
+      }
+
+      .card ul {
+        padding-inline-start: 18px;
+        margin: 8px 0 0;
+      }
+
+      pre,
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      }
+
+      code {
+        background: var(--code-bg);
+        padding: 2px 6px;
+        border-radius: 6px;
+        font-size: 0.82rem;
+        color: var(--text);
+        direction: ltr;
+        unicode-bidi: isolate;
+      }
+
+      pre {
+        margin: 10px 0 0;
+        padding: 12px 14px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: var(--code-bg);
+        overflow-x: auto;
+        font-size: 0.82rem;
+        line-height: 1.5;
+        direction: ltr;
+        text-align: left;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+        font-size: 0.86rem;
+        font-variant-numeric: tabular-nums;
+      }
+
+      th,
+      td {
+        padding: 9px 10px;
+        border-bottom: 1px solid var(--border);
+        text-align: start;
+      }
+
+      th {
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      html.dark th {
+        color: #e6b8a2;
+      }
+
+      .footer {
+        margin-top: 28px;
+        text-align: center;
+        font-size: 0.82rem;
+        color: var(--text-muted);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header class="topbar">
+        <div class="brand">
+          <svg width="22" height="22" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+            <circle cx="16" cy="16" r="13.5" stroke="currentColor" stroke-width="1.35" stroke-opacity="0.4" />
+            <polygon points="16,4 19,13 28,16 19,19 16,28 13,19 4,16 13,13" stroke="currentColor" stroke-width="1.5" fill="none" />
+            <circle cx="16" cy="16" r="2.2" fill="currentColor" />
+          </svg>
+          <span>nimchesko AI studio</span>
+        </div>
+
+        <div class="controls">
+          <div class="lang-group" role="group" aria-label="Language selector">
+            <button type="button" class="lang-btn" data-lang="en">English</button>
+            <button type="button" class="lang-btn" data-lang="fa">فارسی</button>
+            <button type="button" class="lang-btn" data-lang="ar">العربية</button>
+            <button type="button" class="lang-btn" data-lang="de">Deutsch</button>
+            <button type="button" class="lang-btn" data-lang="es">Español</button>
+            <button type="button" class="lang-btn" data-lang="fr">Français</button>
+            <button type="button" class="lang-btn" data-lang="tr">Türkçe</button>
+          </div>
+          <button type="button" class="theme-btn" id="themeToggle">Theme</button>
+          <a class="action-link" href="/nimchesko-ai-studio-app.zip" download="nimchesko-ai-studio-app.zip" id="zipBtn">Download (.zip)</a>
+        </div>
+      </header>
+
+      <section class="hero">
+        <div>
+          <h1 id="heroTitle"></h1>
+          <p class="subtitle" id="heroSub"></p>
+        </div>
+        <div class="motifs" aria-hidden="true">
+          <!-- Persepolis Column -->
+          <svg width="36" height="44" viewBox="0 0 40 56" fill="none">
+            <path d="M12 50H28M15 50V18M25 50V18M9 18H31M11 12C11 8 16 8 16 12M29 12C29 8 24 8 24 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+          </svg>
+          <!-- Azadi Tower -->
+          <svg width="52" height="44" viewBox="0 0 64 56" fill="none">
+            <path d="M8 50H56M14 50L24 22L28 8H36L40 22L50 50" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M24 50C24 38 28 31 32 31C36 31 40 38 40 50" stroke="currentColor" stroke-width="1.6" />
+          </svg>
+          <!-- Si-o-se-pol -->
+          <svg width="60" height="44" viewBox="0 0 72 48" fill="none">
+            <path d="M4 38H68M4 20H68" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            <path d="M10 38V27C10 23.5 14 23.5 14 27V38M22 38V27C22 23.5 26 23.5 26 27V38M34 38V27C34 23.5 38 23.5 38 27V38M46 38V27C46 23.5 50 23.5 50 27V38M58 38V27C58 23.5 62 23.5 62 27V38" stroke="currentColor" stroke-width="1.4" />
+          </svg>
+        </div>
+      </section>
+
+      <section class="grid">
+        <article class="card">
+          <h2 id="c1Title"></h2>
+          <p id="c1Body"></p>
+          <ul id="c1List"></ul>
+        </article>
+
+        <article class="card">
+          <h2 id="c2Title"></h2>
+          <p id="c2Body"></p>
+          <pre id="c2Code"></pre>
+        </article>
+
+        <article class="card">
+          <h2 id="c3Title"></h2>
+          <p id="c3Body"></p>
+          <pre id="c3Code"></pre>
+        </article>
+
+        <article class="card">
+          <h2 id="c4Title"></h2>
+          <p id="c4Body"></p>
+          <ul id="c4List"></ul>
+        </article>
+      </section>
+
+      <section class="card" style="margin-top: 16px;">
+        <h2 id="tableTitle"></h2>
+        <p id="tableBody"></p>
+        <table>
+          <thead>
+            <tr>
+              <th id="thOs"></th>
+              <th id="thFmt"></th>
+              <th id="thCmd"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Debian / Ubuntu</td>
+              <td><code>.deb</code></td>
+              <td><code>sudo apt install ./nimchesko-ai-studio-*.deb</code></td>
+            </tr>
+            <tr>
+              <td>Fedora / RHEL / openSUSE</td>
+              <td><code>.rpm</code></td>
+              <td><code>sudo dnf install ./nimchesko-ai-studio-*.rpm</code></td>
+            </tr>
+            <tr>
+              <td>Arch Linux</td>
+              <td><code>.pkg.tar.zst</code></td>
+              <td><code>sudo pacman -U ./nimchesko-ai-studio-*.pkg.tar.zst</code></td>
+            </tr>
+            <tr>
+              <td>Linux Universal</td>
+              <td><code>.AppImage</code>, <code>.tar</code>, <code>.tar.zst</code></td>
+              <td><code>chmod +x *.AppImage &amp;&amp; ./*.AppImage</code></td>
+            </tr>
+            <tr>
+              <td>Windows</td>
+              <td><code>.exe</code> (Setup &amp; Portable)</td>
+              <td><code>nimchesko-ai-studio-*-win-x64-nsis.exe</code></td>
+            </tr>
+            <tr>
+              <td>macOS</td>
+              <td><code>.pkg</code></td>
+              <td><code>open nimchesko-ai-studio-*-mac-universal.pkg</code></td>
+            </tr>
+            <tr>
+              <td>Offline Web Bundle</td>
+              <td><code>.zip</code></td>
+              <td><code>run-windows.bat</code> / <code>./run-linux.sh</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <footer class="footer" id="footerText"></footer>
+    </div>
+
+    <script>
+      const COPY = {
+        en: {
+          dir: 'ltr',
+          themeLabel: 'Light / Dark',
+          zipBtn: 'Download App (.zip)',
+          heroTitle: 'nimchesko AI studio — Complete Guide',
+          heroSub: 'A minimal Burgundy & Cream local AI workspace for Ollama models, isolated project brains, folder organization, workspace sync, and cross-platform desktop releases.',
+          c1Title: '01. Workspace & Features',
+          c1Body: 'Every project has its own isolated brain, rules, files, and model parameters.',
+          c1List: [
+            'Isolated Projects with custom rules.md and resource files',
+            'Sidebar Folders with drag-and-drop & Quick Prompts library',
+            'Live Context Monitor modal and debounced Auto-Save + drafts',
+            'Models & Sync tab: pull Ollama models, import Modelfile/.gguf, sync .json'
+          ],
+          c2Title: '02. Quick Run (Windows & Linux)',
+          c2Body: 'Extract nimchesko-ai-studio-app.zip and launch with zero Node.js/Git setup:',
+          c2Code: '# Windows (double-click or PowerShell)\nrun-windows.bat\n\n# Linux\nchmod +x run-linux.sh && ./run-linux.sh',
+          c3Title: '03. Connect Local Ollama',
+          c3Body: 'Start Ollama with CORS enabled so the studio can stream directly from localhost:11434:',
+          c3Code: '# Linux / macOS\nOLLAMA_ORIGINS=* ollama serve\n\n# Windows PowerShell\n$env:OLLAMA_ORIGINS="*"; ollama serve',
+          c4Title: '04. Shortcuts & GitHub Permissions',
+          c4Body: 'Keyboard shortcuts and GitHub Actions setup for automated desktop builds:',
+          c4List: [
+            'Cmd/Ctrl + Enter: Send message',
+            'Cmd/Ctrl + N: Start new chat',
+            'Cmd/Ctrl + K: Clear current chat',
+            'GitHub: Settings → Actions → General → Read and write permissions'
+          ],
+          tableTitle: '05. GitHub Actions CI/CD Release Formats',
+          tableBody: 'Push to main/master, push a v* tag, or run .github/workflows/release-desktop.yml manually to generate all packages:',
+          thOs: 'Platform',
+          thFmt: 'Format',
+          thCmd: 'Install / Run',
+          footerText: 'nimchesko AI studio · Burgundy & Cream Edition'
+        },
+        fa: {
+          dir: 'rtl',
+          themeLabel: 'تم روشن / تاریک',
+          zipBtn: 'دانلود بسته برنامه (.zip)',
+          heroTitle: 'راهنمای کامل nimchesko AI studio',
+          heroSub: 'محیط کاری مینیمال زرشکی و کرم برای اجرای مدل‌های لوکال Ollama با پروژه‌های ایزوله، مدیریت مدل‌ها، همگام‌سازی داده‌ها و خروجی‌های دسکتاپ.',
+          c1Title: '۰۱. امکانات و ساختار برنامه',
+          c1Body: 'هر پروژه دارای مغز، فایل قوانین، منابع و تنظیمات مدل مستقل است.',
+          c1List: [
+            'پروژه‌های ایزوله همراه با rules.md و فایل‌های منبع اختصاصی',
+            'پوشه‌بندی چت‌ها با Drag & Drop و کتابخانه پرامپت‌های سریع',
+            'مانیتورینگ زنده کانتکست، ذخیره خودکار و نگهداری پیش‌نویس‌ها',
+            'تب Models & Sync: دانلود از Ollama، ایمپورت Modelfile/.gguf و همگام‌سازی .json'
+          ],
+          c2Title: '۰۲. اجرای سریع در ویندوز و لینوکس',
+          c2Body: 'فایل nimchesko-ai-studio-app.zip را استخراج و بدون نیاز به Node.js اجرا کنید:',
+          c2Code: '# Windows\nrun-windows.bat\n\n# Linux\nchmod +x run-linux.sh && ./run-linux.sh',
+          c3Title: '۰۳. اتصال به Ollama لوکال',
+          c3Body: 'پیش از استفاده، Ollama را با دسترسی CORS اجرا کنید تا ارتباط با پورت 11434 برقرار شود:',
+          c3Code: '# Linux / macOS\nOLLAMA_ORIGINS=* ollama serve\n\n# Windows PowerShell\n$env:OLLAMA_ORIGINS="*"; ollama serve',
+          c4Title: '۰۴. میانبرها و دسترسی گیت‌هاب',
+          c4Body: 'کلیدهای میانبر سریع و تنظیمات لازم برای ساخت خودکار در GitHub Actions:',
+          c4List: [
+            'Cmd/Ctrl + Enter: ارسال پیام',
+            'Cmd/Ctrl + N: گفت‌وگوی جدید',
+            'Cmd/Ctrl + K: پاک کردن چت فعلی',
+            'گیت‌هاب: Settings ← Actions ← General ← Read and write permissions'
+          ],
+          tableTitle: '۰۵. فرمت‌های خروجی GitHub Actions CI/CD',
+          tableBody: 'با Push روی main/master یا اجرای دستی ورک‌فلو، همه فایل‌های نصبی زیر در بخش Releases ساخته می‌شوند:',
+          thOs: 'سیستم‌عامل / توزیع',
+          thFmt: 'فرمت',
+          thCmd: 'دستور نصب / اجرا',
+          footerText: 'nimchesko AI studio · طراحی زرشکی و کرم'
+        },
+        ar: {
+          dir: 'rtl',
+          themeLabel: 'فاتح / داكن',
+          zipBtn: 'تنزيل الحزمة (.zip)',
+          heroTitle: 'الدليل الكامل لـ nimchesko AI studio',
+          heroSub: 'مساحة عمل محلية بتصميم عنابي وكريمي لتشغيل نماذج Ollama مع مشاريع معزولة ومزامنة البيانات وإصدارات سطح المكتب.',
+          c1Title: '٠١. الميزات الرئيسية',
+          c1Body: 'يمتلك كل مشروع بيئة مستقلة وقواعد rules.md وموارد وإعدادات خاصة.',
+          c1List: [
+            'مشاريع معزولة مع ملفات rules.md والموارد النصية',
+            'مجلدات بالسحب والإفلات ومكتبة الأوامر السريعة',
+            'مراقبة السياق المباشرة والحفظ التلقائي',
+            'Models & Sync: سحب نماذج Ollama واستيراد Modelfile/.gguf ومزامنة .json'
+          ],
+          c2Title: '٠٢. التشغيل السريع (ويندوز ولينكس)',
+          c2Body: 'فك ضغط nimchesko-ai-studio-app.zip وشغّل الملف المناسب:',
+          c2Code: '# Windows\nrun-windows.bat\n\n# Linux\nchmod +x run-linux.sh && ./run-linux.sh',
+          c3Title: '٠٣. الاتصال بـ Ollama المحلي',
+          c3Body: 'شغّل Ollama مع تفعيل CORS للاتصال المباشر بالمنفذ 11434:',
+          c3Code: '# Linux / macOS\nOLLAMA_ORIGINS=* ollama serve\n\n# Windows PowerShell\n$env:OLLAMA_ORIGINS="*"; ollama serve',
+          c4Title: '٠٤. الاختصارات وإعدادات GitHub',
+          c4Body: 'اختصارات لوحة المفاتيح وصلاحيات البناء التلقائي:',
+          c4List: [
+            'Cmd/Ctrl + Enter: إرسال الرسالة',
+            'Cmd/Ctrl + N: محادثة جديدة',
+            'Cmd/Ctrl + K: مسح المحادثة الحالية',
+            'GitHub: Settings ← Actions ← General ← Read and write permissions'
+          ],
+          tableTitle: '٠٥. صيغ إصدارات GitHub Actions CI/CD',
+          tableBody: 'عند الدفع إلى main/master أو التشغيل اليدوي يتم إنشاء جميع الصيغ التالية في Releases:',
+          thOs: 'المنصة',
+          thFmt: 'الصيغة',
+          thCmd: 'التثبيت / التشغيل',
+          footerText: 'nimchesko AI studio · إصدار العنابي والكريمي'
+        },
+        de: {
+          dir: 'ltr',
+          themeLabel: 'Hell / Dunkel',
+          zipBtn: 'App laden (.zip)',
+          heroTitle: 'nimchesko AI studio — Vollständiger Leitfaden',
+          heroSub: 'Minimalistischer Arbeitsbereich in Burgunderrot & Creme für lokale Ollama-Modelle, isolierte Projekte, Datensynchronisation und Desktop-Builds.',
+          c1Title: '01. Funktionen',
+          c1Body: 'Jedes Projekt besitzt eigene Regeln, Ressourcen, Konnektoren und Verläufe.',
+          c1List: [
+            'Isolierte Projekte mit rules.md und Ressourcendateien',
+            'Drag-and-Drop-Ordner & Quick-Prompts-Bibliothek',
+            'Live-Kontextmonitor und automatisches Speichern',
+            'Models & Sync: Ollama-Pull, Modelfile/.gguf-Import und .json-Sync'
+          ],
+          c2Title: '02. Schnellstart (Windows & Linux)',
+          c2Body: 'nimchesko-ai-studio-app.zip entpacken und direkt starten:',
+          c2Code: '# Windows\nrun-windows.bat\n\n# Linux\nchmod +x run-linux.sh && ./run-linux.sh',
+          c3Title: '03. Lokales Ollama verbinden',
+          c3Body: 'Starten Sie Ollama mit CORS-Freigabe für localhost:11434:',
+          c3Code: '# Linux / macOS\nOLLAMA_ORIGINS=* ollama serve\n\n# Windows PowerShell\n$env:OLLAMA_ORIGINS="*"; ollama serve',
+          c4Title: '04. Kürzel & GitHub-Rechte',
+          c4Body: 'Tastenkürzel und Berechtigungen für automatische Releases:',
+          c4List: [
+            'Cmd/Ctrl + Enter: Nachricht senden',
+            'Cmd/Ctrl + N: Neuer Chat',
+            'Cmd/Ctrl + K: Chat leeren',
+            'GitHub: Settings → Actions → General → Read and write permissions'
+          ],
+          tableTitle: '05. GitHub Actions CI/CD Formate',
+          tableBody: 'Bei Push auf main/master oder manuellem Start entstehen folgende Pakete:',
+          thOs: 'Plattform',
+          thFmt: 'Format',
+          thCmd: 'Installation / Start',
+          footerText: 'nimchesko AI studio · Burgunderrot & Creme Edition'
+        },
+        es: {
+          dir: 'ltr',
+          themeLabel: 'Claro / Oscuro',
+          zipBtn: 'Descargar (.zip)',
+          heroTitle: 'nimchesko AI studio — Guía Completa',
+          heroSub: 'Espacio de trabajo local en tonos borgoña y crema para Ollama, proyectos aislados, sincronización de chats y compilaciones de escritorio.',
+          c1Title: '01. Funciones Clave',
+          c1Body: 'Cada proyecto mantiene sus propias reglas, recursos y parámetros.',
+          c1List: [
+            'Proyectos aislados con rules.md y archivos de contexto',
+            'Carpetas con arrastrar y soltar y Quick Prompts',
+            'Monitor de contexto en vivo y autoguardado',
+            'Models & Sync: descargar modelos Ollama, Modelfile/.gguf y .json'
+          ],
+          c2Title: '02. Inicio Rápido (Windows y Linux)',
+          c2Body: 'Extrae nimchesko-ai-studio-app.zip y ejecuta el lanzador:',
+          c2Code: '# Windows\nrun-windows.bat\n\n# Linux\nchmod +x run-linux.sh && ./run-linux.sh',
+          c3Title: '03. Conectar Ollama Local',
+          c3Body: 'Inicia Ollama con CORS habilitado para el navegador:',
+          c3Code: '# Linux / macOS\nOLLAMA_ORIGINS=* ollama serve\n\n# Windows PowerShell\n$env:OLLAMA_ORIGINS="*"; ollama serve',
+          c4Title: '04. Atajos y Permisos de GitHub',
+          c4Body: 'Atajos globales y configuración de GitHub Actions:',
+          c4List: [
+            'Cmd/Ctrl + Enter: Enviar mensaje',
+            'Cmd/Ctrl + N: Nuevo chat',
+            'Cmd/Ctrl + K: Limpiar chat actual',
+            'GitHub: Settings → Actions → General → Read and write permissions'
+          ],
+          tableTitle: '05. Formatos de GitHub Actions CI/CD',
+          tableBody: 'Al hacer push a main/master o ejecutar el workflow manualmente se generan:',
+          thOs: 'Plataforma',
+          thFmt: 'Formato',
+          thCmd: 'Instalación / Uso',
+          footerText: 'nimchesko AI studio · Edición Borgoña y Crema'
+        },
+        fr: {
+          dir: 'ltr',
+          themeLabel: 'Clair / Sombre',
+          zipBtn: 'Télécharger (.zip)',
+          heroTitle: 'nimchesko AI studio — Guide Complet',
+          heroSub: 'Espace de travail IA local minimaliste Bordeaux & Crème pour Ollama, projets isolés, synchronisation des discussions et paquets desktop.',
+          c1Title: '01. Fonctionnalités',
+          c1Body: 'Chaque projet dispose de ses propres règles, ressources et paramètres.',
+          c1List: [
+            'Projets isolés avec rules.md et fichiers de ressources',
+            'Dossiers glisser-déposer et bibliothèque Quick Prompts',
+            'Moniteur de contexte en direct et sauvegarde automatique',
+            'Models & Sync : téléchargement Ollama, import Modelfile/.gguf et .json'
+          ],
+          c2Title: '02. Démarrage Rapide (Windows & Linux)',
+          c2Body: 'Extrayez nimchesko-ai-studio-app.zip et lancez directement :',
+          c2Code: '# Windows\nrun-windows.bat\n\n# Linux\nchmod +x run-linux.sh && ./run-linux.sh',
+          c3Title: '03. Connecter Ollama Local',
+          c3Body: 'Démarrez Ollama avec CORS activé pour localhost:11434 :',
+          c3Code: '# Linux / macOS\nOLLAMA_ORIGINS=* ollama serve\n\n# Windows PowerShell\n$env:OLLAMA_ORIGINS="*"; ollama serve',
+          c4Title: '04. Raccourcis & Droits GitHub',
+          c4Body: 'Raccourcis clavier et configuration GitHub Actions :',
+          c4List: [
+            'Cmd/Ctrl + Entrée : Envoyer le message',
+            'Cmd/Ctrl + N : Nouvelle discussion',
+            'Cmd/Ctrl + K : Effacer la discussion',
+            'GitHub : Settings → Actions → General → Read and write permissions'
+          ],
+          tableTitle: '05. Formats GitHub Actions CI/CD',
+          tableBody: 'Chaque push sur main/master ou exécution manuelle génère tous les installateurs :',
+          thOs: 'Plateforme',
+          thFmt: 'Format',
+          thCmd: 'Installation / Lancement',
+          footerText: 'nimchesko AI studio · Édition Bordeaux & Crème'
+        },
+        tr: {
+          dir: 'ltr',
+          themeLabel: 'Açık / Koyu',
+          zipBtn: 'İndir (.zip)',
+          heroTitle: 'nimchesko AI studio — Tam Kılavuz',
+          heroSub: 'Ollama modelleri, izole proje beyinleri, veri eşitleme ve masaüstü paketleri için Bordo & Krem yerel yapay zeka stüdyosu.',
+          c1Title: '01. Temel Özellikler',
+          c1Body: 'Her proje kendi kurallarına, kaynak dosyalarına ve model ayarlarına sahiptir.',
+          c1List: [
+            'Özel rules.md ve kaynak dosyalarıyla izole projeler',
+            'Sürükle-bırak klasörler ve Hızlı İstemler (Quick Prompts)',
+            'Canlı bağlam izleyici ve otomatik kaydetme',
+            'Models & Sync: Ollama indirme, Modelfile/.gguf ve .json eşitleme'
+          ],
+          c2Title: '02. Hızlı Başlangıç (Windows & Linux)',
+          c2Body: 'nimchesko-ai-studio-app.zip dosyasını çıkarın ve başlatın:',
+          c2Code: '# Windows\nrun-windows.bat\n\n# Linux\nchmod +x run-linux.sh && ./run-linux.sh',
+          c3Title: '03. Yerel Ollama Bağlantısı',
+          c3Body: 'Tarayıcı erişimi için Ollama’yı CORS izniyle başlatın:',
+          c3Code: '# Linux / macOS\nOLLAMA_ORIGINS=* ollama serve\n\n# Windows PowerShell\n$env:OLLAMA_ORIGINS="*"; ollama serve',
+          c4Title: '04. Kısayollar ve GitHub İzinleri',
+          c4Body: 'Klavye kısayolları ve GitHub Actions ayarları:',
+          c4List: [
+            'Cmd/Ctrl + Enter: Mesaj gönder',
+            'Cmd/Ctrl + N: Yeni sohbet başlat',
+            'Cmd/Ctrl + K: Mevcut sohbeti temizle',
+            'GitHub: Settings → Actions → General → Read and write permissions'
+          ],
+          tableTitle: '05. GitHub Actions CI/CD Çıktı Biçimleri',
+          tableBody: 'main/master dalına push yapıldığında tüm paketler Releases altında üretilir:',
+          thOs: 'Platform',
+          thFmt: 'Biçim',
+          thCmd: 'Kurulum / Çalıştırma',
+          footerText: 'nimchesko AI studio · Bordo & Krem Sürümü'
+        }
+      };
+
+      function detectInitialLang() {
+        const params = new URLSearchParams(window.location.search);
+        const fromQuery = (params.get('lang') || '').toLowerCase();
+        if (COPY[fromQuery]) return fromQuery;
+        const fromHash = window.location.hash.replace('#', '').toLowerCase();
+        if (COPY[fromHash]) return fromHash;
+        const saved = localStorage.getItem('nimchesko_guide_lang');
+        if (saved && COPY[saved]) return saved;
+        const nav = (navigator.language || 'en').slice(0, 2).toLowerCase();
+        return COPY[nav] ? nav : 'en';
+      }
+
+      let currentLang = detectInitialLang();
+
+      function setList(id, items) {
+        const el = document.getElementById(id);
+        el.innerHTML = '';
+        items.forEach((txt) => {
+          const li = document.createElement('li');
+          li.textContent = txt;
+          el.appendChild(li);
+        });
+      }
+
+      function renderLang(lang, persist = false) {
+        currentLang = COPY[lang] ? lang : 'en';
+        if (persist) {
+          localStorage.setItem('nimchesko_guide_lang', currentLang);
+        }
+        const t = COPY[currentLang];
+        document.documentElement.lang = currentLang;
+        document.documentElement.dir = t.dir;
+        document.getElementById('themeToggle').textContent = t.themeLabel;
+        document.getElementById('zipBtn').textContent = t.zipBtn;
+        document.getElementById('heroTitle').textContent = t.heroTitle;
+        document.getElementById('heroSub').textContent = t.heroSub;
+        document.getElementById('c1Title').textContent = t.c1Title;
+        document.getElementById('c1Body').textContent = t.c1Body;
+        setList('c1List', t.c1List);
+        document.getElementById('c2Title').textContent = t.c2Title;
+        document.getElementById('c2Body').textContent = t.c2Body;
+        document.getElementById('c2Code').textContent = t.c2Code;
+        document.getElementById('c3Title').textContent = t.c3Title;
+        document.getElementById('c3Body').textContent = t.c3Body;
+        document.getElementById('c3Code').textContent = t.c3Code;
+        document.getElementById('c4Title').textContent = t.c4Title;
+        document.getElementById('c4Body').textContent = t.c4Body;
+        setList('c4List', t.c4List);
+        document.getElementById('tableTitle').textContent = t.tableTitle;
+        document.getElementById('tableBody').textContent = t.tableBody;
+        document.getElementById('thOs').textContent = t.thOs;
+        document.getElementById('thFmt').textContent = t.thFmt;
+        document.getElementById('thCmd').textContent = t.thCmd;
+        document.getElementById('footerText').textContent = t.footerText;
+
+        document.querySelectorAll('.lang-btn').forEach((btn) => {
+          btn.classList.toggle('active', btn.getAttribute('data-lang') === currentLang);
+        });
+      }
+
+      document.querySelectorAll('.lang-btn').forEach((btn) => {
+        btn.addEventListener('click', () => renderLang(btn.getAttribute('data-lang'), true));
+      });
+
+      const savedTheme = localStorage.getItem('gemma_studio_theme_v1');
+      if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      }
+
+      document.getElementById('themeToggle').addEventListener('click', () => {
+        const isDark = document.documentElement.classList.toggle('dark');
+        localStorage.setItem('gemma_studio_theme_v1', isDark ? 'dark' : 'light');
+      });
+
+      renderLang(currentLang, false);
+    </script>
+  </body>
+</html>

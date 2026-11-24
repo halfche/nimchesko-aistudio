@@ -25,7 +25,7 @@ rm -f "${RELEASE_DIR}/${TAR_NAME}" "${RELEASE_DIR}/${TAR_NAME}.zst"
 tar -C "${RELEASE_DIR}" --transform="s|^linux-unpacked|nimchesko-ai-studio-${VERSION}-linux-x64|" -cf "${RELEASE_DIR}/${TAR_NAME}" linux-unpacked
 
 # 2. Compressed .tar.zst (.zst) archive
-zstd -19 --rm=false -f -o "${RELEASE_DIR}/${TAR_NAME}.zst" "${RELEASE_DIR}/${TAR_NAME}"
+zstd -19 -k -f -o "${RELEASE_DIR}/${TAR_NAME}.zst" "${RELEASE_DIR}/${TAR_NAME}"
 
 # 3. Arch Linux .pkg.tar.zst package (installable via pacman -U)
 PKG_STAGE="$(mktemp -d)"

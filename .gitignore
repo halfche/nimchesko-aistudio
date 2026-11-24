@@ -8,5 +8,6 @@ coverage/
 !.env.example
 public/*.zip
 release/
+dev-dist/
 desktop/node_modules/
 desktop/build/
