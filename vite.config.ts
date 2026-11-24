@@ -27,7 +27,10 @@ function addDirectoryToZip(zip: JSZip, dirPath: string, rootPath: string): void 
 }
 
 export default defineConfig(() => {
+  const rawBase = (process.env.VITE_BASE || '/').trim();
+  const appBase = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
   return {
+    base: appBase,
     plugins: [
       react(),
       tailwindcss(),
@@ -41,7 +44,7 @@ export default defineConfig(() => {
           'pwa-maskable-512x512.png',
         ],
         manifest: {
-          id: '/',
+          id: appBase,
           name: 'nimchesko AI studio',
           short_name: 'nimchesko AI',
           description:
@@ -49,23 +52,23 @@ export default defineConfig(() => {
           theme_color: '#6B1D2F',
           background_color: '#F6EFE4',
           display: 'standalone',
-          start_url: '/',
-          scope: '/',
+          start_url: appBase,
+          scope: appBase,
           icons: [
             {
-              src: '/pwa-192x192.png',
+              src: `${appBase}pwa-192x192.png`,
               sizes: '192x192',
               type: 'image/png',
               purpose: 'any',
             },
             {
-              src: '/pwa-512x512.png',
+              src: `${appBase}pwa-512x512.png`,
               sizes: '512x512',
               type: 'image/png',
               purpose: 'any',
             },
             {
-              src: '/pwa-maskable-512x512.png',
+              src: `${appBase}pwa-maskable-512x512.png`,
               sizes: '512x512',
               type: 'image/png',
               purpose: 'maskable',
