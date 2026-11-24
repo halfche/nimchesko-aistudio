@@ -4,7 +4,7 @@
 
 # nimchesko AI studio
 
-> **دليل HTML متعدد اللغات (بنفس تصميم التطبيق):** **[انقر هنا لفتح أو تنزيل `public/guide.html`](public/guide.html)**
+> **دليل HTML متعدد اللغات (الواجهة التفاعلية):** **[فتح الدليل التفاعلي مباشرة](https://htmlpreview.github.io/?https://github.com/halfche/nimchesko-aistudio/blob/main/public/guide.html?lang=ar)** · **[GitHub Pages](https://halfche.github.io/nimchesko-aistudio/guide.html?lang=ar)** · [`public/guide.html`](public/guide.html)
 
 مساحة عمل محلية متعددة المنصات لتشغيل نماذج **Ollama** (`gemma4:12b`، والنماذج المحلية، وملفات `Modelfile` / `.gguf`) بتصميم بسيط بألوان **العنابي والكريمي**.
 

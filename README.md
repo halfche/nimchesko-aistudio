@@ -3,10 +3,9 @@
 # nimchesko AI studio
 
 > **Interactive Multilingual HTML Guide (Rendered Interface, Burgundy & Cream Theme):**
-> - GitHub renders `.html` repository files (`public/guide.html`) as source code. To open the **rendered interactive guide & live app UI** directly from GitHub:
->   1. Enable **Settings → Pages → Source: GitHub Actions** once (`.github/workflows/deploy-pages.yml` deploys it automatically).
->   2. Open your live interface at **`https://<YOUR_USERNAME>.github.io/<YOUR_REPO>/guide.html`** (or **`https://<YOUR_USERNAME>.github.io/<YOUR_REPO>/`** for the full studio).
-> - Or view/download the standalone file here: **[`public/guide.html`](public/guide.html)** *(open locally in any browser — supports English, فارسی, العربية, Deutsch, Español, Français, Türkçe + Light/Dark mode)*.
+> - **[Open Rendered Guide Now (HTML Preview)](https://htmlpreview.github.io/?https://github.com/halfche/nimchesko-aistudio/blob/main/public/guide.html)** *(renders `public/guide.html` directly as a webpage)*
+> - **[Open Guide on GitHub Pages](https://halfche.github.io/nimchesko-aistudio/guide.html)** · **[Open Live App on GitHub Pages](https://halfche.github.io/nimchesko-aistudio/)** *(requires **Settings → Pages → Source: GitHub Actions** enabled once)*
+> - Source file in repo: [`public/guide.html`](public/guide.html) *(supports English, فارسی, العربية, Deutsch, Español, Français, Türkçe + Light/Dark mode)*
 
 Cross-platform local AI studio and integration workbench for Ollama (`gemma4:12b`, pulled Ollama tags, custom `Modelfile`s, and `.gguf` definitions), built with a minimal **Burgundy & Cream** aesthetic and Iranian architectural motifs.
 

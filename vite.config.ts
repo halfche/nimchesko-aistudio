@@ -11,7 +11,7 @@ const COMBINED_ZIP_NAME = 'nimchesko-ai-studio-app.zip';
 function addDirectoryToZip(zip: JSZip, dirPath: string, rootPath: string): void {
   const entries = fs.readdirSync(dirPath, {withFileTypes: true});
   for (const entry of entries) {
-    if (entry.name.endsWith('.zip')) continue;
+    if (entry.name.endsWith('.zip') || entry.name === 'aistudio') continue;
     const fullPath = path.join(dirPath, entry.name);
     const relPath = path.relative(rootPath, fullPath).split(path.sep).join('/');
     if (entry.isDirectory()) {

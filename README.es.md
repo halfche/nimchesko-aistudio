@@ -2,7 +2,7 @@
 
 # nimchesko AI studio
 
-> **Guía HTML Multilingüe (con el tema de la app):** **[Haz clic aquí para `public/guide.html`](public/guide.html)**
+> **Guía HTML Multilingüe (Interfaz Renderizada):** **[Abrir guía interactiva ahora](https://htmlpreview.github.io/?https://github.com/halfche/nimchesko-aistudio/blob/main/public/guide.html?lang=es)** · **[GitHub Pages](https://halfche.github.io/nimchesko-aistudio/guide.html?lang=es)** · [`public/guide.html`](public/guide.html)
 
 Espacio de trabajo local multiplataforma para **Ollama** (`gemma4:12b`, modelos locales, `Modelfile` y `.gguf`), diseñado con una estética minimalista en **borgoña y crema** y motivos arquitectónicos persas.
 

@@ -2,7 +2,7 @@
 
 # nimchesko AI studio
 
-> **Mehrsprachiger HTML-Leitfaden (im App-Design):** **[Hier klicken für `public/guide.html`](public/guide.html)**
+> **Mehrsprachiger HTML-Leitfaden (Gerenderte Oberfläche):** **[Interaktiven Leitfaden direkt öffnen](https://htmlpreview.github.io/?https://github.com/halfche/nimchesko-aistudio/blob/main/public/guide.html?lang=de)** · **[GitHub Pages](https://halfche.github.io/nimchesko-aistudio/guide.html?lang=de)** · [`public/guide.html`](public/guide.html)
 
 Plattformübergreifender lokaler KI-Arbeitsbereich für **Ollama** (`gemma4:12b`, lokale Tags, `Modelfile` und `.gguf`) im minimalistischen **Burgunderrot- & Creme-Design** mit persischen Architekturmotiven.
 

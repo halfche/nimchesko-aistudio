@@ -5,11 +5,9 @@
 # nimchesko AI studio
 
 > **راهنمای تعاملی و چندزبانه HTML (رابط گرافیکی با تم زرشکی و کرم):**
-> - گیت‌هاب هنگام کلیک روی فایل‌های `.html` در مخزن (`public/guide.html`)، کد منبع آن را نمایش می‌دهد. برای باز شدن **رابط گرافیکی رندرشده** با یک کلیک:
->   1. یک‌بار در گیت‌هاب به مسیر **Settings ← Pages ← Source** بروید و گزینه **GitHub Actions** را انتخاب کنید (ورک‌فلو `.github/workflows/deploy-pages.yml` به‌صورت خودکار آن را منتشر می‌کند).
->   2. سپس آدرس زیر مستقیماً رابط گرافیکی راهنما و برنامه را باز می‌کند:
->      `https://<YOUR_USERNAME>.github.io/<YOUR_REPO>/guide.html`
-> - همچنین می‌توانید فایل مستقل **[`public/guide.html`](public/guide.html)** را دانلود کرده و روی کامپیوتر خود در مرورگر باز کنید (دارای ۷ زبان و تم روشن/تاریک).
+> - **[باز کردن فوری رابط راهنما (HTML Preview)](https://htmlpreview.github.io/?https://github.com/halfche/nimchesko-aistudio/blob/main/public/guide.html?lang=fa)** *(مستقیم صفحه طراحی‌شده را باز می‌کند، نه کد را)*
+> - **[باز کردن راهنما در GitHub Pages](https://halfche.github.io/nimchesko-aistudio/guide.html?lang=fa)** · **[باز کردن برنامه روی GitHub Pages](https://halfche.github.io/nimchesko-aistudio/)** *(پس از فعال‌کردن **Settings ← Pages ← Source: GitHub Actions**)*
+> - فایل منبع در مخزن: [`public/guide.html`](public/guide.html) *(دارای ۷ زبان و تغییر تم روشن/تاریک)*
 
 محیط کاری هوشمند و کراس‌پلتفرم برای کار با مدل‌های لوکال **Ollama** (از جمله `gemma4:12b`، مدل‌های دانلودشده از Ollama و فایل‌های `Modelfile` / `.gguf`) با طراحی مینیمال **زرشکی و کرم** و نقوش معماری ایرانی.
 
