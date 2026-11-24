@@ -1,0 +1,22 @@
+{
+  "name": "nimchesko-ai-studio",
+  "version": "1.0.0",
+  "description": "nimchesko AI studio — Cross-platform local AI workspace for Ollama",
+  "author": {
+    "name": "nimchesko",
+    "email": "nimchesko@gmail.com"
+  },
+  "license": "MIT",
+  "main": "main.cjs",
+  "scripts": {
+    "prepare:icons": "node scripts/prepare-icons.mjs",
+    "dist:linux": "npm run prepare:icons && electron-builder --linux --x64 --config electron-builder.yml && bash scripts/build-extra-linux-archives.sh",
+    "dist:win": "npm run prepare:icons && electron-builder --win --x64 --config electron-builder.yml",
+    "dist:mac": "npm run prepare:icons && electron-builder --mac pkg --config electron-builder.yml"
+  },
+  "devDependencies": {
+    "electron": "^34.3.0",
+    "electron-builder": "^25.1.8",
+    "png2icons": "^2.0.1"
+  }
+}

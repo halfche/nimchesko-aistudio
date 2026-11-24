@@ -1011,6 +1011,17 @@ export default function App() {
         <div className="flex items-center gap-2 shrink-0">
           <PWAInstallButton />
 
+          <a
+            href="/nimchesko-ai-studio-app.zip"
+            download="nimchesko-ai-studio-app.zip"
+            title="Download combined Windows & Linux app package (.zip)"
+            aria-label="Download combined Windows and Linux app package"
+            className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-[#6B1D2F]/15 dark:border-[#F3E7D8]/16 bg-[#FAF5EC]/75 dark:bg-[#2A1019]/75 px-2.5 sm:px-3 text-xs font-medium text-[#4D1422] dark:text-[#F5ECE0] hover:bg-[#FAF5EC] dark:hover:bg-[#381622] transition-colors whitespace-nowrap shrink-0"
+          >
+            <Download className="h-3.5 w-3.5 text-[#6B1D2F] dark:text-[#E6B8A2]" />
+            <span className="hidden xl:inline">Download App (.zip)</span>
+          </a>
+
           <button
             type="button"
             onClick={() => setIsDark((d) => !d)}

@@ -1,9 +1,30 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import fs from 'fs';
+import JSZip from 'jszip';
 import path from 'path';
 import {defineConfig} from 'vite';
 import {VitePWA} from 'vite-plugin-pwa';
+
+const COMBINED_ZIP_NAME = 'nimchesko-ai-studio-app.zip';
+
+function addDirectoryToZip(zip: JSZip, dirPath: string, rootPath: string): void {
+  const entries = fs.readdirSync(dirPath, {withFileTypes: true});
+  for (const entry of entries) {
+    if (entry.name.endsWith('.zip')) continue;
+    const fullPath = path.join(dirPath, entry.name);
+    const relPath = path.relative(rootPath, fullPath).split(path.sep).join('/');
+    if (entry.isDirectory()) {
+      addDirectoryToZip(zip, fullPath, rootPath);
+    } else if (entry.isFile()) {
+      const content = fs.readFileSync(fullPath);
+      const isShellScript = entry.name.endsWith('.sh');
+      zip.file(relPath, content, {
+        unixPermissions: isShellScript ? '755' : '644',
+      });
+    }
+  }
+}
 
 export default defineConfig(() => {
   return {
@@ -105,6 +126,59 @@ export default defineConfig(() => {
           if (fs.existsSync(distDir) && fs.existsSync(srcAssets)) {
             fs.cpSync(srcAssets, distAssets, {recursive: true, force: true});
           }
+        },
+      },
+      {
+        name: 'package-combined-app-zip',
+        enforce: 'post',
+        closeBundle: {
+          sequential: true,
+          order: 'post',
+          async handler(error?: Error): Promise<void> {
+            if (error) {
+              return;
+            }
+            const distDir = path.resolve(__dirname, 'dist');
+            const publicDir = path.resolve(__dirname, 'public');
+            if (!fs.existsSync(distDir)) {
+              return;
+            }
+            const zip = new JSZip();
+            addDirectoryToZip(zip, distDir, distDir);
+            const buffer = await zip.generateAsync({
+              type: 'nodebuffer',
+              compression: 'DEFLATE',
+              compressionOptions: {level: 6},
+              platform: 'UNIX',
+            });
+            fs.writeFileSync(path.join(distDir, COMBINED_ZIP_NAME), buffer);
+            if (fs.existsSync(publicDir)) {
+              fs.writeFileSync(path.join(publicDir, COMBINED_ZIP_NAME), buffer);
+            }
+          },
+        },
+        configureServer(server) {
+          server.middlewares.use(`/${COMBINED_ZIP_NAME}`, (_req, res, next) => {
+            const publicZip = path.resolve(__dirname, 'public', COMBINED_ZIP_NAME);
+            const distZip = path.resolve(__dirname, 'dist', COMBINED_ZIP_NAME);
+            const target = fs.existsSync(publicZip)
+              ? publicZip
+              : fs.existsSync(distZip)
+                ? distZip
+                : null;
+            if (!target) {
+              return next();
+            }
+            const data = fs.readFileSync(target);
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'application/zip');
+            res.setHeader(
+              'Content-Disposition',
+              `attachment; filename="${COMBINED_ZIP_NAME}"`
+            );
+            res.setHeader('Content-Length', String(data.length));
+            res.end(data);
+          });
         },
       },
     ],

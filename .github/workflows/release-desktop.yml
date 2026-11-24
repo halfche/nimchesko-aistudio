@@ -1,0 +1,150 @@
+name: Build & Release Desktop Installers
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-linux:
+    name: Build Linux (.deb, .rpm, .AppImage, .tar, .tar.zst, .pkg.tar.zst)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Linux packaging tools (rpm, zstd)
+        run: sudo apt-get update && sudo apt-get install -y rpm zstd
+
+      - name: Install web dependencies & build dist
+        run: |
+          npm install
+          npm run build
+
+      - name: Install desktop dependencies & build Linux packages
+        run: |
+          npm --prefix desktop install
+          chmod +x desktop/scripts/build-extra-linux-archives.sh
+          npm --prefix desktop run dist:linux
+
+      - name: Upload Linux artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-packages
+          path: |
+            release/*.deb
+            release/*.rpm
+            release/*.AppImage
+            release/*.tar
+            release/*.tar.zst
+            release/*.pkg.tar.zst
+            release/*.zip
+          if-no-files-found: error
+
+  build-windows:
+    name: Build Windows (.exe installer & portable)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install web dependencies & build dist
+        run: |
+          npm install
+          npm run build
+
+      - name: Install desktop dependencies & build Windows .exe
+        run: |
+          npm --prefix desktop install
+          npm --prefix desktop run dist:win
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-packages
+          path: |
+            release/*.exe
+          if-no-files-found: error
+
+  build-macos:
+    name: Build macOS (.pkg)
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install web dependencies & build dist
+        run: |
+          npm install
+          npm run build
+
+      - name: Install desktop dependencies & build macOS .pkg
+        run: |
+          npm --prefix desktop install
+          npm --prefix desktop run dist:mac
+
+      - name: Upload macOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-packages
+          path: |
+            release/*.pkg
+          if-no-files-found: error
+
+  publish-release:
+    name: Publish Combined GitHub Release
+    needs: [build-linux, build-windows, build-macos]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all platform artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: combined-release
+          merge-multiple: true
+
+      - name: List combined release files
+        run: ls -lh combined-release
+
+      - name: Upload combined workflow bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: nimchesko-ai-studio-all-platforms
+          path: combined-release/*
+
+      - name: Create or Update GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || format('build-{0}', github.run_number) }}
+          name: nimchesko AI studio (${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || format('build-{0}', github.run_number) }})
+          prerelease: ${{ !startsWith(github.ref, 'refs/tags/') }}
+          files: combined-release/*
+          body: |
+            Automated cross-platform desktop build for **nimchesko AI studio**:
+            - **Debian / Ubuntu:** `.deb`
+            - **Fedora / RHEL / openSUSE:** `.rpm`
+            - **Arch Linux:** `.pkg.tar.zst`
+            - **Linux Universal:** `.AppImage`, `.tar`, `.tar.zst`
+            - **Windows:** `.exe` (NSIS installer & portable)
+            - **macOS:** `.pkg`
+            - **Web Bundle:** `nimchesko-ai-studio-app.zip`

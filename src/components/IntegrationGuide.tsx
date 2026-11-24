@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CheckCircle2, RefreshCw, AlertTriangle, ArrowLeft } from 'lucide-react';
+import { CheckCircle2, RefreshCw, AlertTriangle, ArrowLeft, Download } from 'lucide-react';
 import type { ConnectionDiagnostic } from '../types/ollama';
 import { formatBytes, normalizeBaseUrl } from '../services/ollamaClient';
 import { CodeSnippetBlock } from './CodeSnippetBlock';
@@ -447,30 +447,40 @@ curl ${endpoint}/api/chat -d '{
 
         {/* Section 5: Cross-Platform Compiled Web App (Windows & Linux) */}
         <section className="space-y-4">
-          <div>
-            <h2 className="text-lg font-semibold text-[#3A101B] dark:text-[#F5ECE0]">
-              05. Cross-Platform Compiled Web App (Windows &amp; Linux)
-            </h2>
-            <p className="text-xs text-[#6E4A53] dark:text-[#CEB8AE] mt-0.5 leading-relaxed">
-              This project compiles into a self-contained static Progressive Web App (<code className="font-mono">dist/</code>) with offline caching and included launchers for Windows and Linux. Running it locally on <code className="font-mono">http://localhost:4173</code> lets Chromium or Edge install it as a standalone desktop window with direct <code className="font-mono">localhost:11434</code> Ollama access.
-            </p>
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-semibold text-[#3A101B] dark:text-[#F5ECE0]">
+                05. Cross-Platform Compiled Web App (Windows &amp; Linux)
+              </h2>
+              <p className="text-xs text-[#6E4A53] dark:text-[#CEB8AE] mt-0.5 leading-relaxed max-w-2xl">
+                All compiled app files, icons, offline service worker, and Windows/Linux launchers are combined into a single downloadable archive (<code className="font-mono">nimchesko-ai-studio-app.zip</code>). Extract and run directly without installing Node.js or building from source.
+              </p>
+            </div>
+            <a
+              href="/nimchesko-ai-studio-app.zip"
+              download="nimchesko-ai-studio-app.zip"
+              className="inline-flex h-9 items-center gap-1.5 rounded-xl bg-[#6B1D2F] dark:bg-[#8C253E] px-4 text-xs font-medium text-[#FAF5EC] hover:bg-[#541524] dark:hover:bg-[#A02D49] transition-colors whitespace-nowrap shrink-0 shadow-[0_2px_10px_rgba(107,29,47,0.2)]"
+            >
+              <Download className="h-3.5 w-3.5" />
+              <span>Download Combined App (.zip)</span>
+            </a>
           </div>
 
           <CodeSnippetBlock
-            filename="build-and-run.txt"
+            filename="quick-start-windows-linux.txt"
             language="bash"
-            code={`# 1. Compile the cross-platform production bundle (outputs to dist/)
+            code={`# Option A: One-Click Combined Web Package (No npm/git required)
+# 1. Click "Download Combined App (.zip)" above and extract nimchesko-ai-studio-app.zip
+# 2. Windows: Double-click run-windows.bat
+# 3. Linux:   chmod +x run-linux.sh && ./run-linux.sh
+
+# Option B: GitHub Actions CI/CD Native Desktop Releases
+# Workflow: .github/workflows/release-desktop.yml (runs on push to main, v* tags, or manual dispatch)
+# Outputs:  .deb, .rpm, .pkg.tar.zst, .tar, .tar.zst, .AppImage, .exe, and macOS .pkg
+
+# Option C: Build from Source Locally
 npm install
-npm run build
-
-# 2. Run on Windows (double-click dist\\run-windows.bat or run in PowerShell)
-.\\dist\\run-windows.bat
-
-# 3. Run on Linux (terminal)
-chmod +x ./dist/run-linux.sh && ./dist/run-linux.sh
-
-# 4. Install as a Desktop App (Windows & Linux)
-# Open http://localhost:4173 in Chrome or Edge and click "Install App" in the header.`}
+npm run build`}
           />
         </section>
       </div>

@@ -1,0 +1,66 @@
+appId: com.nimchesko.aistudio
+productName: nimchesko AI studio
+executableName: nimchesko-ai-studio
+copyright: Copyright © 2026 nimchesko
+asar: true
+
+directories:
+  output: ../release
+  buildResources: build
+
+files:
+  - main.cjs
+  - package.json
+  - from: ../dist
+    to: dist
+    filter:
+      - "**/*"
+      - "!*.zip"
+
+linux:
+  icon: build/icon.png
+  category: Development;Utility;
+  maintainer: nimchesko <nimchesko@gmail.com>
+  synopsis: nimchesko AI studio — Local AI workspace for Ollama
+  description: Cross-platform local AI chatbot, model manager, and workspace studio for Ollama.
+  artifactName: nimchesko-ai-studio-${version}-${arch}.${ext}
+  target:
+    - target: AppImage
+      arch: [x64]
+    - target: deb
+      arch: [x64]
+    - target: rpm
+      arch: [x64]
+    - target: dir
+      arch: [x64]
+
+win:
+  icon: build/icon.ico
+  artifactName: nimchesko-ai-studio-${version}-win-${arch}-${target}.${ext}
+  target:
+    - target: nsis
+      arch: [x64]
+    - target: portable
+      arch: [x64]
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: nimchesko AI studio
+
+mac:
+  icon: build/icon.icns
+  category: public.app-category.developer-tools
+  identity: null
+  artifactName: nimchesko-ai-studio-${version}-mac-${arch}.${ext}
+  target:
+    - target: pkg
+      arch: [universal]
+
+pkg:
+  allowAnywhere: true
+  allowCurrentUserHome: true
+  allowRootDirectory: true

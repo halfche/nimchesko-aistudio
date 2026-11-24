@@ -1000,6 +1000,14 @@ export function ModelsAndSyncView({
                     <Download className="h-3.5 w-3.5" />
                     <span>Export Sync Bundle (.json)</span>
                   </button>
+                  <a
+                    href="/nimchesko-ai-studio-app.zip"
+                    download="nimchesko-ai-studio-app.zip"
+                    className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-[#6B1D2F]/18 dark:border-[#F3E7D8]/16 bg-[#FCF8F2]/85 dark:bg-[#16080D]/80 px-3.5 text-xs font-medium text-[#4D1422] dark:text-[#F5ECE0] hover:bg-[#FCF8F2] dark:hover:bg-[#2F121B] transition-colors"
+                  >
+                    <Download className="h-3.5 w-3.5 text-[#6B1D2F] dark:text-[#E6B8A2]" />
+                    <span>Download Combined App (.zip)</span>
+                  </a>
                 </div>
               </div>
 
