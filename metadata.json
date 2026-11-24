@@ -1,0 +1,6 @@
+{
+  "name": "Gemma Studio for Ollama",
+  "description": "Custom streaming chatbot interface and integration workbench for local Gemma 4 12B models running on Ollama.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
