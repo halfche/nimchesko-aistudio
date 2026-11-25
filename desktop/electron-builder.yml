@@ -36,7 +36,6 @@ linux:
 
 win:
   icon: build/icon.ico
-  artifactName: nimchesko-ai-studio-${version}-win-${arch}-${target}.${ext}
   target:
     - target: nsis
       arch: [x64]
@@ -44,12 +43,16 @@ win:
       arch: [x64]
 
 nsis:
+  artifactName: nimchesko-ai-studio-${version}-win-${arch}-setup.${ext}
   oneClick: false
   perMachine: false
   allowToChangeInstallationDirectory: true
   createDesktopShortcut: true
   createStartMenuShortcut: true
   shortcutName: nimchesko AI studio
+
+portable:
+  artifactName: nimchesko-ai-studio-${version}-win-${arch}-portable.${ext}
 
 mac:
   icon: build/icon.icns
