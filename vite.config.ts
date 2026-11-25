@@ -184,6 +184,25 @@ export default defineConfig(() => {
           });
         },
       },
+      {
+        name: 'disable-hmr-client-ws-guard',
+        apply: 'serve',
+        transform(code: string, id: string) {
+          if (process.env.DISABLE_HMR !== 'true') {
+            return null;
+          }
+          const normalizedId = id.split('?')[0].replace(/\\/g, '/');
+          if (!normalizedId.endsWith('/vite/dist/client/client.mjs')) {
+            return null;
+          }
+          return code
+            .replace(
+              'ws.send(JSON.stringify(data));',
+              'if (ws && ws.readyState === ws.OPEN) ws.send(JSON.stringify(data));'
+            )
+            .replace('await wsTransport.connect(handlers);', 'return;');
+        },
+      },
     ],
     resolve: {
       alias: {
