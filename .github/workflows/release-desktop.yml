@@ -28,7 +28,9 @@ jobs:
       - name: Install Linux packaging tools (rpm, debugedit, xz, zstd)
         run: |
           sudo apt-get update
-          sudo apt-get install -y rpm debugedit xz-utils zstd dpkg-dev
+          sudo apt-get install -y rpm debugedit file binutils xz-utils zstd dpkg-dev fakeroot
+          sudo apt-get install -y rpm-common || true
+          rpmbuild --version
 
       - name: Install web dependencies & build dist
         shell: bash
@@ -39,8 +41,9 @@ jobs:
       - name: Install desktop dependencies & build Linux packages
         shell: bash
         env:
-          DEBUG: electron-builder
+          DEBUG: "electron-builder,electron-builder:*"
         run: |
+          rm -rf release
           npm --prefix desktop install --legacy-peer-deps
           chmod +x desktop/scripts/build-extra-linux-archives.sh
           npm --prefix desktop run dist:linux

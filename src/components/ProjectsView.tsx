@@ -20,6 +20,8 @@ import {
   Trash2,
 } from 'lucide-react';
 import type {
+  ConnectionDiagnostic,
+  ImportedModelProfile,
   MotifId,
   ProjectContextItem,
   ProjectEnvVar,
@@ -30,10 +32,13 @@ import type {
 import { ProjectMotifIcon } from './PersianMotifs';
 import { MarkdownRenderer } from './MarkdownRenderer';
 import { composeSystemPrompt } from '../services/ollamaClient';
+import { readAnyUploadedFiles } from '../services/fileUploads';
 
 interface ProjectsViewProps {
   projects: WorkspaceProject[];
   activeProject: WorkspaceProject;
+  diagnostic?: ConnectionDiagnostic;
+  importedModels?: ImportedModelProfile[];
   onSelectProject: (projectId: string) => void;
   onCreateProject: (input: {
     name: string;
@@ -80,6 +85,8 @@ function formatSize(bytes?: number, chars?: number): string {
 export function ProjectsView({
   projects,
   activeProject,
+  diagnostic,
+  importedModels = [],
   onSelectProject,
   onCreateProject,
   onDuplicateProject,
@@ -88,6 +95,16 @@ export function ProjectsView({
   onUsePromptInChat,
   onBackToChat,
 }: ProjectsViewProps) {
+  const allLocalModelNames = Array.from(
+    new Set(
+      [
+        activeProject.defaultModel,
+        ...(activeProject.enabledModels || []),
+        ...(diagnostic?.models.map((m) => m.name) || []),
+        ...importedModels.map((m) => m.name),
+      ].filter(Boolean)
+    )
+  );
   const [sectionTab, setSectionTab] = useState<ProjectSectionTab>('brain');
 
   // New project creation state
@@ -158,20 +175,24 @@ export function ProjectsView({
   // Resource files handlers
   const handleImportResourceFiles = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
-    const imported: ProjectContextItem[] = [];
-    for (const file of Array.from(files)) {
-      const text = await file.text();
-      imported.push({
+    const uploaded = await readAnyUploadedFiles(files);
+    const imported: ProjectContextItem[] = uploaded.map((u) => {
+      const content =
+        u.textContent ||
+        (u.kind === 'image'
+          ? `[Image resource: ${u.name} (${u.mimeType}, ${u.sizeBytes} bytes)]`
+          : `[Binary resource: ${u.name} (${u.mimeType}, ${u.sizeBytes} bytes)]`);
+      return {
         id: `res-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-        title: file.name.replace(/\.[^.]+$/, ''),
-        filename: file.name,
+        title: u.name.replace(/\.[^.]+$/, ''),
+        filename: u.name,
         source: 'file',
-        sizeBytes: file.size || text.length,
-        content: text.trim().slice(0, 32000),
+        sizeBytes: u.sizeBytes || content.length,
+        content: content.trim().slice(0, 32000),
         enabled: true,
         updatedAt: Date.now(),
-      });
-    }
+      };
+    });
     if (imported.length > 0) {
       onUpdateActiveProject((proj) => ({
         ...proj,
@@ -794,6 +815,53 @@ export function ProjectsView({
                 </div>
 
                 <div>
+                  <label className="block text-xs font-medium text-[#4D1422] dark:text-[#E6B8A2] mb-1.5">
+                    Project Multi-Model Pool ({(activeProject.enabledModels || []).length} selected)
+                  </label>
+                  {allLocalModelNames.length === 0 ? (
+                    <p className="text-xs text-[#6E4A53] dark:text-[#CEB8AE]">
+                      Connect Ollama or import local models to assign multiple models to this project.
+                    </p>
+                  ) : (
+                    <div className="flex flex-wrap gap-2">
+                      {allLocalModelNames.map((name) => {
+                        const checked = (activeProject.enabledModels || []).includes(name);
+                        return (
+                          <label
+                            key={name}
+                            className={`inline-flex items-center gap-1.5 rounded-xl border px-2.5 py-1.5 text-xs font-mono cursor-pointer transition-colors ${
+                              checked
+                                ? 'border-[#6B1D2F]/45 bg-[#6B1D2F]/10 dark:bg-[#8C253E]/25 text-[#3A101B] dark:text-[#FAF5EC]'
+                                : 'border-[#6B1D2F]/16 dark:border-[#F3E7D8]/16 bg-[#FCF8F2]/80 dark:bg-[#16080D]/80 text-[#5C3A42] dark:text-[#CEB8AE]'
+                            }`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={checked}
+                              onChange={() =>
+                                onUpdateActiveProject((p) => {
+                                  const current = p.enabledModels || [];
+                                  const next = current.includes(name)
+                                    ? current.filter((m) => m !== name)
+                                    : [...current, name];
+                                  return {
+                                    ...p,
+                                    enabledModels: next,
+                                    updatedAt: Date.now(),
+                                  };
+                                })
+                              }
+                              className="accent-[#6B1D2F] dark:accent-[#E6B8A2]"
+                            />
+                            <span>{name}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                <div>
                   <label className="block text-xs font-medium text-[#4D1422] dark:text-[#E6B8A2] mb-1">
                     Core Brain Prompt
                   </label>
@@ -968,7 +1036,6 @@ export function ProjectsView({
                     ref={resourceFileRef}
                     type="file"
                     multiple
-                    accept=".md,.txt,.json,.csv,.ts,.tsx,.js,.jsx,.py,.sql,.yaml,.yml,.html,.css,.xml,.log"
                     className="hidden"
                     onChange={(e) => {
                       void handleImportResourceFiles(e.target.files);

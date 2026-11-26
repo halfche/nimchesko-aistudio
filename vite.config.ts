@@ -2,6 +2,7 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import fs from 'fs';
 import JSZip from 'jszip';
+import os from 'os';
 import path from 'path';
 import {defineConfig} from 'vite';
 import {VitePWA} from 'vite-plugin-pwa';
@@ -182,6 +183,51 @@ export default defineConfig(() => {
             );
             res.setHeader('Content-Length', String(data.length));
             res.end(data);
+          });
+
+          server.middlewares.use('/api/desktop-files/save', (req, res, next) => {
+            if (req.method !== 'POST') return next();
+            const host = String(req.headers.host || '');
+            const isLoopback = /^(localhost|127\.0\.0\.1)(:\d+)?$/i.test(host);
+            if (!isLoopback) {
+              res.statusCode = 403;
+              res.setHeader('Content-Type', 'application/json; charset=utf-8');
+              res.end(JSON.stringify({ ok: false, reason: 'remote_host' }));
+              return;
+            }
+            const chunks: Buffer[] = [];
+            req.on('data', (chunk: Buffer) => chunks.push(chunk));
+            req.on('end', () => {
+              try {
+                const body = JSON.parse(Buffer.concat(chunks).toString('utf8') || '{}') as {
+                  folderName?: string;
+                  fileName?: string;
+                  content?: string;
+                };
+                const safeFolder = String(body.folderName || 'Hyper Mode Markdown Files')
+                  .replace(/[<>:"/\\|?*\x00-\x1F]/g, '-')
+                  .replace(/\.\.+/g, '.')
+                  .trim() || 'Hyper Mode Markdown Files';
+                let safeFile = String(body.fileName || 'untitled.md')
+                  .replace(/[<>:"/\\|?*\x00-\x1F]/g, '-')
+                  .replace(/\.\.+/g, '.')
+                  .trim() || 'untitled.md';
+                if (!safeFile.toLowerCase().endsWith('.md')) {
+                  safeFile = `${safeFile}.md`;
+                }
+                const targetDir = path.join(os.homedir(), 'Desktop', safeFolder);
+                fs.mkdirSync(targetDir, { recursive: true });
+                const filePath = path.join(targetDir, safeFile);
+                fs.writeFileSync(filePath, String(body.content || ''), 'utf8');
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json; charset=utf-8');
+                res.end(JSON.stringify({ ok: true, dirPath: targetDir, filePath }));
+              } catch (err) {
+                res.statusCode = 500;
+                res.setHeader('Content-Type', 'application/json; charset=utf-8');
+                res.end(JSON.stringify({ ok: false, error: String(err) }));
+              }
+            });
           });
         },
       },

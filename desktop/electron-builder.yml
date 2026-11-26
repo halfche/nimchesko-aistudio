@@ -10,6 +10,7 @@ directories:
 
 files:
   - main.cjs
+  - preload.cjs
   - package.json
   - from: ../dist
     to: dist
@@ -51,7 +52,7 @@ rpm:
     - libuuid
   fpm:
     - --rpm-compression
-    - xz
+    - gzip
 
 win:
   icon: build/icon.ico

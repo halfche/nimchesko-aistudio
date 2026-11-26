@@ -11,6 +11,10 @@ import type {
   SkillModule,
   SystemConnector,
 } from '../types/ollama';
+import {
+  collectVisionBase64,
+  formatMessageWithFiles,
+} from './fileUploads';
 
 export function normalizeBaseUrl(rawUrl: string): string {
   const trimmed = rawUrl.trim().replace(/\/+$/, '');
@@ -523,6 +527,8 @@ export async function streamOllamaChat({
 
   for (const msg of messages) {
     if (msg.role === 'system') continue;
+    const mergedContent = formatMessageWithFiles(msg.content, msg.files);
+    const mergedImages = collectVisionBase64(msg.images, msg.files);
     const payload: {
       role: 'user' | 'assistant' | 'tool';
       content: string;
@@ -531,10 +537,10 @@ export async function streamOllamaChat({
       tool_name?: string;
     } = {
       role: msg.role,
-      content: msg.content,
+      content: mergedContent,
     };
-    if (msg.images && msg.images.length > 0) {
-      payload.images = msg.images.map((img) => img.base64);
+    if (mergedImages.length > 0) {
+      payload.images = mergedImages;
     }
     if (msg.toolCalls && msg.toolCalls.length > 0) {
       payload.tool_calls = msg.toolCalls;

@@ -37,6 +37,18 @@ export interface ChatAttachment {
   base64: string; // Raw base64 payload expected by Ollama /api/chat images[]
 }
 
+export interface UploadedFileAttachment {
+  id: string;
+  name: string;
+  mimeType: string;
+  sizeBytes: number;
+  kind: 'image' | 'text' | 'binary';
+  dataUrl?: string; // For images
+  base64?: string; // Raw base64 for Ollama vision images[]
+  textContent?: string; // Decoded text / code / markdown / extracted strings
+  truncated?: boolean;
+}
+
 export interface OllamaToolCall {
   function: {
     name: string;
@@ -49,7 +61,9 @@ export interface ChatMessage {
   role: 'user' | 'assistant' | 'system' | 'tool';
   content: string;
   thinking?: string;
+  modelName?: string;
   images?: ChatAttachment[];
+  files?: UploadedFileAttachment[];
   toolCalls?: OllamaToolCall[];
   toolName?: string;
   toolDurationMs?: number;
@@ -70,6 +84,7 @@ export interface Conversation {
   id: string;
   title: string;
   model: string;
+  secondaryModels?: string[];
   systemPrompt: string;
   folderId?: string | null;
   messages: ChatMessage[];
@@ -156,6 +171,7 @@ export interface WorkspaceProject {
   description: string;
   motif: MotifId;
   defaultModel: string;
+  enabledModels?: string[];
   brainPrompt: string;
   rulesMarkdown: string;
   rulesEnabled: boolean;
@@ -243,5 +259,49 @@ export interface WorkspaceSyncBundle {
   projects: WorkspaceProject[];
   importedModels: ImportedModelProfile[];
   drafts: Record<string, string>;
+}
+
+export interface HyperSession {
+  id: string;
+  name: string;
+  higherModel: string;
+  lowerModel: string;
+  language: 'auto' | 'fa' | 'en' | 'ar' | 'fr' | 'de' | 'es';
+  taskPrompt: string;
+  attachments?: UploadedFileAttachment[];
+  markdownSpec: string;
+  lowerOutput: string;
+  higherThinking?: string;
+  lowerThinking?: string;
+  savedFilePath?: string;
+  savedMethod?: string;
+  status: 'idle' | 'architecting' | 'executing' | 'done' | 'error';
+  error?: string;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export type JournalCategory =
+  | 'Skill Module'
+  | 'Model Bridge'
+  | 'Journal Note'
+  | 'Creative Prompt';
+
+export interface JournalSkillEntry {
+  id: string;
+  name: string;
+  category: JournalCategory;
+  model: string;
+  sourceSide: string;
+  targetSide: string;
+  links: string[];
+  prompt: string;
+  markdownContent: string;
+  attachments?: UploadedFileAttachment[];
+  targetModels?: string[];
+  attachedProjectIds?: string[];
+  savedFilePath?: string;
+  createdAt: number;
+  updatedAt: number;
 }
 

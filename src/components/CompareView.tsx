@@ -8,7 +8,8 @@ import {
   Copy,
   Download,
   Eye,
-  ImagePlus,
+  FileText,
+  Paperclip,
   Play,
   Plus,
   RefreshCw,
@@ -18,13 +19,13 @@ import {
   X,
 } from 'lucide-react';
 import type {
-  ChatAttachment,
   ChatMessage,
   CompareModelResult,
   CompareRound,
   ConnectionDiagnostic,
   ImportedModelProfile,
   OllamaShowResponse,
+  UploadedFileAttachment,
   WorkspaceProject,
 } from '../types/ollama';
 import {
@@ -33,6 +34,7 @@ import {
   showOllamaModel,
   streamOllamaChat,
 } from '../services/ollamaClient';
+import { readAnyUploadedFiles } from '../services/fileUploads';
 import { MarkdownRenderer } from './MarkdownRenderer';
 import {
   AzadiTowerMotif,
@@ -85,26 +87,6 @@ const BENCHMARK_PROMPTS = [
       'Compare Q4_K_M, Q5_K_M, and Q8_0 GGUF quantization trade-offs in 4 concise bullet points covering RAM footprint, perplexity impact, and throughput.',
   },
 ];
-
-function fileToAttachment(file: File): Promise<ChatAttachment> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const dataUrl = String(reader.result || '');
-      const commaIndex = dataUrl.indexOf(',');
-      const base64 = commaIndex >= 0 ? dataUrl.slice(commaIndex + 1) : dataUrl;
-      resolve({
-        id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-        name: file.name,
-        mimeType: file.type || 'image/png',
-        dataUrl,
-        base64,
-      });
-    };
-    reader.onerror = () => reject(new Error(`Failed to read ${file.name}`));
-    reader.readAsDataURL(file);
-  });
-}
 
 export function CompareView({
   project,
@@ -188,7 +170,7 @@ export function CompareView({
   const [modelFilter, setModelFilter] = useState<'all' | 'ollama' | 'file'>('all');
   const [modelSearch, setModelSearch] = useState('');
   const [prompt, setPrompt] = useState('');
-  const [attachments, setAttachments] = useState<ChatAttachment[]>([]);
+  const [attachments, setAttachments] = useState<UploadedFileAttachment[]>([]);
   const [executionMode, setExecutionMode] = useState<'sequential' | 'parallel'>(
     'sequential'
   );
@@ -271,11 +253,10 @@ export function CompareView({
     }
   };
 
-  const handleAttachImages = async (files: FileList | null) => {
+  const handleAttachFiles = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
-    const imgs = Array.from(files).filter((f) => f.type.startsWith('image/'));
-    if (imgs.length === 0) return;
-    const converted = await Promise.all(imgs.map(fileToAttachment));
+    const converted = await readAnyUploadedFiles(files);
+    if (converted.length === 0) return;
     setAttachments((prev) => [...prev, ...converted]);
   };
 
@@ -302,7 +283,7 @@ export function CompareView({
     roundId: string,
     modelName: string,
     promptText: string,
-    attachedImages: ChatAttachment[],
+    attachedFiles: UploadedFileAttachment[],
     systemPrompt: string,
     signal: AbortSignal
   ) => {
@@ -317,7 +298,7 @@ export function CompareView({
       id: `cmp-u-${Date.now()}`,
       role: 'user',
       content: promptText,
-      images: attachedImages.length > 0 ? attachedImages : undefined,
+      files: attachedFiles.length > 0 ? attachedFiles : undefined,
       createdAt: Date.now(),
     };
 
@@ -384,7 +365,7 @@ export function CompareView({
     const roundId = `cmp-round-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
     const newRound: CompareRound = {
       id: roundId,
-      prompt: trimmed || '(Image prompt)',
+      prompt: trimmed || attachments[0]?.name || '(Attached files)',
       executionMode,
       includeProjectBrain,
       createdAt: Date.now(),
@@ -800,34 +781,55 @@ export function CompareView({
 
           {attachments.length > 0 && (
             <div className="flex flex-wrap gap-2">
-              {attachments.map((img) => (
-                <div
-                  key={img.id}
-                  className="relative group rounded-xl overflow-hidden border border-[#6B1D2F]/20 dark:border-[#F3E7D8]/20"
-                >
-                  <img
-                    src={img.dataUrl}
-                    alt={img.name}
-                    referrerPolicy="no-referrer"
-                    className="h-16 w-16 object-cover"
-                  />
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setAttachments((prev) => prev.filter((a) => a.id !== img.id))
-                    }
-                    aria-label={`Remove ${img.name}`}
-                    className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#2B0F17]/80 text-white"
+              {attachments.map((att) =>
+                att.kind === 'image' && att.dataUrl ? (
+                  <div
+                    key={att.id}
+                    className="relative group rounded-xl overflow-hidden border border-[#6B1D2F]/20 dark:border-[#F3E7D8]/20"
                   >
-                    <X className="h-3 w-3" />
-                  </button>
-                </div>
-              ))}
+                    <img
+                      src={att.dataUrl}
+                      alt={att.name}
+                      referrerPolicy="no-referrer"
+                      className="h-16 w-16 object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setAttachments((prev) => prev.filter((a) => a.id !== att.id))
+                      }
+                      aria-label={`Remove ${att.name}`}
+                      className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#2B0F17]/80 text-white"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ) : (
+                  <div
+                    key={att.id}
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-[#6B1D2F]/20 dark:border-[#F3E7D8]/20 bg-[#FCF8F2]/85 dark:bg-[#16080D]/80 px-2.5 py-1.5 text-xs font-mono text-[#3A101B] dark:text-[#F5ECE0]"
+                  >
+                    <FileText className="h-3.5 w-3.5 text-[#6B1D2F] dark:text-[#E6B8A2]" />
+                    <span className="max-w-[160px] truncate">{att.name}</span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setAttachments((prev) => prev.filter((a) => a.id !== att.id))
+                      }
+                      aria-label={`Remove ${att.name}`}
+                      className="text-[#6E4A53] hover:text-[#6B1D2F] dark:hover:text-[#E6B8A2]"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                )
+              )}
             </div>
           )}
 
           <textarea
             rows={3}
+            dir="auto"
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             onKeyDown={(e) => {
@@ -845,11 +847,10 @@ export function CompareView({
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/*"
                 multiple
                 className="hidden"
                 onChange={(e) => {
-                  void handleAttachImages(e.target.files);
+                  void handleAttachFiles(e.target.files);
                   e.target.value = '';
                 }}
               />
@@ -858,8 +859,8 @@ export function CompareView({
                 onClick={() => fileInputRef.current?.click()}
                 className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[#6B1D2F]/16 dark:border-[#F3E7D8]/16 bg-[#FCF8F2]/80 dark:bg-[#16080D]/80 px-2.5 text-xs font-medium text-[#4D1422] dark:text-[#F5ECE0] hover:bg-[#FCF8F2] dark:hover:bg-[#2F121B]"
               >
-                <ImagePlus className="h-3.5 w-3.5" />
-                <span>Attach Image</span>
+                <Paperclip className="h-3.5 w-3.5" />
+                <span>Upload Any File</span>
               </button>
 
               <label className="flex items-center gap-1.5 cursor-pointer">

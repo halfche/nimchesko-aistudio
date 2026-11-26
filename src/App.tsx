@@ -14,18 +14,20 @@ import {
 } from 'lucide-react';
 import { ProjectMotifIcon, ShamsehEmblem } from './components/PersianMotifs';
 import type {
-  ChatAttachment,
   ChatMessage,
   CompareRound,
   ConnectionDiagnostic,
   Conversation,
+  HyperSession,
   ImportedModelProfile,
+  JournalSkillEntry,
   ModelParameters,
   MotifId,
   OllamaToolCall,
   PromptKind,
   SkillModule,
   SystemConnector,
+  UploadedFileAttachment,
   WorkspaceProject,
   WorkspaceSyncBundle,
 } from './types/ollama';
@@ -44,6 +46,8 @@ import {
 } from './data/presets';
 import { ChatView } from './components/ChatView';
 import { CompareView } from './components/CompareView';
+import { HyperModeView } from './components/HyperModeView';
+import { JournalCreativeView } from './components/JournalCreativeView';
 import { IntegrationGuide } from './components/IntegrationGuide';
 import { SkillsAndConnectorsView } from './components/SkillsAndConnectorsView';
 import { ProjectsView } from './components/ProjectsView';
@@ -55,6 +59,10 @@ import {
   buildWorkspaceSyncBundle,
   mergeWorkspaceSyncBundle,
 } from './services/workspaceSync';
+import {
+  linkDesktopDirectory,
+  type DesktopDirectoryHandleLike,
+} from './services/desktopFiles';
 
 const STORAGE_PROJECTS_KEY = 'gemma_studio_projects_v2';
 const STORAGE_ACTIVE_PROJECT_KEY = 'gemma_studio_active_project_v2';
@@ -64,6 +72,8 @@ const STORAGE_AUTOSAVE_KEY = 'gemma_studio_autosave_v1';
 const STORAGE_DRAFTS_KEY = 'gemma_studio_drafts_v1';
 const STORAGE_IMPORTED_MODELS_KEY = 'gemma_studio_imported_models_v1';
 const STORAGE_COMPARE_ROUNDS_KEY = 'local_studio_compare_rounds_v1';
+const STORAGE_HYPER_SESSIONS_KEY = 'local_studio_hyper_sessions_v1';
+const STORAGE_JOURNAL_ENTRIES_KEY = 'local_studio_journal_skills_v1';
 const STORAGE_CLEARED_GEMMA_DEFAULT_KEY = 'local_studio_cleared_gemma_default_v1';
 
 // Legacy v1 keys for smooth one-time migration
@@ -209,6 +219,38 @@ function loadInitialCompareRounds(): CompareRound[] {
   return [];
 }
 
+function loadInitialHyperSessions(): HyperSession[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_HYPER_SESSIONS_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as HyperSession[];
+      if (Array.isArray(parsed)) {
+        return parsed.map((s) =>
+          s.status === 'architecting' || s.status === 'executing'
+            ? { ...s, status: 'idle' }
+            : s
+        );
+      }
+    }
+  } catch {
+    // Ignore corrupt hyper sessions
+  }
+  return [];
+}
+
+function loadInitialJournalEntries(): JournalSkillEntry[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_JOURNAL_ENTRIES_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as JournalSkillEntry[];
+      if (Array.isArray(parsed)) return parsed;
+    }
+  } catch {
+    // Ignore corrupt journal entries
+  }
+  return [];
+}
+
 interface SyncFileHandleLike {
   name: string;
   getFile: () => Promise<File>;
@@ -226,6 +268,26 @@ export default function App() {
   const [compareRounds, setCompareRounds] = useState<CompareRound[]>(
     loadInitialCompareRounds
   );
+  const [hyperSessions, setHyperSessions] = useState<HyperSession[]>(
+    loadInitialHyperSessions
+  );
+  const [activeHyperSessionId, setActiveHyperSessionId] = useState<string>(
+    () => hyperSessions[0]?.id || ''
+  );
+  const [journalEntries, setJournalEntries] = useState<JournalSkillEntry[]>(
+    loadInitialJournalEntries
+  );
+  const [activeJournalEntryId, setActiveJournalEntryId] = useState<string>(
+    () => journalEntries[0]?.id || ''
+  );
+  const [desktopDirHandle, setDesktopDirHandle] =
+    useState<DesktopDirectoryHandleLike | null>(null);
+
+  const [showNewChatModal, setShowNewChatModal] = useState(false);
+  const [newChatNameInput, setNewChatNameInput] = useState('');
+  const [newChatPrimaryModel, setNewChatPrimaryModel] = useState('');
+  const [newChatSecondaryModels, setNewChatSecondaryModels] = useState<string[]>([]);
+
   const [drafts, setDrafts] = useState<Record<string, string>>(loadInitialDrafts);
   const [activeProjectId, setActiveProjectId] = useState<string>(() => {
     return localStorage.getItem(STORAGE_ACTIVE_PROJECT_KEY) || '';
@@ -254,7 +316,7 @@ export default function App() {
   });
 
   const [activeTab, setActiveTab] = useState<
-    'chat' | 'compare' | 'projects' | 'models' | 'skills' | 'guide'
+    'chat' | 'compare' | 'hyper' | 'journal' | 'projects' | 'models' | 'skills' | 'guide'
   >('chat');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [projectMenuOpen, setProjectMenuOpen] = useState(false);
@@ -351,7 +413,15 @@ export default function App() {
             ...p,
             conversations: p.conversations.map((c) => ({
               ...c,
-              messages: c.messages.map((m) => ({ ...m, images: undefined })),
+              messages: c.messages.map((m) => ({
+                ...m,
+                images: undefined,
+                files: m.files?.map((f) => ({
+                  ...f,
+                  dataUrl: undefined,
+                  base64: undefined,
+                })),
+              })),
             })),
           }));
           localStorage.setItem(STORAGE_PROJECTS_KEY, JSON.stringify(stripped));
@@ -467,6 +537,36 @@ export default function App() {
       // Ignore storage quota issues for compare rounds
     }
   }, [compareRounds]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        STORAGE_HYPER_SESSIONS_KEY,
+        JSON.stringify(hyperSessions)
+      );
+    } catch {
+      // Ignore storage quota issues for hyper sessions
+    }
+  }, [hyperSessions]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        STORAGE_JOURNAL_ENTRIES_KEY,
+        JSON.stringify(journalEntries)
+      );
+    } catch {
+      // Ignore storage quota issues for journal entries
+    }
+  }, [journalEntries]);
+
+  const handleLinkDesktopFolder = useCallback(async () => {
+    const handle = await linkDesktopDirectory();
+    if (handle) {
+      setDesktopDirHandle(handle);
+    }
+    return handle;
+  }, []);
 
   const firstDetectedLocalModel = useMemo(
     () => diagnostic.models[0]?.name || importedModels[0]?.name || '',
@@ -636,24 +736,63 @@ export default function App() {
     });
   };
 
-  const handleNewChat = () => {
+  const allAvailableModelNames = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          [
+            activeProject?.defaultModel || '',
+            ...(activeProject?.enabledModels || []),
+            ...diagnostic.models.map((m) => m.name),
+            ...importedModels.map((m) => m.name),
+          ].filter(Boolean)
+        )
+      ),
+    [activeProject, diagnostic.models, importedModels]
+  );
+
+  const handleOpenNewChatModal = () => {
     if (!activeProject) return;
+    const primary =
+      activeConversation?.model ||
+      activeProject.defaultModel ||
+      firstDetectedLocalModel ||
+      '';
+    const preEnabled = (activeProject.enabledModels || []).filter(
+      (m) => m && m !== primary
+    );
+    setNewChatNameInput('');
+    setNewChatPrimaryModel(primary);
+    setNewChatSecondaryModels(preEnabled);
+    setShowNewChatModal(true);
+  };
+
+  const handleConfirmCreateNamedChat = () => {
+    if (!activeProject) return;
+    const cleanTitle = newChatNameInput.trim();
+    if (!cleanTitle) return;
     if (isStreaming) {
       abortControllerRef.current?.abort();
       setIsStreaming(false);
     }
-    const next = createConversation(
-      activeConversation?.model ||
-        activeProject.defaultModel ||
-        firstDetectedLocalModel ||
-        ''
+    const baseConv = createConversation(
+      newChatPrimaryModel.trim() || firstDetectedLocalModel || ''
     );
+    const created: Conversation = {
+      ...baseConv,
+      title: cleanTitle,
+      secondaryModels:
+        newChatSecondaryModels.length > 0
+          ? newChatSecondaryModels.filter((m) => m !== baseConv.model)
+          : undefined,
+    };
     updateActiveProject((proj) => ({
       ...proj,
-      conversations: [next, ...proj.conversations],
-      activeConversationId: next.id,
+      conversations: [created, ...proj.conversations],
+      activeConversationId: created.id,
       updatedAt: Date.now(),
     }));
+    setShowNewChatModal(false);
     setActiveTab('chat');
     setSidebarOpen(false);
     setComposerFocusTick((t) => t + 1);
@@ -682,8 +821,8 @@ export default function App() {
     setComposerFocusTick((t) => t + 1);
   };
 
-  const newChatRef = useRef(handleNewChat);
-  newChatRef.current = handleNewChat;
+  const newChatRef = useRef(handleOpenNewChatModal);
+  newChatRef.current = handleOpenNewChatModal;
   const clearChatRef = useRef(handleClearChat);
   clearChatRef.current = handleClearChat;
 
@@ -746,12 +885,18 @@ export default function App() {
     model: string,
     threadSystemPrompt: string,
     historyMessages: ChatMessage[],
-    initialAssistantMsgId: string
+    initialAssistantMsgId: string,
+    manageStreamingState = true
   ) => {
-    abortControllerRef.current?.abort();
-    const controller = new AbortController();
-    abortControllerRef.current = controller;
-    setIsStreaming(true);
+    let controller: AbortController;
+    if (manageStreamingState) {
+      abortControllerRef.current?.abort();
+      controller = new AbortController();
+      abortControllerRef.current = controller;
+      setIsStreaming(true);
+    } else {
+      controller = abortControllerRef.current || new AbortController();
+    }
 
     const effectiveSystemPrompt = composeSystemPrompt(
       threadSystemPrompt,
@@ -796,7 +941,7 @@ export default function App() {
               updatedAt: Date.now(),
               messages: conv.messages.map((m) =>
                 m.id === currentAssistantId
-                  ? { ...m, content, thinking, toolCalls }
+                  ? { ...m, modelName: model, content, thinking, toolCalls }
                   : m
               ),
             }));
@@ -807,7 +952,9 @@ export default function App() {
               ...conv,
               updatedAt: Date.now(),
               messages: conv.messages.map((m) =>
-                m.id === currentAssistantId ? { ...m, metrics, toolCalls } : m
+                m.id === currentAssistantId
+                  ? { ...m, modelName: model, metrics, toolCalls }
+                  : m
               ),
             }));
           },
@@ -826,6 +973,7 @@ export default function App() {
           {
             id: currentAssistantId,
             role: 'assistant',
+            modelName: model,
             content: roundContent,
             thinking: roundThinking,
             toolCalls: roundToolCalls,
@@ -873,10 +1021,11 @@ export default function App() {
           });
         }
 
-        const nextAssistantId = `msg-a-${Date.now() + 1}`;
+        const nextAssistantId = `msg-a-${Date.now() + 1}-${Math.random().toString(36).slice(2, 5)}`;
         const nextAssistantPlaceholder: ChatMessage = {
           id: nextAssistantId,
           role: 'assistant',
+          modelName: model,
           content: '',
           thinking: '',
           createdAt: Date.now(),
@@ -905,16 +1054,22 @@ export default function App() {
         ...conv,
         updatedAt: Date.now(),
         messages: conv.messages.map((m) =>
-          m.id === currentAssistantId ? { ...m, error: message } : m
+          m.id === currentAssistantId ? { ...m, modelName: model, error: message } : m
         ),
       }));
     } finally {
-      setIsStreaming(false);
-      abortControllerRef.current = null;
+      if (manageStreamingState) {
+        setIsStreaming(false);
+        abortControllerRef.current = null;
+      }
     }
   };
 
-  const handleSendMessage = async (text: string, attachments: ChatAttachment[]) => {
+  const handleSendMessage = async (
+    text: string,
+    files: UploadedFileAttachment[],
+    explicitTitle?: string
+  ) => {
     if (!activeProject || !activeConversation || isStreaming) return;
 
     const targetModel =
@@ -926,44 +1081,65 @@ export default function App() {
       return;
     }
 
+    const modelsToRun = Array.from(
+      new Set([targetModel, ...(activeConversation.secondaryModels || [])].filter(Boolean))
+    );
+
+    const now = Date.now();
     const userMsg: ChatMessage = {
-      id: `msg-u-${Date.now()}`,
+      id: `msg-u-${now}`,
       role: 'user',
       content: text,
-      images: attachments.length > 0 ? attachments : undefined,
-      createdAt: Date.now(),
+      files: files.length > 0 ? files : undefined,
+      createdAt: now,
     };
 
-    const assistantMsg: ChatMessage = {
-      id: `msg-a-${Date.now() + 1}`,
+    const assistantPlaceholders: ChatMessage[] = modelsToRun.map((mName, idx) => ({
+      id: `msg-a-${now + idx + 1}-${Math.random().toString(36).slice(2, 5)}`,
       role: 'assistant',
+      modelName: mName,
       content: '',
       thinking: '',
-      createdAt: Date.now(),
-    };
+      createdAt: now + idx + 1,
+    }));
 
     const nextMessages = [...activeConversation.messages, userMsg];
-    const derivedTitle =
-      activeConversation.messages.length === 0
-        ? (text || attachments[0]?.name || 'Image prompt').slice(0, 46)
-        : activeConversation.title;
+    const resolvedTitle =
+      explicitTitle?.trim() ||
+      (activeConversation.title && activeConversation.title !== 'New chat'
+        ? activeConversation.title
+        : (text || files[0]?.name || 'Local chat').slice(0, 46));
 
     updateConversation(activeProject.id, activeConversation.id, (conv) => ({
       ...conv,
       model: targetModel,
-      title: derivedTitle,
-      updatedAt: Date.now(),
-      messages: [...nextMessages, assistantMsg],
+      title: resolvedTitle,
+      updatedAt: now,
+      messages: [...nextMessages, ...assistantPlaceholders],
     }));
 
-    await runAssistantGeneration(
-      activeProject,
-      activeConversation.id,
-      targetModel,
-      activeConversation.systemPrompt,
-      nextMessages,
-      assistantMsg.id
-    );
+    abortControllerRef.current?.abort();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    setIsStreaming(true);
+
+    try {
+      for (let i = 0; i < modelsToRun.length; i++) {
+        if (controller.signal.aborted) break;
+        await runAssistantGeneration(
+          activeProject,
+          activeConversation.id,
+          modelsToRun[i],
+          activeConversation.systemPrompt,
+          nextMessages,
+          assistantPlaceholders[i].id,
+          false
+        );
+      }
+    } finally {
+      setIsStreaming(false);
+      abortControllerRef.current = null;
+    }
   };
 
   const handleRegenerateLast = async () => {
@@ -987,6 +1163,7 @@ export default function App() {
     const assistantMsg: ChatMessage = {
       id: `msg-a-${Date.now()}`,
       role: 'assistant',
+      modelName: last.modelName || targetModel,
       content: '',
       thinking: '',
       createdAt: Date.now(),
@@ -1002,10 +1179,11 @@ export default function App() {
     await runAssistantGeneration(
       activeProject,
       activeConversation.id,
-      targetModel,
+      last.modelName || targetModel,
       activeConversation.systemPrompt,
       historyWithoutLast,
-      assistantMsg.id
+      assistantMsg.id,
+      true
     );
   };
 
@@ -1098,6 +1276,28 @@ export default function App() {
           </button>
           <button
             type="button"
+            onClick={() => setActiveTab('hyper')}
+            className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors whitespace-nowrap shrink-0 ${
+              activeTab === 'hyper'
+                ? 'bg-[#FCF8F2] dark:bg-[#8C253E] text-[#541524] dark:text-[#FAF5EC] shadow-[0_1px_4px_rgba(77,20,34,0.1)] border border-[#6B1D2F]/12 dark:border-transparent'
+                : 'text-[#6E4A53] dark:text-[#CEB8AE] hover:text-[#3A101B] dark:hover:text-[#FAF5EC]'
+            }`}
+          >
+            Hyper Mode
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('journal')}
+            className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors whitespace-nowrap shrink-0 ${
+              activeTab === 'journal'
+                ? 'bg-[#FCF8F2] dark:bg-[#8C253E] text-[#541524] dark:text-[#FAF5EC] shadow-[0_1px_4px_rgba(77,20,34,0.1)] border border-[#6B1D2F]/12 dark:border-transparent'
+                : 'text-[#6E4A53] dark:text-[#CEB8AE] hover:text-[#3A101B] dark:hover:text-[#FAF5EC]'
+            }`}
+          >
+            Journal &amp; Skills
+          </button>
+          <button
+            type="button"
             onClick={() => setActiveTab('projects')}
             className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors whitespace-nowrap shrink-0 ${
               activeTab === 'projects'
@@ -1168,8 +1368,8 @@ export default function App() {
 
           <button
             type="button"
-            onClick={handleNewChat}
-            title="New chat (Cmd/Ctrl + N)"
+            onClick={handleOpenNewChatModal}
+            title="New named chat (Cmd/Ctrl + N)"
             className="inline-flex h-9 items-center gap-1.5 rounded-xl bg-[#6B1D2F] dark:bg-[#8C253E] px-3.5 text-xs font-medium text-[#FAF5EC] hover:bg-[#541524] dark:hover:bg-[#A02D49] transition-colors whitespace-nowrap shrink-0 shadow-[0_2px_10px_rgba(107,29,47,0.2)]"
           >
             <Plus className="h-3.5 w-3.5" />
@@ -1501,6 +1701,19 @@ export default function App() {
                 updateConversation(activeProject.id, activeConversation.id, (c) => ({
                   ...c,
                   model,
+                  secondaryModels: (c.secondaryModels || []).filter((m) => m !== model),
+                }))
+              }
+              onChangeSecondaryModels={(secondaryModels) =>
+                updateConversation(activeProject.id, activeConversation.id, (c) => ({
+                  ...c,
+                  secondaryModels,
+                }))
+              }
+              onChangeConversationTitle={(title) =>
+                updateConversation(activeProject.id, activeConversation.id, (c) => ({
+                  ...c,
+                  title,
                 }))
               }
               onChangeSystemPrompt={(systemPrompt) =>
@@ -1590,6 +1803,7 @@ export default function App() {
                   messages.push({
                     id: `msg-a-${now + 1}`,
                     role: 'assistant',
+                    modelName: model,
                     content: response,
                     createdAt: now + 1,
                   });
@@ -1611,10 +1825,122 @@ export default function App() {
               }}
               onBackToChat={() => setActiveTab('chat')}
             />
+          ) : activeTab === 'hyper' ? (
+            <HyperModeView
+              project={activeProject}
+              diagnostic={diagnostic}
+              importedModels={importedModels}
+              sessions={hyperSessions}
+              activeSessionId={activeHyperSessionId}
+              onSelectSession={setActiveHyperSessionId}
+              onCreateSession={(session) => {
+                setHyperSessions((prev) => [session, ...prev]);
+                setActiveHyperSessionId(session.id);
+              }}
+              onUpdateSession={(id, updater) => {
+                setHyperSessions((prev) =>
+                  prev.map((s) => (s.id === id ? updater(s) : s))
+                );
+              }}
+              onDeleteSession={(id) => {
+                setHyperSessions((prev) => {
+                  const next = prev.filter((s) => s.id !== id);
+                  if (activeHyperSessionId === id) {
+                    setActiveHyperSessionId(next[0]?.id || '');
+                  }
+                  return next;
+                });
+              }}
+              desktopDirHandle={desktopDirHandle}
+              onLinkDesktopFolder={handleLinkDesktopFolder}
+              onOpenInChat={(model, prompt, response, title) => {
+                const now = Date.now();
+                const baseConv = createConversation(model);
+                const messages: ChatMessage[] = [
+                  {
+                    id: `msg-u-${now}`,
+                    role: 'user',
+                    content: prompt,
+                    createdAt: now,
+                  },
+                ];
+                if (response.trim()) {
+                  messages.push({
+                    id: `msg-a-${now + 1}`,
+                    role: 'assistant',
+                    modelName: model,
+                    content: response,
+                    createdAt: now + 1,
+                  });
+                }
+                const nextConv: Conversation = {
+                  ...baseConv,
+                  title: (title || prompt || model).slice(0, 46),
+                  messages,
+                  updatedAt: now,
+                };
+                updateActiveProject((proj) => ({
+                  ...proj,
+                  conversations: [nextConv, ...proj.conversations],
+                  activeConversationId: nextConv.id,
+                  updatedAt: now,
+                }));
+                setActiveTab('chat');
+                setSidebarOpen(false);
+              }}
+              onOpenModels={() => setActiveTab('models')}
+              onBackToChat={() => setActiveTab('chat')}
+            />
+          ) : activeTab === 'journal' ? (
+            <JournalCreativeView
+              project={activeProject}
+              diagnostic={diagnostic}
+              importedModels={importedModels}
+              entries={journalEntries}
+              activeEntryId={activeJournalEntryId}
+              onSelectEntry={setActiveJournalEntryId}
+              onCreateEntry={(entry) => {
+                setJournalEntries((prev) => [entry, ...prev]);
+                setActiveJournalEntryId(entry.id);
+              }}
+              onUpdateEntry={(id, updater) => {
+                setJournalEntries((prev) =>
+                  prev.map((e) => (e.id === id ? updater(e) : e))
+                );
+              }}
+              onDeleteEntry={(id) => {
+                setJournalEntries((prev) => {
+                  const next = prev.filter((e) => e.id !== id);
+                  if (activeJournalEntryId === id) {
+                    setActiveJournalEntryId(next[0]?.id || '');
+                  }
+                  return next;
+                });
+              }}
+              onAttachSkillToProject={(skill) => {
+                updateActiveProject((p) => {
+                  const exists = p.skills.some((s) => s.id === skill.id);
+                  const nextSkills = exists
+                    ? p.skills.map((s) => (s.id === skill.id ? skill : s))
+                    : [skill, ...p.skills];
+                  return {
+                    ...p,
+                    skills: nextSkills,
+                    updatedAt: Date.now(),
+                  };
+                });
+              }}
+              desktopDirHandle={desktopDirHandle}
+              onLinkDesktopFolder={handleLinkDesktopFolder}
+              onOpenSkills={() => setActiveTab('skills')}
+              onBackToChat={() => setActiveTab('chat')}
+            />
           ) : activeTab === 'projects' ? (
             <ProjectsView
               projects={projects}
               activeProject={activeProject}
+              diagnostic={diagnostic}
+              importedModels={importedModels}
               onSelectProject={handleSelectProject}
               onCreateProject={handleCreateProject}
               onDuplicateProject={handleDuplicateProject}
@@ -1807,6 +2133,125 @@ export default function App() {
       </div>
 
       <OfflineIndicator />
+
+      {/* Mandatory Chat Naming Modal when creating a New Chat */}
+      {showNewChatModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#2B0F17]/50 backdrop-blur-xs p-4">
+          <div className="w-full max-w-md rounded-2xl border border-[#6B1D2F]/20 dark:border-[#F3E7D8]/16 bg-[#FCF8F2] dark:bg-[#210C13] p-5 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-base font-semibold text-[#3A101B] dark:text-[#F5ECE0]">
+                Name Your New Chat ({activeProject.name})
+              </h2>
+              <button
+                type="button"
+                onClick={() => setShowNewChatModal(false)}
+                className="text-[#6E4A53] dark:text-[#CEB8AE]"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleConfirmCreateNamedChat();
+              }}
+              className="space-y-3"
+            >
+              <div>
+                <label className="block text-xs font-medium text-[#4D1422] dark:text-[#E6B8A2] mb-1">
+                  Chat Name (required before chatting)
+                </label>
+                <input
+                  type="text"
+                  dir="auto"
+                  autoFocus
+                  value={newChatNameInput}
+                  onChange={(e) => setNewChatNameInput(e.target.value)}
+                  placeholder="e.g. Architecture Review / Persian Essay / API Bug"
+                  className="h-9 w-full rounded-xl border border-[#6B1D2F]/20 dark:border-[#F3E7D8]/18 bg-white/90 dark:bg-[#16080D]/85 px-3 text-sm text-[#2B0F17] dark:text-[#F5ECE0] focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-[#4D1422] dark:text-[#E6B8A2] mb-1">
+                  Primary Local Model
+                </label>
+                <select
+                  value={newChatPrimaryModel}
+                  onChange={(e) => {
+                    const nextPrimary = e.target.value;
+                    setNewChatPrimaryModel(nextPrimary);
+                    setNewChatSecondaryModels((prev) =>
+                      prev.filter((m) => m !== nextPrimary)
+                    );
+                  }}
+                  className="h-9 w-full rounded-xl border border-[#6B1D2F]/20 dark:border-[#F3E7D8]/18 bg-white/90 dark:bg-[#16080D]/85 px-2.5 text-xs font-mono text-[#2B0F17] dark:text-[#F5ECE0]"
+                >
+                  <option value="">Select or import local model...</option>
+                  {allAvailableModelNames.map((n) => (
+                    <option key={n} value={n}>
+                      {n}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {allAvailableModelNames.filter((n) => n !== newChatPrimaryModel).length > 0 && (
+                <div>
+                  <label className="block text-xs font-medium text-[#4D1422] dark:text-[#E6B8A2] mb-1">
+                    Additional Models in This Chat (Multi-Model)
+                  </label>
+                  <div className="max-h-36 overflow-y-auto rounded-xl border border-[#6B1D2F]/14 dark:border-[#F3E7D8]/14 bg-white/75 dark:bg-[#16080D]/70 p-2 space-y-1">
+                    {allAvailableModelNames
+                      .filter((n) => n !== newChatPrimaryModel)
+                      .map((n) => {
+                        const checked = newChatSecondaryModels.includes(n);
+                        return (
+                          <label
+                            key={n}
+                            className="flex items-center gap-2 rounded-lg px-2 py-1 text-xs font-mono text-[#2B0F17] dark:text-[#F5ECE0] cursor-pointer hover:bg-[#6B1D2F]/6"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={checked}
+                              onChange={() =>
+                                setNewChatSecondaryModels((prev) =>
+                                  prev.includes(n)
+                                    ? prev.filter((m) => m !== n)
+                                    : [...prev, n]
+                                )
+                              }
+                              className="accent-[#6B1D2F] dark:accent-[#E6B8A2]"
+                            />
+                            <span className="truncate">{n}</span>
+                          </label>
+                        );
+                      })}
+                  </div>
+                </div>
+              )}
+
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowNewChatModal(false)}
+                  className="h-9 rounded-xl border border-[#6B1D2F]/18 dark:border-[#F3E7D8]/16 px-4 text-xs font-medium text-[#4D1422] dark:text-[#F5ECE0]"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={!newChatNameInput.trim()}
+                  className="h-9 rounded-xl bg-[#6B1D2F] dark:bg-[#8C253E] px-4 text-xs font-medium text-[#FAF5EC] disabled:opacity-40"
+                >
+                  Create Named Chat
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

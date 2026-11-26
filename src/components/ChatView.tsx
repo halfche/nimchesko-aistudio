@@ -4,11 +4,13 @@ import {
   AlertCircle,
   ArrowUp,
   Brain,
+  Check,
   ChevronDown,
   ChevronRight,
   Copy,
-  Check,
-  ImagePlus,
+  FileText,
+  Layers,
+  Paperclip,
   RefreshCw,
   SlidersHorizontal,
   Sparkles,
@@ -18,15 +20,16 @@ import {
   X,
 } from 'lucide-react';
 import type {
-  ChatAttachment,
   ChatMessage,
   ConnectionDiagnostic,
   Conversation,
   ImportedModelProfile,
   ModelParameters,
+  UploadedFileAttachment,
   WorkspaceProject,
 } from '../types/ollama';
 import { formatBytes } from '../services/ollamaClient';
+import { readAnyUploadedFiles } from '../services/fileUploads';
 import { computeContextSnapshot } from '../services/contextMetrics';
 import { ContextMonitorModal, ContextMonitorStrip } from './ContextMonitorModal';
 import { MarkdownRenderer } from './MarkdownRenderer';
@@ -47,9 +50,15 @@ interface ChatViewProps {
   params: ModelParameters;
   onChangeParams: (next: ModelParameters) => void;
   onChangeModel: (model: string) => void;
+  onChangeSecondaryModels: (models: string[]) => void;
+  onChangeConversationTitle: (title: string) => void;
   onChangeSystemPrompt: (prompt: string) => void;
   isStreaming: boolean;
-  onSendMessage: (text: string, attachments: ChatAttachment[]) => void;
+  onSendMessage: (
+    text: string,
+    files: UploadedFileAttachment[],
+    chatTitle?: string
+  ) => void;
   onStopStreaming: () => void;
   onRegenerateLast: () => void;
   onOpenIntegrationGuide: () => void;
@@ -116,26 +125,6 @@ function renderMotif(motif: 'azadi' | 'persepolis' | 'isfahan' | 'siosepol') {
   }
 }
 
-function fileToAttachment(file: File): Promise<ChatAttachment> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const dataUrl = String(reader.result || '');
-      const commaIndex = dataUrl.indexOf(',');
-      const base64 = commaIndex >= 0 ? dataUrl.slice(commaIndex + 1) : dataUrl;
-      resolve({
-        id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-        name: file.name,
-        mimeType: file.type || 'image/png',
-        dataUrl,
-        base64,
-      });
-    };
-    reader.onerror = () => reject(new Error(`Failed to read ${file.name}`));
-    reader.readAsDataURL(file);
-  });
-}
-
 export function ChatView({
   project,
   conversation,
@@ -146,6 +135,8 @@ export function ChatView({
   params,
   onChangeParams,
   onChangeModel,
+  onChangeSecondaryModels,
+  onChangeConversationTitle,
   onChangeSystemPrompt,
   isStreaming,
   onSendMessage,
@@ -174,8 +165,9 @@ export function ChatView({
     const resolved = typeof next === 'function' ? next(draftText) : next;
     onChangeDraft(conversation.id, resolved);
   };
-  const [attachments, setAttachments] = useState<ChatAttachment[]>([]);
+  const [attachments, setAttachments] = useState<UploadedFileAttachment[]>([]);
   const [showParams, setShowParams] = useState(false);
+  const [showMultiModelPicker, setShowMultiModelPicker] = useState(false);
   const [showContextMonitor, setShowContextMonitor] = useState(false);
   const [showPromptPicker, setShowPromptPicker] = useState(false);
   const [customModelMode, setCustomModelMode] = useState(false);
@@ -183,21 +175,37 @@ export function ChatView({
   const [expandedThinking, setExpandedThinking] = useState<Record<string, boolean>>({});
   const [expandedTools, setExpandedTools] = useState<Record<string, boolean>>({});
   const [isDragging, setIsDragging] = useState(false);
+  const [pendingChatName, setPendingChatName] = useState('');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const chatNameInputRef = useRef<HTMLInputElement>(null);
 
   const isMac =
     typeof navigator !== 'undefined' &&
     /Mac|iPod|iPhone|iPad/i.test(navigator.platform || navigator.userAgent);
   const modKey = isMac ? '⌘' : 'Ctrl+';
 
+  const needsMandatoryTitle =
+    conversation.messages.length === 0 &&
+    (!conversation.title.trim() || conversation.title.trim().toLowerCase() === 'new chat');
+
+  useEffect(() => {
+    setPendingChatName(needsMandatoryTitle ? '' : conversation.title);
+  }, [conversation.id, conversation.title, needsMandatoryTitle]);
+
   useEffect(() => {
     if (composerFocusTick && composerFocusTick > 0) {
-      window.setTimeout(() => textareaRef.current?.focus(), 20);
+      window.setTimeout(() => {
+        if (needsMandatoryTitle && chatNameInputRef.current) {
+          chatNameInputRef.current.focus();
+        } else {
+          textareaRef.current?.focus();
+        }
+      }, 20);
     }
-  }, [composerFocusTick]);
+  }, [composerFocusTick, needsMandatoryTitle]);
 
   useEffect(() => {
     if (pendingPrompt?.text) {
@@ -222,24 +230,45 @@ export function ChatView({
   const importedNames = importedModels.map((m) => m.name);
   const modelOptions = Array.from(
     new Set(
-      [conversation.model, project.defaultModel, ...installedNames, ...importedNames].filter(
-        Boolean
-      )
+      [
+        conversation.model,
+        project.defaultModel,
+        ...(project.enabledModels || []),
+        ...installedNames,
+        ...importedNames,
+      ].filter(Boolean)
     )
   );
 
+  const secondaryModels = conversation.secondaryModels || [];
+
+  const handleToggleSecondaryModel = (name: string) => {
+    if (name === conversation.model) return;
+    const exists = secondaryModels.includes(name);
+    onChangeSecondaryModels(
+      exists ? secondaryModels.filter((m) => m !== name) : [...secondaryModels, name]
+    );
+  };
+
   const handleFiles = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
-    const imageFiles = Array.from(files).filter((f) => f.type.startsWith('image/'));
-    if (imageFiles.length === 0) return;
-    const converted = await Promise.all(imageFiles.map(fileToAttachment));
+    const converted = await readAnyUploadedFiles(files);
+    if (converted.length === 0) return;
     setAttachments((prev) => [...prev, ...converted]);
   };
 
   const handleSubmit = () => {
     if (isStreaming) return;
     if (!input.trim() && attachments.length === 0) return;
-    onSendMessage(input.trim(), attachments);
+    const resolvedTitle = needsMandatoryTitle ? pendingChatName.trim() : conversation.title.trim();
+    if (!resolvedTitle) {
+      chatNameInputRef.current?.focus();
+      return;
+    }
+    if (needsMandatoryTitle && resolvedTitle !== conversation.title) {
+      onChangeConversationTitle(resolvedTitle);
+    }
+    onSendMessage(input.trim(), attachments, resolvedTitle);
     onChangeDraft(conversation.id, '');
     setAttachments([]);
     if (textareaRef.current) {
@@ -382,6 +411,71 @@ export function ChatView({
                 <option value="__import__">+ Add from local files or Ollama...</option>
                 <option value="__custom__">Enter custom model tag...</option>
               </select>
+            )}
+          </div>
+
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setShowMultiModelPicker((v) => !v)}
+              aria-expanded={showMultiModelPicker}
+              className={`inline-flex h-8 items-center gap-1.5 rounded-xl border px-2.5 text-xs font-medium transition-colors whitespace-nowrap ${
+                secondaryModels.length > 0
+                  ? 'border-[#6B1D2F]/40 bg-[#6B1D2F]/10 dark:bg-[#8C253E]/25 text-[#4D1422] dark:text-[#FAF5EC]'
+                  : 'border-[#6B1D2F]/16 dark:border-[#F3E7D8]/16 bg-[#FAF5EC]/70 dark:bg-[#230D14]/75 text-[#4D1422] dark:text-[#F5ECE0]'
+              }`}
+            >
+              <Layers className="h-3.5 w-3.5 text-[#6B1D2F] dark:text-[#E6B8A2]" />
+              <span>
+                {secondaryModels.length > 0
+                  ? `+${secondaryModels.length} Multi-Model`
+                  : '+ Multi-Model'}
+              </span>
+            </button>
+
+            {showMultiModelPicker && (
+              <div className="absolute left-0 top-10 z-30 w-72 rounded-2xl border border-[#6B1D2F]/18 dark:border-[#F3E7D8]/16 bg-[#FCF8F2] dark:bg-[#260E16] p-3 shadow-xl space-y-2">
+                <div className="flex items-center justify-between text-xs font-semibold text-[#3A101B] dark:text-[#F5ECE0]">
+                  <span>Run Multiple Models in This Chat</span>
+                  <button
+                    type="button"
+                    onClick={() => setShowMultiModelPicker(false)}
+                    className="text-[#6E4A53] dark:text-[#CEB8AE]"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+                <p className="text-[11px] text-[#6E4A53] dark:text-[#CEB8AE]">
+                  Each checked local model will answer alongside <strong>{conversation.model || 'primary model'}</strong> in this thread.
+                </p>
+                <div className="max-h-52 overflow-y-auto space-y-1">
+                  {modelOptions.filter((n) => n !== conversation.model).length === 0 ? (
+                    <div className="py-2 text-[11px] text-[#6E4A53] dark:text-[#CEB8AE]">
+                      Add or pull more local models to enable multi-model responses.
+                    </div>
+                  ) : (
+                    modelOptions
+                      .filter((n) => n !== conversation.model)
+                      .map((name) => {
+                        const checked = secondaryModels.includes(name);
+                        return (
+                          <label
+                            key={name}
+                            className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-xs font-mono text-[#2B0F17] dark:text-[#F5ECE0] hover:bg-[#6B1D2F]/8 dark:hover:bg-[#F3E7D8]/8 cursor-pointer"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={checked}
+                              onChange={() => handleToggleSecondaryModel(name)}
+                              className="accent-[#6B1D2F] dark:accent-[#E6B8A2]"
+                            />
+                            <span className="truncate">{name}</span>
+                          </label>
+                        );
+                      })
+                  )}
+                </div>
+              </div>
             )}
           </div>
 
@@ -853,7 +947,30 @@ export function ChatView({
                           ))}
                         </div>
                       )}
-                      <p className="whitespace-pre-wrap text-[15px] leading-relaxed">
+                      {msg.files && msg.files.length > 0 && (
+                        <div className="mb-2.5 flex flex-wrap gap-2">
+                          {msg.files.map((f) =>
+                            f.kind === 'image' && f.dataUrl ? (
+                              <img
+                                key={f.id}
+                                src={f.dataUrl}
+                                alt={f.name}
+                                referrerPolicy="no-referrer"
+                                className="h-24 w-24 rounded-lg object-cover border border-[#FAF5EC]/25"
+                              />
+                            ) : (
+                              <span
+                                key={f.id}
+                                className="inline-flex items-center gap-1.5 rounded-lg border border-[#FAF5EC]/25 bg-[#FAF5EC]/15 px-2.5 py-1 text-xs font-mono text-[#FAF5EC]"
+                              >
+                                <FileText className="h-3.5 w-3.5" />
+                                <span className="truncate max-w-[180px]">{f.name}</span>
+                              </span>
+                            )
+                          )}
+                        </div>
+                      )}
+                      <p dir="auto" className="whitespace-pre-wrap text-[15px] leading-relaxed">
                         {msg.content}
                       </p>
                     </div>
@@ -861,7 +978,7 @@ export function ChatView({
                     <div className="w-full min-w-0">
                       <div className="mb-1.5 flex items-center gap-2 text-xs text-[#6E4A53] dark:text-[#C5AE9F]">
                         <span className="font-mono font-medium text-[#4D1422] dark:text-[#E6B8A2]">
-                          {conversation.model}
+                          {msg.modelName || conversation.model}
                         </span>
                         {isStreaming && isLastAssistant && (
                           <>
@@ -1021,37 +1138,79 @@ export function ChatView({
                 : 'border-[#6B1D2F]/18 dark:border-[#F3E7D8]/16 bg-[#FCF8F2]/80 dark:bg-[#210C13]/85 focus-within:border-[#6B1D2F]/55 dark:focus-within:border-[#E6B8A2]/55'
             }`}
           >
+            {needsMandatoryTitle && (
+              <div className="flex flex-wrap items-center gap-2 border-b border-[#6B1D2F]/12 dark:border-[#F3E7D8]/12 bg-[#6B1D2F]/[0.04] dark:bg-[#8C253E]/15 px-3.5 py-2 rounded-t-2xl">
+                <label
+                  htmlFor="mandatory-chat-name"
+                  className="text-xs font-semibold text-[#6B1D2F] dark:text-[#E6B8A2] whitespace-nowrap"
+                >
+                  Chat Name (required):
+                </label>
+                <input
+                  id="mandatory-chat-name"
+                  ref={chatNameInputRef}
+                  type="text"
+                  dir="auto"
+                  value={pendingChatName}
+                  onChange={(e) => setPendingChatName(e.target.value)}
+                  placeholder="Enter a name for this chat before sending..."
+                  className="h-7 flex-1 min-w-[200px] rounded-lg border border-[#6B1D2F]/22 dark:border-[#F3E7D8]/20 bg-white/90 dark:bg-[#16080D]/90 px-2.5 text-xs text-[#2B0F17] dark:text-[#F5ECE0] focus:border-[#6B1D2F] focus:outline-none"
+                />
+              </div>
+            )}
+
             {attachments.length > 0 && (
               <div className="flex flex-wrap gap-2 border-b border-[#6B1D2F]/10 dark:border-[#F3E7D8]/10 px-3 py-2.5">
-                {attachments.map((att) => (
-                  <div
-                    key={att.id}
-                    className="relative group rounded-lg border border-[#6B1D2F]/18 dark:border-[#F3E7D8]/18 overflow-hidden"
-                  >
-                    <img
-                      src={att.dataUrl}
-                      alt={att.name}
-                      referrerPolicy="no-referrer"
-                      className="h-16 w-16 object-cover"
-                    />
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setAttachments((prev) => prev.filter((item) => item.id !== att.id))
-                      }
-                      aria-label={`Remove ${att.name}`}
-                      className="absolute right-1 top-1 rounded bg-[#2B0F17]/80 p-0.5 text-[#FAF5EC] hover:bg-[#2B0F17]"
+                {attachments.map((att) =>
+                  att.kind === 'image' && att.dataUrl ? (
+                    <div
+                      key={att.id}
+                      className="relative group rounded-lg border border-[#6B1D2F]/18 dark:border-[#F3E7D8]/18 overflow-hidden"
                     >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </div>
-                ))}
+                      <img
+                        src={att.dataUrl}
+                        alt={att.name}
+                        referrerPolicy="no-referrer"
+                        className="h-16 w-16 object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setAttachments((prev) => prev.filter((item) => item.id !== att.id))
+                        }
+                        aria-label={`Remove ${att.name}`}
+                        className="absolute right-1 top-1 rounded bg-[#2B0F17]/80 p-0.5 text-[#FAF5EC] hover:bg-[#2B0F17]"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div
+                      key={att.id}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-[#6B1D2F]/18 dark:border-[#F3E7D8]/18 bg-[#FAF5EC]/85 dark:bg-[#16080D]/80 px-2.5 py-1.5 text-xs font-mono text-[#3A101B] dark:text-[#F5ECE0]"
+                    >
+                      <FileText className="h-3.5 w-3.5 text-[#6B1D2F] dark:text-[#E6B8A2]" />
+                      <span className="max-w-[160px] truncate">{att.name}</span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setAttachments((prev) => prev.filter((item) => item.id !== att.id))
+                        }
+                        aria-label={`Remove ${att.name}`}
+                        className="text-[#6E4A53] hover:text-[#6B1D2F] dark:hover:text-[#E6B8A2]"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  )
+                )}
               </div>
             )}
 
             <textarea
               ref={textareaRef}
               rows={1}
+              dir="auto"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => {
@@ -1063,7 +1222,11 @@ export function ChatView({
                   handleSubmit();
                 }
               }}
-              placeholder={`Message ${conversation.model} inside ${project.name}...`}
+              placeholder={
+                secondaryModels.length > 0
+                  ? `Message ${conversation.model} + ${secondaryModels.length} more model(s) inside ${project.name}...`
+                  : `Message ${conversation.model || 'local model'} inside ${project.name}...`
+              }
               className="w-full resize-none bg-transparent px-4 pt-3 pb-2 text-[15px] text-[#2B0F17] dark:text-[#F5ECE0] placeholder:text-[#8E6B73] dark:placeholder:text-[#A98F95] focus:outline-none"
             />
 
@@ -1072,7 +1235,6 @@ export function ChatView({
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept="image/*"
                   multiple
                   className="hidden"
                   onChange={(e) => {
@@ -1085,8 +1247,8 @@ export function ChatView({
                   onClick={() => fileInputRef.current?.click()}
                   className="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-xs font-medium text-[#6E4A53] dark:text-[#CEB8AE] hover:bg-[#6B1D2F]/8 dark:hover:bg-[#F3E7D8]/10 hover:text-[#3A101B] dark:hover:text-[#FAF5EC] transition-colors whitespace-nowrap shrink-0"
                 >
-                  <ImagePlus className="h-4 w-4" />
-                  <span>Image</span>
+                  <Paperclip className="h-4 w-4" />
+                  <span>Upload File</span>
                 </button>
 
                 {project.prompts.length > 0 && (
@@ -1163,7 +1325,7 @@ export function ChatView({
                     className="inline-flex h-8 items-center gap-1 rounded-lg px-2 text-xs text-[#6E4A53] dark:text-[#CEB8AE] hover:text-[#6B1D2F] dark:hover:text-[#E6B8A2]"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
-                    <span>Clear images</span>
+                    <span>Clear files</span>
                   </button>
                 )}
 
@@ -1198,11 +1360,22 @@ export function ChatView({
                   <button
                     type="button"
                     onClick={handleSubmit}
-                    disabled={!input.trim() && attachments.length === 0}
-                    title={`Send message (${modKey}Enter)`}
+                    disabled={
+                      (!input.trim() && attachments.length === 0) ||
+                      (needsMandatoryTitle && !pendingChatName.trim())
+                    }
+                    title={
+                      needsMandatoryTitle && !pendingChatName.trim()
+                        ? 'Enter a chat name before sending'
+                        : `Send message (${modKey}Enter)`
+                    }
                     className="inline-flex h-9 items-center gap-1.5 rounded-xl bg-[#6B1D2F] dark:bg-[#8C253E] px-3.5 text-xs font-medium text-[#FAF5EC] hover:bg-[#541524] dark:hover:bg-[#A02D49] disabled:opacity-40 disabled:cursor-not-allowed transition-colors whitespace-nowrap shrink-0"
                   >
-                    <span>Send</span>
+                    <span>
+                      {needsMandatoryTitle && !pendingChatName.trim()
+                        ? 'Name Chat First'
+                        : 'Send'}
+                    </span>
                     <ArrowUp className="h-3.5 w-3.5" />
                   </button>
                 )}

@@ -1,6 +1,7 @@
-const { app, BrowserWindow, shell } = require('electron');
+const { app, BrowserWindow, ipcMain, shell } = require('electron');
 const http = require('http');
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 
 const DIST_DIR = path.join(__dirname, 'dist');
@@ -24,15 +25,89 @@ const MIME_TYPES = {
 let serverInstance = null;
 let mainWindow = null;
 
+function sanitizeSegment(value, fallback) {
+  const cleaned = String(value || '')
+    .replace(/[<>:"/\\|?*\x00-\x1F]/g, '-')
+    .replace(/\.\.+/g, '.')
+    .trim();
+  return cleaned || fallback;
+}
+
+function getDesktopBaseDir() {
+  try {
+    return app.getPath('desktop');
+  } catch {
+    return path.join(os.homedir(), 'Desktop');
+  }
+}
+
+function saveMarkdownToDesktop({ folderName, fileName, content }) {
+  const safeFolder = sanitizeSegment(folderName, 'Hyper Mode Markdown Files');
+  let safeFile = sanitizeSegment(fileName, 'untitled.md');
+  if (!safeFile.toLowerCase().endsWith('.md')) {
+    safeFile = `${safeFile}.md`;
+  }
+
+  const desktopRoot = getDesktopBaseDir();
+  const targetDir = path.join(desktopRoot, safeFolder);
+  fs.mkdirSync(targetDir, { recursive: true });
+  const targetFile = path.join(targetDir, safeFile);
+  fs.writeFileSync(targetFile, String(content || ''), 'utf8');
+  return { ok: true, dirPath: targetDir, filePath: targetFile };
+}
+
+function readJsonBody(req) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    req.on('data', (chunk) => chunks.push(chunk));
+    req.on('end', () => {
+      try {
+        const raw = Buffer.concat(chunks).toString('utf8');
+        resolve(raw ? JSON.parse(raw) : {});
+      } catch (err) {
+        reject(err);
+      }
+    });
+    req.on('error', reject);
+  });
+}
+
 function startStaticServer() {
   return new Promise((resolve, reject) => {
-    const server = http.createServer((req, res) => {
+    const server = http.createServer(async (req, res) => {
       try {
         const urlPath = decodeURIComponent((req.url || '/').split('?')[0]);
+
+        if (req.method === 'POST' && urlPath === '/api/desktop-files/save') {
+          const body = await readJsonBody(req);
+          const result = saveMarkdownToDesktop(body || {});
+          const payload = JSON.stringify(result);
+          res.writeHead(200, {
+            'Content-Type': 'application/json; charset=utf-8',
+            'Content-Length': Buffer.byteLength(payload),
+          });
+          res.end(payload);
+          return;
+        }
+
+        if (req.method === 'POST' && urlPath === '/api/desktop-files/open') {
+          const body = await readJsonBody(req);
+          const safeFolder = sanitizeSegment(body?.folderName, 'Hyper Mode Markdown Files');
+          const targetDir = path.join(getDesktopBaseDir(), safeFolder);
+          fs.mkdirSync(targetDir, { recursive: true });
+          await shell.openPath(targetDir);
+          const payload = JSON.stringify({ ok: true, dirPath: targetDir });
+          res.writeHead(200, {
+            'Content-Type': 'application/json; charset=utf-8',
+            'Content-Length': Buffer.byteLength(payload),
+          });
+          res.end(payload);
+          return;
+        }
+
         let relPath = urlPath.replace(/^\/+/, '');
         if (!relPath) relPath = 'index.html';
 
-        // Prevent path traversal while supporting ASAR & normal filesystem
         const normalized = path.posix.normalize(relPath).replace(/^(\.\.(\/|\\|$))+/, '');
         let targetPath = path.join(DIST_DIR, normalized);
 
@@ -87,14 +162,15 @@ async function createWindow() {
   serverInstance = server;
 
   mainWindow = new BrowserWindow({
-    width: 1360,
-    height: 880,
+    width: 1380,
+    height: 900,
     minWidth: 960,
     minHeight: 640,
     title: 'nimchesko AI studio',
     autoHideMenuBar: true,
     backgroundColor: '#14070B',
     webPreferences: {
+      preload: path.join(__dirname, 'preload.cjs'),
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true,
@@ -114,6 +190,27 @@ async function createWindow() {
     mainWindow = null;
   });
 }
+
+ipcMain.handle('desktop:save-markdown', async (_event, payload) => {
+  return saveMarkdownToDesktop(payload || {});
+});
+
+ipcMain.handle('desktop:open-folder', async (_event, payload) => {
+  const safeFolder = sanitizeSegment(payload?.folderName, 'Hyper Mode Markdown Files');
+  const targetDir = path.join(getDesktopBaseDir(), safeFolder);
+  fs.mkdirSync(targetDir, { recursive: true });
+  await shell.openPath(targetDir);
+  return { ok: true, dirPath: targetDir };
+});
+
+ipcMain.handle('desktop:get-paths', async () => {
+  const desktopDir = getDesktopBaseDir();
+  return {
+    desktopDir,
+    hyperDir: path.join(desktopDir, 'Hyper Mode Markdown Files'),
+    journalDir: path.join(desktopDir, 'Journal & Skill Mode'),
+  };
+});
 
 const gotLock = app.requestSingleInstanceLock();
 if (!gotLock) {
