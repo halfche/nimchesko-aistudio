@@ -4,18 +4,19 @@
 
 # nimchesko AI studio
 
-> **راهنمای تعاملی و چندزبانه HTML (رابط گرافیکی با تم زرشکی و کرم):**
-> - **[باز کردن فوری رابط راهنما (HTML Preview)](https://htmlpreview.github.io/?https://github.com/halfche/nimchesko-aistudio/blob/main/public/guide.html?lang=fa)** *(مستقیم صفحه طراحی‌شده را باز می‌کند، نه کد را)*
-> - **[باز کردن راهنما در GitHub Pages](https://halfche.github.io/nimchesko-aistudio/guide.html?lang=fa)** · **[باز کردن برنامه روی GitHub Pages](https://halfche.github.io/nimchesko-aistudio/)** *(پس از فعال‌کردن **Settings ← Pages ← Source: GitHub Actions**)*
-> - فایل منبع در مخزن: [`public/guide.html`](public/guide.html) *(دارای ۷ زبان و تغییر تم روشن/تاریک)*
+> **راهنمای تعاملی و چندزبانه HTML (باز شدن مستقیم در مرورگر، بدون کد یا خطای 404):**
+> - **[باز کردن راهنمای کامل (`guide.html` در GitHub Pages)](https://halfche.github.io/nimchesko-aistudio/#fa)** *(یا [guide.html#fa](https://halfche.github.io/nimchesko-aistudio/guide.html#fa) — دارای دکمه بازگشت به مخزن گیت‌هاب و اجرای برنامه)*
+> - **[باز کردن فوری راهنما (آینه CDN)](https://raw.githack.com/halfche/nimchesko-aistudio/main/public/guide.html#fa)** · **[اجرای نسخه وب](https://halfche.github.io/nimchesko-aistudio/studio.html)** · **[نسخه‌های دسکتاپ](https://github.com/halfche/nimchesko-aistudio/releases)**
+> - دارای ۷ زبان (فارسی، انگلیسی، عربی، آلمانی، اسپانیایی، فرانسوی، ترکی) + تم روشن/تاریک.
 
-محیط کاری هوشمند و کراس‌پلتفرم برای کار با مدل‌های لوکال **Ollama** (از جمله `gemma4:12b`، مدل‌های دانلودشده از Ollama و فایل‌های `Modelfile` / `.gguf`) با طراحی مینیمال **زرشکی و کرم** و نقوش معماری ایرانی.
+محیط کاری هوشمند و کراس‌پلتفرم برای کار با **تمام مدل‌های لوکال** (ایمپورت مستقیم از **فایل‌های محلی** مانند `.gguf`، `.bin`، `.safetensors`، `Modelfile` و `.json` یا کشف و دانلود از **Ollama**) به همراه محیط مقایسه هم‌زمان مدل‌ها، با طراحی مینیمال **زرشکی و کرم** و نقوش معماری ایرانی.
 
 ## قابلیت‌های اصلی
 
+- **مقایسه همه مدل‌های لوکال (`Compare`):** اجرای هم‌زمان یا ترتیبی (بهینه برای VRAM) پرامپت روی تمام مدل‌های لوکال انتخاب‌شده، مشاهده مشخصات `/api/show`، مقایسه سرعت (`tok/s`)، تاخیر، تعداد توکن‌ها، خروجی گزارش Markdown و ادامه گفتگو در چت.
+- **افزودن هر مدل لوکال (`Models & Sync`):** افزودن مدل از **فایل‌های محلی** (آپلود مستقیم وزن‌های `.gguf`/`.bin`/`.safetensors` به Ollama با `/api/blobs` و `/api/create` یا ایمپورت `Modelfile`/`.json`) و از **Ollama** (تشخیص خودکار `/api/tags`، ایمپورت یکجای همه مدل‌ها و دانلود از Ollama یا `hf.co/...`).
 - **پروژه‌های ایزوله:** هر پروژه دارای حافظه مستقل، فایل قوانین `rules.md`، فایل‌های منبع، تنظیمات پارامتر مدل و تاریخچه گفت‌وگوهای جداگانه است.
-- **مدیریت مدل‌ها و همگام‌سازی (`Models & Sync`):** دانلود مستقیم مدل از Ollama (`/api/pull`)، مشاهده مشخصات (`/api/show`)، ایمپورت `Modelfile` / `.gguf`، خروجی و ادغام هوشمند بکاپ `.json`، اتصال فایل `.json` روی دیسک برای همگام‌سازی خودکار و ایمپورت چت‌های `.json` / `.md` / `.txt`.
-- **ابزارهای بهره‌وری:** پوشه‌بندی کشیدن و رها کردن (Drag & Drop) در نوار کناری، کتابخانه پرامپت‌های سریع، مانیتورینگ زنده کانتکست، ذخیره خودکار و کلیدهای میانبر (`Cmd/Ctrl + Enter`، `Cmd/Ctrl + N`، `Cmd/Ctrl + K`).
+- **ابزارهای بهره‌وری و همگام‌سازی:** بکاپ و ادغام هوشمند `.json`، اتصال فایل روی دیسک برای همگام‌سازی خودکار، ایمپورت چت‌های `.json`/`.md`/`.txt`، پوشه‌بندی Drag & Drop، پرامپت‌های سریع، مانیتورینگ زنده کانتکست، ذخیره خودکار و میانبرها (`Cmd/Ctrl + Enter`، `Cmd/Ctrl + N`، `Cmd/Ctrl + K`).
 - **تم روشن و تاریک:** طراحی هماهنگ زرشکی و کرم به همراه فایل راهنمای مستقل `public/guide.html`.
 - **خروجی کراس‌پلتفرم:** بسته آماده یکپارچه (`nimchesko-ai-studio-app.zip`) و بیلد خودکار دسکتاپ در GitHub Actions با فرمت‌های `.deb`، `.rpm`، `.pkg`، `.pkg.tar.zst`، `.tar`، `.tar.zst`، `.AppImage` و `.exe`.
 
@@ -33,7 +34,7 @@
 ## ساخت و اجرای محلی از سورس
 
 ```bash
-npm install
+npm install --legacy-peer-deps
 npm run dev      # اجرای محیط توسعه روی http://localhost:3000
 npm run build    # کامپایل پوشه dist و ساخت فایل nimchesko-ai-studio-app.zip
 ```

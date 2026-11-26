@@ -2,6 +2,11 @@
   "name": "nimchesko-ai-studio",
   "private": true,
   "version": "1.0.0",
+  "homepage": "https://github.com/halfche/nimchesko-aistudio",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/halfche/nimchesko-aistudio.git"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",

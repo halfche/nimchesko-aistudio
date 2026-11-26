@@ -23,7 +23,7 @@ export const DEFAULT_SKILLS: SkillModule[] = [
     name: 'Systems & API Integration',
     category: 'Architecture',
     description:
-      'Guides Gemma 4 to invoke connected tools and cite exact live payloads.',
+      'Guides local models to invoke connected tools and cite exact live payloads.',
     instructions:
       'When an external system connector or tool is available and relevant to the user question, invoke the appropriate tool first instead of guessing live data. Summarize the exact data returned by the system clearly.',
     enabled: true,
@@ -120,7 +120,7 @@ export const DEFAULT_CONNECTORS: SystemConnector[] = [
       'Sends a structured event payload to a local or remote webhook endpoint (supports {{env.KEY}} variables).',
     kind: 'http',
     method: 'POST',
-    url: '{{env.BRIDGE_URL}}/webhook/gemma-action',
+    url: '{{env.BRIDGE_URL}}/webhook/local-action',
     headersJson: '{\n  "Content-Type": "application/json"\n}',
     bodyTemplate: '{\n  "action": "{{action}}",\n  "payload": "{{payload}}"\n}',
     parameters: [
@@ -167,7 +167,7 @@ export const DEFAULT_CONNECTORS: SystemConnector[] = [
   },
 ];
 
-export function createConversation(model = 'gemma4:12b'): Conversation {
+export function createConversation(model = ''): Conversation {
   return {
     id: `conv-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
     title: 'New chat',
@@ -207,7 +207,7 @@ export function createWorkspaceProject(options: {
   connectors?: SystemConnector[];
   conversations?: Conversation[];
 }): WorkspaceProject {
-  const model = options.defaultModel || 'gemma4:12b';
+  const model = options.defaultModel ?? '';
   const initialConversations =
     options.conversations && options.conversations.length > 0
       ? options.conversations
@@ -271,9 +271,9 @@ export function createInitialProjects(): WorkspaceProject[] {
   const general = createWorkspaceProject({
     id: 'proj-general',
     name: 'General Studio',
-    description: 'Primary isolated workspace for everyday Gemma 4 12B sessions and prototyping.',
+    description: 'Primary isolated workspace for everyday local model sessions, comparisons, and prototyping.',
     motif: 'persepolis',
-    defaultModel: 'gemma4:12b',
+    defaultModel: '',
     brainPrompt:
       'You are a thoughtful, precise AI engineering partner inside the General Studio project.',
     rulesMarkdown:
@@ -286,7 +286,7 @@ export function createInitialProjects(): WorkspaceProject[] {
     description:
       'Isolated engineering environment for backend integrations, tool schemas, and local services.',
     motif: 'azadi',
-    defaultModel: 'gemma4:12b',
+    defaultModel: '',
     brainPrompt:
       'You are a senior systems architect. Focus on reliable API contracts, clean TypeScript/Python code, and explicit error handling.',
     rulesMarkdown:
@@ -300,9 +300,9 @@ export function createInitialProjects(): WorkspaceProject[] {
       title: 'Local Ollama Runtime Target',
       filename: 'ollama-runtime.md',
       source: 'file',
-      sizeBytes: 129,
+      sizeBytes: 132,
       content:
-        'Primary model: gemma4:12b running locally on Ollama port 11434. Use /api/chat for NDJSON streaming and function tool calling.',
+        'Local models running via Ollama on port 11434 or imported from local GGUF/Modelfile weights. Use /api/chat for NDJSON streaming and function tool calling.',
       enabled: true,
       updatedAt: Date.now(),
     },

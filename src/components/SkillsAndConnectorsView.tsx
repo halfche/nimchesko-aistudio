@@ -68,7 +68,7 @@ function createEmptyConnector(): Omit<SystemConnector, 'id'> {
       {
         name: 'query',
         type: 'string',
-        description: 'Input value passed by Gemma 4',
+        description: 'Input value passed by the local model',
         required: true,
       },
     ],
@@ -327,7 +327,7 @@ export function SkillsAndConnectorsView({
     }
   };
 
-  const expressToolBridgeCode = `// local-system-bridge.ts — Connect local DBs, files, or internal APIs to Gemma 4
+  const expressToolBridgeCode = `// local-system-bridge.ts — Connect local DBs, files, or internal APIs to local models
 import express from 'express';
 import cors from 'cors';
 
@@ -725,7 +725,7 @@ app.listen(4000, () => console.log('System bridge running on http://localhost:40
 
                 <div>
                   <label className="block text-xs font-medium text-[#4D1422] dark:text-[#E6B8A2] mb-1">
-                    Description for Gemma 4
+                    Description for Local Model
                   </label>
                   <input
                     type="text"
@@ -1056,7 +1056,7 @@ app.listen(4000, () => console.log('System bridge running on http://localhost:40
                 Local Express Bridge
               </h2>
               <p className="text-xs text-[#6E4A53] dark:text-[#CEB8AE] mt-0.5 leading-relaxed">
-                Run this local Express bridge and register its URLs under <strong>Connectors</strong> so Gemma 4 12B can query SQLite, Postgres, files, or internal APIs.
+                Run this local Express bridge and register its URLs under <strong>Connectors</strong> so any connected local model can query SQLite, Postgres, files, or internal APIs.
               </p>
               <CodeSnippetBlock
                 code={expressToolBridgeCode}

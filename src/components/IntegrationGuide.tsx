@@ -30,6 +30,7 @@ export function IntegrationGuide({
   const [osTab, setOsTab] = useState<OsPlatform>('macos');
   const [codeTab, setCodeTab] = useState<CodeTab>('react');
 
+  const displayModel = model.trim() || 'your-local-model';
   const endpoint = normalizeBaseUrl(baseUrl);
   const currentOrigin =
     typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
@@ -44,8 +45,8 @@ launchctl setenv OLLAMA_ORIGINS "${currentOrigin},http://localhost:3000"
 # Or run directly in terminal:
 OLLAMA_ORIGINS="*" ollama serve
 
-# Pull Gemma 4 12B:
-ollama pull ${model}`,
+# Pull any local model:
+ollama pull ${displayModel}`,
     },
     linux: {
       title: 'Linux (systemd / CLI)',
@@ -79,8 +80,8 @@ cloudflared tunnel --url http://localhost:11434 --http-host-header="localhost:11
     },
   };
 
-  const reactSnippet = `// Browser streaming client for Ollama /api/chat (${model})
-export async function streamGemmaChat(
+  const reactSnippet = `// Browser streaming client for Ollama /api/chat (${displayModel})
+export async function streamLocalModelChat(
   messages: Array<{ role: 'user' | 'assistant' | 'system'; content: string; images?: string[] }>,
   onToken: (text: string) => void,
   signal?: AbortSignal
@@ -90,7 +91,7 @@ export async function streamGemmaChat(
     headers: { 'Content-Type': 'application/json' },
     signal,
     body: JSON.stringify({
-      model: '${model}',
+      model: '${displayModel}',
       messages,
       stream: true,
       options: { temperature: 0.7, num_ctx: 16384 },
@@ -130,7 +131,7 @@ app.post('/api/chat', async (req, res) => {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: req.body.model || '${model}',
+      model: req.body.model || '${displayModel}',
       messages: req.body.messages,
       stream: true,
       options: req.body.options,
@@ -161,7 +162,7 @@ from openai import OpenAI
 client = OpenAI(base_url="${endpoint}/v1", api_key="ollama")
 
 stream = client.chat.completions.create(
-    model="${model}",
+    model="${displayModel}",
     messages=[
         {"role": "system", "content": "Respond concisely with clean technical clarity."},
         {"role": "user", "content": "Introduce Persepolis in two sentences."},
@@ -177,9 +178,9 @@ for chunk in stream:
   const curlSnippet = `# 1. List local models
 curl ${endpoint}/api/tags
 
-# 2. Stream chat with ${model}
+# 2. Stream chat with ${displayModel}
 curl ${endpoint}/api/chat -d '{
-  "model": "${model}",
+  "model": "${displayModel}",
   "messages": [
     { "role": "user", "content": "Introduce Azadi Tower in two sentences." }
   ],
@@ -208,7 +209,7 @@ curl ${endpoint}/api/chat -d '{
                 Project Endpoint · {projectName}
               </div>
               <h1 className="mt-0.5 text-2xl sm:text-3xl font-semibold tracking-tight text-[#3A101B] dark:text-[#F5ECE0] [text-wrap:balance]">
-                Local Gemma 4 12B Integration Guide
+                Local Models Integration Guide
               </h1>
               <p className="mt-2 text-sm text-[#6E4A53] dark:text-[#CEB8AE] max-w-2xl leading-relaxed">
                 Ollama runs a local REST API on port <code className="font-mono text-xs px-1.5 py-0.5 rounded-md bg-[#FAF5EC]/80 dark:bg-[#230D14]/80 border border-[#6B1D2F]/14 dark:border-[#F3E7D8]/14 text-[#4D1422] dark:text-[#E6B8A2]">11434</code>. Connect directly from the browser with CORS enabled or through a Node/Express proxy.
@@ -217,7 +218,7 @@ curl ${endpoint}/api/chat -d '{
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <a
-              href="/guide.html"
+              href="./guide.html"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-[#6B1D2F]/18 dark:border-[#F3E7D8]/16 bg-[#FAF5EC]/75 dark:bg-[#230D14]/75 px-3.5 text-xs font-medium text-[#4D1422] dark:text-[#F5ECE0] hover:bg-[#FCF8F2] dark:hover:bg-[#2F121B] transition-colors whitespace-nowrap shrink-0"
@@ -301,7 +302,7 @@ curl ${endpoint}/api/chat -d '{
                 </div>
               ) : (
                 <p className="mt-2 text-xs text-[#5C3A42] dark:text-[#CEB8AE]">
-                  Server responded, but no models are pulled yet. Run <code className="font-mono">ollama pull {model}</code>.
+                  Server responded, but no models are pulled yet. Run <code className="font-mono">ollama pull {displayModel}</code>.
                 </p>
               )}
             </div>
@@ -411,7 +412,7 @@ curl ${endpoint}/api/chat -d '{
           />
         </section>
 
-        {/* Section 4: Gemma 4 12B Request Reference */}
+        {/* Section 4: Local Model /api/chat Request Reference */}
         <section className="space-y-3">
           <h2 className="text-lg font-semibold text-[#3A101B] dark:text-[#F5ECE0]">
             04. Key <code className="font-mono text-base">/api/chat</code> Fields
@@ -428,8 +429,8 @@ curl ${endpoint}/api/chat -d '{
               <tbody className="divide-y divide-[#6B1D2F]/10 dark:divide-[#F3E7D8]/10">
                 <tr>
                   <td className="px-4 py-2.5 font-mono text-[#3A101B] dark:text-[#F5ECE0]">model</td>
-                  <td className="px-4 py-2.5 font-mono text-[#6B1D2F] dark:text-[#E6B8A2]">"{model}"</td>
-                  <td className="px-4 py-2.5 text-[#5C3A42] dark:text-[#CEB8AE]">Exact tag from <code className="font-mono">ollama list</code>.</td>
+                  <td className="px-4 py-2.5 font-mono text-[#6B1D2F] dark:text-[#E6B8A2]">"{displayModel}"</td>
+                  <td className="px-4 py-2.5 text-[#5C3A42] dark:text-[#CEB8AE]">Exact tag from <code className="font-mono">ollama list</code> or imported local file.</td>
                 </tr>
                 <tr>
                   <td className="px-4 py-2.5 font-mono text-[#3A101B] dark:text-[#F5ECE0]">stream</td>
@@ -439,7 +440,7 @@ curl ${endpoint}/api/chat -d '{
                 <tr>
                   <td className="px-4 py-2.5 font-mono text-[#3A101B] dark:text-[#F5ECE0]">messages[].images</td>
                   <td className="px-4 py-2.5 font-mono text-[#6B1D2F] dark:text-[#E6B8A2]">["/9j/4AAQ..."]</td>
-                  <td className="px-4 py-2.5 text-[#5C3A42] dark:text-[#CEB8AE]">Base64 images (without data URI prefix) for Gemma 4 vision.</td>
+                  <td className="px-4 py-2.5 text-[#5C3A42] dark:text-[#CEB8AE]">Base64 images (without data URI prefix) for vision-capable local models.</td>
                 </tr>
                 <tr>
                   <td className="px-4 py-2.5 font-mono text-[#3A101B] dark:text-[#F5ECE0]">options.num_ctx</td>
@@ -468,7 +469,7 @@ curl ${endpoint}/api/chat -d '{
               </p>
             </div>
             <a
-              href="/nimchesko-ai-studio-app.zip"
+              href="./nimchesko-ai-studio-app.zip"
               download="nimchesko-ai-studio-app.zip"
               className="inline-flex h-9 items-center gap-1.5 rounded-xl bg-[#6B1D2F] dark:bg-[#8C253E] px-4 text-xs font-medium text-[#FAF5EC] hover:bg-[#541524] dark:hover:bg-[#A02D49] transition-colors whitespace-nowrap shrink-0 shadow-[0_2px_10px_rgba(107,29,47,0.2)]"
             >

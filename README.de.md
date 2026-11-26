@@ -2,15 +2,15 @@
 
 # nimchesko AI studio
 
-> **Mehrsprachiger HTML-Leitfaden (Gerenderte Oberfläche):** **[Interaktiven Leitfaden direkt öffnen](https://htmlpreview.github.io/?https://github.com/halfche/nimchesko-aistudio/blob/main/public/guide.html?lang=de)** · **[GitHub Pages](https://halfche.github.io/nimchesko-aistudio/guide.html?lang=de)** · [`public/guide.html`](public/guide.html)
+> **Mehrsprachiger HTML-Leitfaden (Direkt im Browser öffnen):** **[Vollständigen Leitfaden öffnen (GitHub Pages)](https://halfche.github.io/nimchesko-aistudio/#de)** · **[Sofort-Mirror (CDN)](https://raw.githack.com/halfche/nimchesko-aistudio/main/public/guide.html#de)** · **[Web-Studio](https://halfche.github.io/nimchesko-aistudio/studio.html)** · **[Releases](https://github.com/halfche/nimchesko-aistudio/releases)**
 
-Plattformübergreifender lokaler KI-Arbeitsbereich für **Ollama** (`gemma4:12b`, lokale Tags, `Modelfile` und `.gguf`) im minimalistischen **Burgunderrot- & Creme-Design** mit persischen Architekturmotiven.
+Plattformübergreifender lokaler KI-Arbeitsbereich zum Ausführen, Importieren und Vergleichen **aller lokalen Modelle** (über **lokale Dateien** wie `.gguf`, `.bin`, `.safetensors`, `Modelfile`, `.json` oder via **Ollama**) im minimalistischen **Burgunderrot- & Creme-Design** mit persischen Architekturmotiven.
 
 ## Hauptfunktionen
 
-- **Isolierte Projekte:** Eigene Regeln (`rules.md`), Ressourcen, System-Konnektoren, Modellparameter und Chatverläufe pro Projekt.
-- **Modelle & Synchronisierung (`Models & Sync`):** Ollama-Modelle laden (`/api/pull`), prüfen (`/api/show`), `Modelfile`/`.gguf` importieren, `.json`-Sync-Pakete exportieren/zusammenführen und Chat-Exporte (`.json`, `.md`, `.txt`) einlesen.
-- **Produktivität:** Drag-and-Drop-Ordner, Quick-Prompts-Bibliothek, Live-Kontextmonitor, automatisches Speichern sowie Tastenkürzel (`Cmd/Ctrl + Enter`, `Cmd/Ctrl + N`, `Cmd/Ctrl + K`).
+- **Alle lokalen Modelle vergleichen (`Compare`):** Prompts sequenziell oder parallel über beliebig viele lokale Modelle testen, `/api/show`-Details prüfen, `tok/s` und Latenzen vergleichen und als Markdown exportieren.
+- **Beliebige lokale Modelle importieren (`Models & Sync`):** Lokale Gewichtsdateien direkt per `/api/blobs` + `/api/create` in Ollama laden oder Ollama-Tags & `hf.co/...`-Modelle verwalten (`/api/pull`, `/api/show`), inklusive `.json`-Sync und Chat-Import (`.json`, `.md`, `.txt`).
+- **Isolierte Projekte & Produktivität:** Eigene Regeln (`rules.md`), Ressourcen, System-Konnektoren, Drag-and-Drop-Ordner, Quick-Prompts, Live-Kontextmonitor, automatisches Speichern und Tastenkürzel (`Cmd/Ctrl + Enter`, `Cmd/Ctrl + N`, `Cmd/Ctrl + K`).
 - **Plattformübergreifende Pakete:** Kombiniertes Web-Archiv (`nimchesko-ai-studio-app.zip`) und automatisierte GitHub Actions CI/CD-Builds (`.deb`, `.rpm`, `.pkg`, `.pkg.tar.zst`, `.tar`, `.tar.zst`, `.AppImage`, `.exe`).
 
 ## Schnellstart
@@ -25,7 +25,7 @@ Plattformübergreifender lokaler KI-Arbeitsbereich für **Ollama** (`gemma4:12b`
 ## Lokale Entwicklung & GitHub Actions CI/CD
 
 ```bash
-npm install
+npm install --legacy-peer-deps
 npm run build
 ```
 

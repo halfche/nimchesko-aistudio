@@ -3,15 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>nimchesko AI studio — Multilingual User &amp; Deployment Guide</title>
-    <link rel="icon" type="image/svg+xml" href="./icon.svg" />
+    <title>nimchesko AI studio — Full Multilingual Guide</title>
+    <meta
+      name="description"
+      content="Complete multilingual interactive guide for nimchesko AI studio — local AI workspace for Ollama, local .gguf/.safetensors/Modelfile models, and side-by-side model comparison."
+    />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%236B1D2F'/%3E%3Cpolygon points='16,5 19,13 27,16 19,19 16,27 13,19 5,16 13,13' fill='none' stroke='%23FAF5EC' stroke-width='1.8'/%3E%3Ccircle cx='16' cy='16' r='2.2' fill='%23FAF5EC'/%3E%3C/svg%3E"
+    />
     <style>
       :root {
         --bg: #f6efe4;
         --bg-radial-1: rgba(107, 29, 47, 0.11);
         --bg-radial-2: rgba(183, 134, 72, 0.13);
-        --surface: rgba(252, 248, 242, 0.86);
-        --surface-soft: rgba(250, 245, 236, 0.74);
+        --surface: rgba(252, 248, 242, 0.88);
+        --surface-soft: rgba(250, 245, 236, 0.78);
         --border: rgba(107, 29, 47, 0.16);
         --text: #2b0f17;
         --text-muted: #6e4a53;
@@ -26,9 +34,9 @@
         --bg: #14070b;
         --bg-radial-1: rgba(140, 37, 62, 0.24);
         --bg-radial-2: rgba(230, 184, 162, 0.08);
-        --surface: rgba(30, 10, 17, 0.86);
-        --surface-soft: rgba(35, 13, 20, 0.74);
-        --border: rgba(243, 231, 216, 0.14);
+        --surface: rgba(30, 10, 17, 0.88);
+        --surface-soft: rgba(35, 13, 20, 0.78);
+        --border: rgba(243, 231, 216, 0.15);
         --text: #f5ece0;
         --text-muted: #ceb8ae;
         --accent: #8c253e;
@@ -56,7 +64,7 @@
       }
 
       .container {
-        max-width: 1020px;
+        max-width: 1060px;
         margin: 0 auto;
         padding: 20px 18px 64px;
       }
@@ -115,21 +123,27 @@
 
       .lang-btn,
       .theme-btn,
-      .action-link {
+      .action-link,
+      .secondary-link {
         border: 1px solid transparent;
         border-radius: 9px;
-        padding: 6px 10px;
+        padding: 7px 11px;
         font-size: 0.78rem;
         font-weight: 600;
         cursor: pointer;
         background: transparent;
         color: var(--text-muted);
         text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
         transition: all 0.15s ease;
       }
 
       .lang-btn:hover,
-      .theme-btn:hover {
+      .theme-btn:hover,
+      .secondary-link:hover {
         color: var(--text);
         background: var(--code-bg);
       }
@@ -139,7 +153,8 @@
         color: var(--accent-contrast);
       }
 
-      .theme-btn {
+      .theme-btn,
+      .secondary-link {
         border: 1px solid var(--border);
         background: var(--surface-soft);
         color: var(--text);
@@ -169,10 +184,17 @@
         align-items: center;
       }
 
-      @media (max-width: 720px) {
+      @media (max-width: 760px) {
         .hero {
           grid-template-columns: 1fr;
         }
+      }
+
+      .hero-actions {
+        margin-top: 18px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
       }
 
       .motifs {
@@ -189,21 +211,21 @@
 
       h1 {
         margin: 0 0 8px;
-        font-size: clamp(1.5rem, 3vw, 2.05rem);
+        font-size: clamp(1.5rem, 3vw, 2.1rem);
         letter-spacing: -0.02em;
       }
 
       .subtitle {
         margin: 0;
         color: var(--text-muted);
-        font-size: 0.95rem;
-        max-width: 64ch;
+        font-size: 0.96rem;
+        max-width: 66ch;
       }
 
       .grid {
         margin-top: 22px;
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(285px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
         gap: 16px;
       }
 
@@ -324,7 +346,16 @@
             <button type="button" class="lang-btn" data-lang="tr">Türkçe</button>
           </div>
           <button type="button" class="theme-btn" id="themeToggle">Theme</button>
-          <a class="action-link" href="./nimchesko-ai-studio-app.zip" download="nimchesko-ai-studio-app.zip" id="zipBtn">Download (.zip)</a>
+          <a
+            class="secondary-link"
+            href="https://github.com/halfche/nimchesko-aistudio"
+            target="_blank"
+            rel="noopener noreferrer"
+            id="navRepoBtn"
+          >
+            Main Repo
+          </a>
+          <a class="action-link" href="./studio.html" id="navStudioBtn">Open Studio</a>
         </div>
       </header>
 
@@ -332,18 +363,38 @@
         <div>
           <h1 id="heroTitle"></h1>
           <p class="subtitle" id="heroSub"></p>
+          <div class="hero-actions">
+            <a
+              class="action-link"
+              href="https://github.com/halfche/nimchesko-aistudio"
+              target="_blank"
+              rel="noopener noreferrer"
+              id="heroRepoBtn"
+            ></a>
+            <a class="secondary-link" href="./studio.html" id="heroStudioBtn"></a>
+            <a
+              class="secondary-link"
+              href="./nimchesko-ai-studio-app.zip"
+              download="nimchesko-ai-studio-app.zip"
+              id="zipBtn"
+            ></a>
+            <a
+              class="secondary-link"
+              href="https://github.com/halfche/nimchesko-aistudio/releases"
+              target="_blank"
+              rel="noopener noreferrer"
+              id="releasesBtn"
+            ></a>
+          </div>
         </div>
         <div class="motifs" aria-hidden="true">
-          <!-- Persepolis Column -->
           <svg width="36" height="44" viewBox="0 0 40 56" fill="none">
             <path d="M12 50H28M15 50V18M25 50V18M9 18H31M11 12C11 8 16 8 16 12M29 12C29 8 24 8 24 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
           </svg>
-          <!-- Azadi Tower -->
           <svg width="52" height="44" viewBox="0 0 64 56" fill="none">
             <path d="M8 50H56M14 50L24 22L28 8H36L40 22L50 50" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
             <path d="M24 50C24 38 28 31 32 31C36 31 40 38 40 50" stroke="currentColor" stroke-width="1.6" />
           </svg>
-          <!-- Si-o-se-pol -->
           <svg width="60" height="44" viewBox="0 0 72 48" fill="none">
             <path d="M4 38H68M4 20H68" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
             <path d="M10 38V27C10 23.5 14 23.5 14 27V38M22 38V27C22 23.5 26 23.5 26 27V38M34 38V27C34 23.5 38 23.5 38 27V38M46 38V27C46 23.5 50 23.5 50 27V38M58 38V27C58 23.5 62 23.5 62 27V38" stroke="currentColor" stroke-width="1.4" />
@@ -374,6 +425,18 @@
           <h2 id="c4Title"></h2>
           <p id="c4Body"></p>
           <ul id="c4List"></ul>
+        </article>
+
+        <article class="card">
+          <h2 id="c5Title"></h2>
+          <p id="c5Body"></p>
+          <ul id="c5List"></ul>
+        </article>
+
+        <article class="card">
+          <h2 id="c6Title"></h2>
+          <p id="c6Body"></p>
+          <pre id="c6Code"></pre>
         </article>
       </section>
 
@@ -412,7 +475,7 @@
             <tr>
               <td>Windows</td>
               <td><code>.exe</code> (Setup &amp; Portable)</td>
-              <td><code>nimchesko-ai-studio-*-win-x64-nsis.exe</code></td>
+              <td><code>nimchesko-ai-studio-*-win-x64-setup.exe</code></td>
             </tr>
             <tr>
               <td>macOS</td>
@@ -432,251 +495,423 @@
     </div>
 
     <script>
+      const REPO_URL = 'https://github.com/halfche/nimchesko-aistudio';
+      const RELEASES_URL = 'https://github.com/halfche/nimchesko-aistudio/releases';
+      const PAGES_STUDIO_URL = 'https://halfche.github.io/nimchesko-aistudio/studio.html';
+      const RAW_ZIP_URL =
+        'https://github.com/halfche/nimchesko-aistudio/raw/main/public/nimchesko-ai-studio-app.zip';
+
+      function resolveRuntimeLinks() {
+        const host = window.location.hostname || '';
+        const proto = window.location.protocol || '';
+        const isGithubPages = host.endsWith('github.io') && !host.includes('htmlpreview');
+        const isLocalServer =
+          (proto === 'http:' || proto === 'https:') &&
+          (host === 'localhost' || host === '127.0.0.1' || host.endsWith('.run.app'));
+
+        const studioHref = isGithubPages
+          ? './studio.html'
+          : isLocalServer
+            ? './'
+            : PAGES_STUDIO_URL;
+
+        const zipHref =
+          isGithubPages || isLocalServer || proto === 'file:'
+            ? './nimchesko-ai-studio-app.zip'
+            : RAW_ZIP_URL;
+
+        ['navStudioBtn', 'heroStudioBtn'].forEach((id) => {
+          const el = document.getElementById(id);
+          if (el) el.setAttribute('href', studioHref);
+        });
+        const zipEl = document.getElementById('zipBtn');
+        if (zipEl) zipEl.setAttribute('href', zipHref);
+        ['navRepoBtn', 'heroRepoBtn'].forEach((id) => {
+          const el = document.getElementById(id);
+          if (el) el.setAttribute('href', REPO_URL);
+        });
+        const relEl = document.getElementById('releasesBtn');
+        if (relEl) relEl.setAttribute('href', RELEASES_URL);
+      }
+
       const COPY = {
         en: {
           dir: 'ltr',
           themeLabel: 'Light / Dark',
+          navRepo: 'Main Repo',
+          navStudio: 'Open Studio',
+          heroRepo: 'Go to Main GitHub Repo',
+          heroStudio: 'Launch Web Studio',
           zipBtn: 'Download App (.zip)',
-          heroTitle: 'nimchesko AI studio — Complete Guide',
-          heroSub: 'A minimal Burgundy & Cream local AI workspace for Ollama models, isolated project brains, folder organization, workspace sync, and cross-platform desktop releases.',
-          c1Title: '01. Workspace & Features',
-          c1Body: 'Every project has its own isolated brain, rules, files, and model parameters.',
+          releasesBtn: 'Desktop Releases',
+          heroTitle: 'nimchesko AI studio — Complete User & Developer Guide',
+          heroSub:
+            'Cross-platform local AI studio for all local models (local .gguf/.bin/.safetensors files, Modelfiles, and Ollama). Import any model, compare all local models side-by-side, organize isolated project brains, and run locally on Windows, Linux, macOS, or browser.',
+          c1Title: '01. How It Works & Core Architecture',
+          c1Body: '100% local execution with zero mandatory cloud dependency:',
           c1List: [
-            'Isolated Projects with custom rules.md and resource files',
-            'Sidebar Folders with drag-and-drop & Quick Prompts library',
-            'Live Context Monitor modal and debounced Auto-Save + drafts',
-            'Models & Sync tab: pull Ollama models, import Modelfile/.gguf, sync .json'
+            'All Local Models: auto-discovers installed Ollama tags or lets you import any local weight file (.gguf, .bin, .safetensors), Modelfile, or .json profile',
+            'Compare Tab: run prompts across all selected local models sequentially (VRAM-safe) or in parallel, inspect /api/show specs, compare tok/s speed & reasoning traces, and continue any winner in Chat',
+            'Isolated Projects: separate system Brain, rules.md, markdown/text resource files, API connectors, and drag-and-drop folders per project',
+            'Local Persistence & Sync: auto-save + drafts, live Context Monitor pruning, and local .json file mirroring'
           ],
-          c2Title: '02. Quick Run (Windows & Linux)',
-          c2Body: 'Extract nimchesko-ai-studio-app.zip and launch with zero Node.js/Git setup:',
-          c2Code: '# Windows (double-click or PowerShell)\nrun-windows.bat\n\n# Linux\nchmod +x run-linux.sh && ./run-linux.sh',
-          c3Title: '03. Connect Local Ollama',
-          c3Body: 'Start Ollama with CORS enabled so the studio can stream directly from localhost:11434:',
-          c3Code: '# Linux / macOS\nOLLAMA_ORIGINS=* ollama serve\n\n# Windows PowerShell\n$env:OLLAMA_ORIGINS="*"; ollama serve',
-          c4Title: '04. Shortcuts & GitHub Permissions',
-          c4Body: 'Keyboard shortcuts and GitHub Actions setup for automated desktop builds:',
+          c2Title: '02. Quick Start (Zero-Setup .zip Package)',
+          c2Body: 'Download nimchesko-ai-studio-app.zip, extract it anywhere, and launch offline:',
+          c2Code:
+            '# Windows (double-click or PowerShell)\nrun-windows.bat\n\n# Linux (Terminal)\nchmod +x run-linux.sh && ./run-linux.sh',
+          c3Title: '03. Connect Ollama & Local Model Files',
+          c3Body: 'Start Ollama with CORS allowed, then pull any model or import local .gguf files inside Models & Sync:',
+          c3Code:
+            '# Linux / macOS\nOLLAMA_ORIGINS=* ollama serve\n\n# Windows PowerShell\n$env:OLLAMA_ORIGINS="*"; ollama serve\n\n# Pull any model or HuggingFace GGUF\nollama pull llama3.2:latest\nollama pull hf.co/<user>/<repo>:<quant>',
+          c4Title: '04. Compare & Workspace Productivity',
+          c4Body: 'Built for everyday engineering, benchmarking, and prompt workflows:',
           c4List: [
-            'Cmd/Ctrl + Enter: Send message',
-            'Cmd/Ctrl + N: Start new chat',
-            'Cmd/Ctrl + K: Clear current chat',
-            'GitHub: Settings → Actions → General → Read and write permissions'
+            'Models & Sync: upload local .gguf/.bin/.safetensors weights directly into Ollama (/api/blobs + /api/create) or import all detected Ollama tags in one click',
+            'Compare Arena: export full Markdown comparison reports and open any model output straight into a new Chat',
+            'Shortcuts: Cmd/Ctrl + Enter (Send), Cmd/Ctrl + N (New Chat), Cmd/Ctrl + K (Clear Chat)',
+            'Themes: synced Burgundy & Cream Light and Dark modes across the app and this guide'
           ],
-          tableTitle: '05. GitHub Actions CI/CD Release Formats',
-          tableBody: 'Push to main/master, push a v* tag, or run .github/workflows/release-desktop.yml manually to generate all packages:',
-          thOs: 'Platform',
+          c5Title: '05. How to Use With Desktop & Web',
+          c5Body: 'Choose the best way to run nimchesko AI studio on your machine:',
+          c5List: [
+            'Desktop App (.exe / .deb / .rpm / .AppImage / .pkg): download from GitHub Releases and install natively with built-in static server',
+            'Web Studio in Browser: click Launch Web Studio above or install it as an offline PWA',
+            'Repo Access: click Go to Main GitHub Repo above anytime to inspect source code, issues, or workflows'
+          ],
+          c6Title: '06. Build From Source & GitHub Actions',
+          c6Body: 'Run locally from source or enable automated Releases & Pages in GitHub:',
+          c6Code:
+            'git clone https://github.com/halfche/nimchesko-aistudio.git\ncd nimchesko-aistudio\nnpm install --legacy-peer-deps\nnpm run dev      # http://localhost:3000\nnpm run build    # outputs dist/ & nimchesko-ai-studio-app.zip',
+          tableTitle: '07. GitHub Actions CI/CD Desktop & Offline Formats',
+          tableBody: 'Automated releases build installers for every major OS in GitHub Releases:',
+          thOs: 'Platform / Distro',
           thFmt: 'Format',
           thCmd: 'Install / Run',
-          footerText: 'nimchesko AI studio · Burgundy & Cream Edition'
+          footerText: 'nimchesko AI studio · Burgundy & Cream Edition · github.com/halfche/nimchesko-aistudio'
         },
         fa: {
           dir: 'rtl',
           themeLabel: 'تم روشن / تاریک',
+          navRepo: 'مخزن اصلی گیت‌هاب',
+          navStudio: 'باز کردن استودیو',
+          heroRepo: 'رفتن به مخزن اصلی (GitHub)',
+          heroStudio: 'اجرای نسخه وب استودیو',
           zipBtn: 'دانلود بسته برنامه (.zip)',
-          heroTitle: 'راهنمای کامل nimchesko AI studio',
-          heroSub: 'محیط کاری مینیمال زرشکی و کرم برای اجرای مدل‌های لوکال Ollama با پروژه‌های ایزوله، مدیریت مدل‌ها، همگام‌سازی داده‌ها و خروجی‌های دسکتاپ.',
-          c1Title: '۰۱. امکانات و ساختار برنامه',
-          c1Body: 'هر پروژه دارای مغز، فایل قوانین، منابع و تنظیمات مدل مستقل است.',
+          releasesBtn: 'نسخه‌های دسکتاپ',
+          heroTitle: 'راهنمای جامع nimchesko AI studio',
+          heroSub:
+            'محیط کاری کراس‌پلتفرم برای تمام مدل‌های لوکال (فایل‌های .gguf/.bin/.safetensors، Modelfile و Ollama). هر مدلی را ایمپورت کنید، همه مدل‌ها را هم‌زمان مقایسه کنید، پروژه‌های ایزوله بسازید و روی ویندوز، لینوکس، مک یا مرورگر اجرا کنید.',
+          c1Title: '۰۱. نحوه عملکرد و ساختار برنامه',
+          c1Body: 'اجرای ۱۰۰٪ محلی بدون نیاز به سرویس‌های ابری:',
           c1List: [
-            'پروژه‌های ایزوله همراه با rules.md و فایل‌های منبع اختصاصی',
-            'پوشه‌بندی چت‌ها با Drag & Drop و کتابخانه پرامپت‌های سریع',
-            'مانیتورینگ زنده کانتکست، ذخیره خودکار و نگهداری پیش‌نویس‌ها',
-            'تب Models & Sync: دانلود از Ollama، ایمپورت Modelfile/.gguf و همگام‌سازی .json'
+            'پشتیبانی از تمام مدل‌های لوکال: تشخیص خودکار مدل‌های Ollama یا ایمپورت مستقیم فایل‌های .gguf، .bin، .safetensors و Modelfile',
+            'تب مقایسه (Compare): اجرای هم‌زمان یا ترتیبی (بهینه برای VRAM) روی تمام مدل‌های انتخاب‌شده، مشاهده مشخصات /api/show و سرعت tok/s و ادامه چت با مدل برتر',
+            'پروژه‌های ایزوله: مغز مستقل، فایل قوانین rules.md، فایل‌های منبع، ابزارها و پوشه‌بندی Drag & Drop',
+            'ذخیره خودکار و همگام‌سازی: نگهداری پیش‌نویس‌ها، مانیتورینگ زنده کانتکست و اتصال فایل .json روی دیسک'
           ],
-          c2Title: '۰۲. اجرای سریع در ویندوز و لینوکس',
-          c2Body: 'فایل nimchesko-ai-studio-app.zip را استخراج و بدون نیاز به Node.js اجرا کنید:',
-          c2Code: '# Windows\nrun-windows.bat\n\n# Linux\nchmod +x run-linux.sh && ./run-linux.sh',
-          c3Title: '۰۳. اتصال به Ollama لوکال',
-          c3Body: 'پیش از استفاده، Ollama را با دسترسی CORS اجرا کنید تا ارتباط با پورت 11434 برقرار شود:',
-          c3Code: '# Linux / macOS\nOLLAMA_ORIGINS=* ollama serve\n\n# Windows PowerShell\n$env:OLLAMA_ORIGINS="*"; ollama serve',
-          c4Title: '۰۴. میانبرها و دسترسی گیت‌هاب',
-          c4Body: 'کلیدهای میانبر سریع و تنظیمات لازم برای ساخت خودکار در GitHub Actions:',
+          c2Title: '۰۲. اجرای سریع (بسته آماده .zip بدون نیاز به نصب)',
+          c2Body: 'فایل nimchesko-ai-studio-app.zip را دانلود و استخراج کرده و اجرا کنید:',
+          c2Code:
+            '# ویندوز (دابل‌کلیک یا PowerShell)\nrun-windows.bat\n\n# لینوکس (ترمینال)\nchmod +x run-linux.sh && ./run-linux.sh',
+          c3Title: '۰۳. اتصال به Ollama و فایل‌های مدل محلی',
+          c3Body: 'ابتدا Ollama را با دسترسی CORS اجرا کنید و سپس مدل‌ها را از تب Models & Sync اضافه کنید:',
+          c3Code:
+            '# Linux / macOS\nOLLAMA_ORIGINS=* ollama serve\n\n# Windows PowerShell\n$env:OLLAMA_ORIGINS="*"; ollama serve\n\n# دانلود هر مدل دلخواه از Ollama یا HuggingFace\nollama pull llama3.2:latest\nollama pull hf.co/<user>/<repo>:<quant>',
+          c4Title: '۰۴. مقایسه مدل‌ها و ابزارهای بهره‌وری',
+          c4Body: 'امکانات کاربردی برای کار روزانه و بنچمارک مدل‌های لوکال:',
           c4List: [
-            'Cmd/Ctrl + Enter: ارسال پیام',
-            'Cmd/Ctrl + N: گفت‌وگوی جدید',
-            'Cmd/Ctrl + K: پاک کردن چت فعلی',
-            'گیت‌هاب: Settings ← Actions ← General ← Read and write permissions'
+            'Models & Sync: آپلود مستقیم فایل‌های .gguf/.bin/.safetensors به Ollama (/api/blobs + /api/create) یا ایمپورت یکجای مدل‌ها',
+            'خروجی گزارش Markdown از جدول مقایسه و انتقال پاسخ هر مدل به چت جدید با یک کلیک',
+            'کلیدهای میانبر: Cmd/Ctrl + Enter (ارسال)، Cmd/Ctrl + N (چت جدید)، Cmd/Ctrl + K (پاک‌سازی چت)',
+            'تم زرشکی و کرم هماهنگ در حالت روشن و تاریک بین برنامه و این راهنما'
           ],
-          tableTitle: '۰۵. فرمت‌های خروجی GitHub Actions CI/CD',
-          tableBody: 'با Push روی main/master یا اجرای دستی ورک‌فلو، همه فایل‌های نصبی زیر در بخش Releases ساخته می‌شوند:',
+          c5Title: '۰۵. روش‌های استفاده (دسکتاپ و وب)',
+          c5Body: 'به هر روشی که راحت‌ترید برنامه را اجرا کنید:',
+          c5List: [
+            'نسخه دسکتاپ (.exe / .deb / .rpm / .AppImage / .pkg): دانلود از بخش Releases گیت‌هاب و نصب مستقیم',
+            'نسخه وب در مرورگر: کلیک روی «اجرای نسخه وب استودیو» در بالا یا نصب به صورت PWA',
+            'مشاهده سورس در گیت‌هاب: کلیک روی دکمه «رفتن به مخزن اصلی (GitHub)» در بالای صفحه'
+          ],
+          c6Title: '۰۶. ساخت از سورس و GitHub Actions',
+          c6Body: 'مراحل کلون کردن و ساخت برنامه از سورس کد:',
+          c6Code:
+            'git clone https://github.com/halfche/nimchesko-aistudio.git\ncd nimchesko-aistudio\nnpm install --legacy-peer-deps\nnpm run dev      # http://localhost:3000\nnpm run build    # ساخت dist/ و فایل .zip',
+          tableTitle: '۰۷. فرمت‌های خروجی دسکتاپ و وب',
+          tableBody: 'همه بسته‌های نصبی به صورت خودکار در بخش Releases مخزن منتشر می‌شوند:',
           thOs: 'سیستم‌عامل / توزیع',
           thFmt: 'فرمت',
           thCmd: 'دستور نصب / اجرا',
-          footerText: 'nimchesko AI studio · طراحی زرشکی و کرم'
+          footerText: 'nimchesko AI studio · نسخه زرشکی و کرم · github.com/halfche/nimchesko-aistudio'
         },
         ar: {
           dir: 'rtl',
           themeLabel: 'فاتح / داكن',
+          navRepo: 'المستودع الرئيسي',
+          navStudio: 'فتح الاستوديو',
+          heroRepo: 'الانتقال إلى المستودع الرئيسي (GitHub)',
+          heroStudio: 'تشغيل استوديو الويب',
           zipBtn: 'تنزيل الحزمة (.zip)',
+          releasesBtn: 'إصدارات سطح المكتب',
           heroTitle: 'الدليل الكامل لـ nimchesko AI studio',
-          heroSub: 'مساحة عمل محلية بتصميم عنابي وكريمي لتشغيل نماذج Ollama مع مشاريع معزولة ومزامنة البيانات وإصدارات سطح المكتب.',
-          c1Title: '٠١. الميزات الرئيسية',
-          c1Body: 'يمتلك كل مشروع بيئة مستقلة وقواعد rules.md وموارد وإعدادات خاصة.',
+          heroSub:
+            'مساحة عمل محلية متعددة المنصات لجميع النماذج المحلية (ملفات .gguf/.bin/.safetensors وModelfile وOllama) مع مقارنة النماذج جنباً إلى جنب ومشاريع معزولة.',
+          c1Title: '٠١. آلية العمل والبنية الأساسية',
+          c1Body: 'تشغيل محلي بالكامل بدون أي اعتماد إلزامي على السحابة:',
           c1List: [
-            'مشاريع معزولة مع ملفات rules.md والموارد النصية',
-            'مجلدات بالسحب والإفلات ومكتبة الأوامر السريعة',
-            'مراقبة السياق المباشرة والحفظ التلقائي',
-            'Models & Sync: سحب نماذج Ollama واستيراد Modelfile/.gguf ومزامنة .json'
+            'جميع النماذج المحلية: اكتشاف تلقائي لنماذج Ollama أو استيراد أي ملف محلي (.gguf, .bin, .safetensors) أو Modelfile',
+            'تبويب المقارنة (Compare): تشغيل الأوامر بالتتابع أو بالتوازي وفحص المواصفات (/api/show) ومقارنة السرعة (tok/s)',
+            'مشاريع معزولة: ملف قواعد rules.md مستقل ومجلدات بالسحب والإفلات',
+            'الحفظ التلقائي ومزامنة ملفات .json ومراقبة السياق المباشرة'
           ],
-          c2Title: '٠٢. التشغيل السريع (ويندوز ولينكس)',
-          c2Body: 'فك ضغط nimchesko-ai-studio-app.zip وشغّل الملف المناسب:',
-          c2Code: '# Windows\nrun-windows.bat\n\n# Linux\nchmod +x run-linux.sh && ./run-linux.sh',
-          c3Title: '٠٣. الاتصال بـ Ollama المحلي',
-          c3Body: 'شغّل Ollama مع تفعيل CORS للاتصال المباشر بالمنفذ 11434:',
-          c3Code: '# Linux / macOS\nOLLAMA_ORIGINS=* ollama serve\n\n# Windows PowerShell\n$env:OLLAMA_ORIGINS="*"; ollama serve',
-          c4Title: '٠٤. الاختصارات وإعدادات GitHub',
-          c4Body: 'اختصارات لوحة المفاتيح وصلاحيات البناء التلقائي:',
+          c2Title: '٠٢. التشغيل السريع (حزمة .zip)',
+          c2Body: 'نزّل nimchesko-ai-studio-app.zip وفك الضغط ثم شغّله مباشرة:',
+          c2Code:
+            '# Windows\nrun-windows.bat\n\n# Linux\nchmod +x run-linux.sh && ./run-linux.sh',
+          c3Title: '٠٣. الاتصال بـ Ollama والملفات المحلية',
+          c3Body: 'شغّل Ollama مع تفعيل CORS ثم أضف النماذج من Models & Sync:',
+          c3Code:
+            '# Linux / macOS\nOLLAMA_ORIGINS=* ollama serve\n\n# Windows PowerShell\n$env:OLLAMA_ORIGINS="*"; ollama serve\n\nollama pull llama3.2:latest',
+          c4Title: '٠٤. المقارنة والأدوات الإنتاجية',
+          c4Body: 'ميزات مصممة لاختبار النماذج والعمل اليومي:',
           c4List: [
-            'Cmd/Ctrl + Enter: إرسال الرسالة',
-            'Cmd/Ctrl + N: محادثة جديدة',
-            'Cmd/Ctrl + K: مسح المحادثة الحالية',
-            'GitHub: Settings ← Actions ← General ← Read and write permissions'
+            'رفع ملفات الأوزان المحلية مباشرة إلى Ollama عبر /api/blobs و/api/create',
+            'تصدير تقارير المقارنة بصيغة Markdown ومتابعة أي نتيجة في محادثة جديدة',
+            'الاختصارات: Cmd/Ctrl + Enter للإرسال، Cmd/Ctrl + N لمحادثة جديدة، Cmd/Ctrl + K للمسح',
+            'مظهر العنابي والكريمي الفاتح والداكن متزامن مع الدليل'
           ],
-          tableTitle: '٠٥. صيغ إصدارات GitHub Actions CI/CD',
-          tableBody: 'عند الدفع إلى main/master أو التشغيل اليدوي يتم إنشاء جميع الصيغ التالية في Releases:',
+          c5Title: '٠٥. طرق التشغيل المتاحة',
+          c5Body: 'اختر الطريقة الأنسب لجهازك:',
+          c5List: [
+            'تطبيق سطح المكتب (.exe / .deb / .rpm / .AppImage / .pkg) من صفحة Releases',
+            'استوديو الويب مباشرة من المتصفح أو تثبيته كـ PWA',
+            'الوصول المباشر للكود المصدري عبر زر الانتقال إلى المستودع الرئيسي أعلاه'
+          ],
+          c6Title: '٠٦. البناء من المصدر',
+          c6Body: 'لتشغيل المشروع أو تعديله محلياً من الكود المصدري:',
+          c6Code:
+            'git clone https://github.com/halfche/nimchesko-aistudio.git\ncd nimchesko-aistudio\nnpm install --legacy-peer-deps\nnpm run build',
+          tableTitle: '٠٧. صيغ إصدارات سطح المكتب والويب',
+          tableBody: 'تُبنى جميع الصيغ التالية تلقائياً وتُنشر في GitHub Releases:',
           thOs: 'المنصة',
           thFmt: 'الصيغة',
           thCmd: 'التثبيت / التشغيل',
-          footerText: 'nimchesko AI studio · إصدار العنابي والكريمي'
+          footerText: 'nimchesko AI studio · إصدار العنابي والكريمي · github.com/halfche/nimchesko-aistudio'
         },
         de: {
           dir: 'ltr',
           themeLabel: 'Hell / Dunkel',
+          navRepo: 'Haupt-Repo',
+          navStudio: 'Studio öffnen',
+          heroRepo: 'Zum Haupt-Repo (GitHub)',
+          heroStudio: 'Web-Studio starten',
           zipBtn: 'App laden (.zip)',
+          releasesBtn: 'Desktop-Releases',
           heroTitle: 'nimchesko AI studio — Vollständiger Leitfaden',
-          heroSub: 'Minimalistischer Arbeitsbereich in Burgunderrot & Creme für lokale Ollama-Modelle, isolierte Projekte, Datensynchronisation und Desktop-Builds.',
-          c1Title: '01. Funktionen',
-          c1Body: 'Jedes Projekt besitzt eigene Regeln, Ressourcen, Konnektoren und Verläufe.',
+          heroSub:
+            'Plattformübergreifender lokaler KI-Arbeitsbereich für alle lokalen Modelle (.gguf/.bin/.safetensors-Dateien, Modelfiles & Ollama) inklusive Modellvergleich und isolierten Projekten.',
+          c1Title: '01. Funktionsweise & Architektur',
+          c1Body: '100 % lokal ohne verpflichtende Cloud-Anbindung:',
           c1List: [
-            'Isolierte Projekte mit rules.md und Ressourcendateien',
-            'Drag-and-Drop-Ordner & Quick-Prompts-Bibliothek',
-            'Live-Kontextmonitor und automatisches Speichern',
-            'Models & Sync: Ollama-Pull, Modelfile/.gguf-Import und .json-Sync'
+            'Alle lokalen Modelle: erkennt Ollama-Tags automatisch und importiert lokale .gguf/.bin/.safetensors-Dateien sowie Modelfiles',
+            'Compare-Arena: Prompts sequenziell (VRAM-schonend) oder parallel vergleichen, /api/show-Daten prüfen und tok/s messen',
+            'Isolierte Projekte: eigene rules.md, Ressourcen-Dateien und Drag-and-Drop-Ordner',
+            'Auto-Save, Entwürfe, Live-Kontextmonitor und .json-Dateisync'
           ],
-          c2Title: '02. Schnellstart (Windows & Linux)',
-          c2Body: 'nimchesko-ai-studio-app.zip entpacken und direkt starten:',
-          c2Code: '# Windows\nrun-windows.bat\n\n# Linux\nchmod +x run-linux.sh && ./run-linux.sh',
-          c3Title: '03. Lokales Ollama verbinden',
-          c3Body: 'Starten Sie Ollama mit CORS-Freigabe für localhost:11434:',
-          c3Code: '# Linux / macOS\nOLLAMA_ORIGINS=* ollama serve\n\n# Windows PowerShell\n$env:OLLAMA_ORIGINS="*"; ollama serve',
-          c4Title: '04. Kürzel & GitHub-Rechte',
-          c4Body: 'Tastenkürzel und Berechtigungen für automatische Releases:',
+          c2Title: '02. Schnellstart (.zip-Paket)',
+          c2Body: 'nimchesko-ai-studio-app.zip entpacken und ohne Installation starten:',
+          c2Code:
+            '# Windows\nrun-windows.bat\n\n# Linux\nchmod +x run-linux.sh && ./run-linux.sh',
+          c3Title: '03. Ollama & lokale Modelle verbinden',
+          c3Body: 'Starten Sie Ollama mit CORS-Freigabe und laden oder importieren Sie beliebige Modelle:',
+          c3Code:
+            '# Linux / macOS\nOLLAMA_ORIGINS=* ollama serve\n\n# Windows PowerShell\n$env:OLLAMA_ORIGINS="*"; ollama serve\n\nollama pull llama3.2:latest',
+          c4Title: '04. Vergleich & Produktivität',
+          c4Body: 'Werkzeuge für schnelles Benchmarking und tägliche Arbeit:',
           c4List: [
-            'Cmd/Ctrl + Enter: Nachricht senden',
-            'Cmd/Ctrl + N: Neuer Chat',
-            'Cmd/Ctrl + K: Chat leeren',
-            'GitHub: Settings → Actions → General → Read and write permissions'
+            'Lokale Gewichtsdateien direkt per /api/blobs + /api/create an Ollama übertragen',
+            'Vergleichsberichte als Markdown exportieren und Gewinner direkt im Chat fortführen',
+            'Kürzel: Cmd/Ctrl + Enter (Senden), Cmd/Ctrl + N (Neu), Cmd/Ctrl + K (Leeren)',
+            'Burgunderrot & Creme Hell/Dunkel automatisch synchronisiert'
           ],
-          tableTitle: '05. GitHub Actions CI/CD Formate',
-          tableBody: 'Bei Push auf main/master oder manuellem Start entstehen folgende Pakete:',
+          c5Title: '05. Desktop & Web nutzen',
+          c5Body: 'Alle Optionen auf einen Blick:',
+          c5List: [
+            'Desktop-Installer (.exe / .deb / .rpm / .AppImage / .pkg) unter GitHub Releases',
+            'Web-Studio direkt im Browser oder als Offline-PWA installierbar',
+            'Quellcode jederzeit über „Zum Haupt-Repo (GitHub)“ öffnen'
+          ],
+          c6Title: '06. Aus dem Quellcode bauen',
+          c6Body: 'Lokale Entwicklung und Paket-Erstellung:',
+          c6Code:
+            'git clone https://github.com/halfche/nimchesko-aistudio.git\ncd nimchesko-aistudio\nnpm install --legacy-peer-deps\nnpm run build',
+          tableTitle: '07. GitHub Actions CI/CD Release-Formate',
+          tableBody: 'Automatisierte Desktop- und Web-Pakete für alle Systeme:',
           thOs: 'Plattform',
           thFmt: 'Format',
           thCmd: 'Installation / Start',
-          footerText: 'nimchesko AI studio · Burgunderrot & Creme Edition'
+          footerText: 'nimchesko AI studio · Burgunderrot & Creme Edition · github.com/halfche/nimchesko-aistudio'
         },
         es: {
           dir: 'ltr',
           themeLabel: 'Claro / Oscuro',
-          zipBtn: 'Descargar (.zip)',
+          navRepo: 'Repo Principal',
+          navStudio: 'Abrir Studio',
+          heroRepo: 'Ir al Repo Principal (GitHub)',
+          heroStudio: 'Abrir Web Studio',
+          zipBtn: 'Descargar App (.zip)',
+          releasesBtn: 'Versiones Desktop',
           heroTitle: 'nimchesko AI studio — Guía Completa',
-          heroSub: 'Espacio de trabajo local en tonos borgoña y crema para Ollama, proyectos aislados, sincronización de chats y compilaciones de escritorio.',
-          c1Title: '01. Funciones Clave',
-          c1Body: 'Cada proyecto mantiene sus propias reglas, recursos y parámetros.',
+          heroSub:
+            'Espacio de trabajo local multiplataforma para todos tus modelos locales (archivos .gguf/.bin/.safetensors, Modelfiles y Ollama), comparación lado a lado y proyectos aislados.',
+          c1Title: '01. Cómo Funciona',
+          c1Body: 'Ejecución 100 % local sin depender de la nube:',
           c1List: [
-            'Proyectos aislados con rules.md y archivos de contexto',
-            'Carpetas con arrastrar y soltar y Quick Prompts',
-            'Monitor de contexto en vivo y autoguardado',
-            'Models & Sync: descargar modelos Ollama, Modelfile/.gguf y .json'
+            'Todos los modelos locales: detecta modelos de Ollama o importa archivos .gguf/.bin/.safetensors y Modelfiles',
+            'Pestaña Compare: ejecuta prompts en paralelo o secuencialmente, inspecciona /api/show y compara tok/s',
+            'Proyectos aislados con rules.md, archivos de contexto y carpetas arrastrables',
+            'Autoguardado, borradores, monitor de contexto y sincronización .json'
           ],
-          c2Title: '02. Inicio Rápido (Windows y Linux)',
-          c2Body: 'Extrae nimchesko-ai-studio-app.zip y ejecuta el lanzador:',
-          c2Code: '# Windows\nrun-windows.bat\n\n# Linux\nchmod +x run-linux.sh && ./run-linux.sh',
-          c3Title: '03. Conectar Ollama Local',
-          c3Body: 'Inicia Ollama con CORS habilitado para el navegador:',
-          c3Code: '# Linux / macOS\nOLLAMA_ORIGINS=* ollama serve\n\n# Windows PowerShell\n$env:OLLAMA_ORIGINS="*"; ollama serve',
-          c4Title: '04. Atajos y Permisos de GitHub',
-          c4Body: 'Atajos globales y configuración de GitHub Actions:',
+          c2Title: '02. Inicio Rápido (Paquete .zip)',
+          c2Body: 'Extrae nimchesko-ai-studio-app.zip y ejecútalo al instante:',
+          c2Code:
+            '# Windows\nrun-windows.bat\n\n# Linux\nchmod +x run-linux.sh && ./run-linux.sh',
+          c3Title: '03. Conectar Ollama y Archivos Locales',
+          c3Body: 'Inicia Ollama con CORS habilitado y carga cualquier modelo desde Models & Sync:',
+          c3Code:
+            '# Linux / macOS\nOLLAMA_ORIGINS=* ollama serve\n\n# Windows PowerShell\n$env:OLLAMA_ORIGINS="*"; ollama serve\n\nollama pull llama3.2:latest',
+          c4Title: '04. Comparación y Productividad',
+          c4Body: 'Diseñado para probar múltiples modelos locales con claridad:',
           c4List: [
-            'Cmd/Ctrl + Enter: Enviar mensaje',
-            'Cmd/Ctrl + N: Nuevo chat',
-            'Cmd/Ctrl + K: Limpiar chat actual',
-            'GitHub: Settings → Actions → General → Read and write permissions'
+            'Sube archivos locales directo a Ollama (/api/blobs + /api/create)',
+            'Exporta comparativas en Markdown y continúa cualquier respuesta en el chat',
+            'Atajos: Cmd/Ctrl + Enter (Enviar), Cmd/Ctrl + N (Nuevo), Cmd/Ctrl + K (Limpiar)',
+            'Temas Claro y Oscuro en Borgoña y Crema sincronizados'
           ],
-          tableTitle: '05. Formatos de GitHub Actions CI/CD',
-          tableBody: 'Al hacer push a main/master o ejecutar el workflow manualmente se generan:',
+          c5Title: '05. Modos de Uso',
+          c5Body: 'Elige cómo prefieres trabajar:',
+          c5List: [
+            'Instaladores de escritorio (.exe / .deb / .rpm / .AppImage / .pkg) en Releases',
+            'Web Studio en tu navegador o como aplicación PWA sin conexión',
+            'Código fuente disponible en el botón Ir al Repo Principal'
+          ],
+          c6Title: '06. Compilar desde el Código Fuente',
+          c6Body: 'Comandos para desarrollo y compilación local:',
+          c6Code:
+            'git clone https://github.com/halfche/nimchesko-aistudio.git\ncd nimchesko-aistudio\nnpm install --legacy-peer-deps\nnpm run build',
+          tableTitle: '07. Formatos de Lanzamiento (CI/CD)',
+          tableBody: 'Todos los paquetes compilados automáticamente en GitHub Releases:',
           thOs: 'Plataforma',
           thFmt: 'Formato',
           thCmd: 'Instalación / Uso',
-          footerText: 'nimchesko AI studio · Edición Borgoña y Crema'
+          footerText: 'nimchesko AI studio · Edición Borgoña y Crema · github.com/halfche/nimchesko-aistudio'
         },
         fr: {
           dir: 'ltr',
           themeLabel: 'Clair / Sombre',
+          navRepo: 'Dépôt Principal',
+          navStudio: 'Ouvrir Studio',
+          heroRepo: 'Aller au Dépôt GitHub',
+          heroStudio: 'Lancer Web Studio',
           zipBtn: 'Télécharger (.zip)',
+          releasesBtn: 'Versions Desktop',
           heroTitle: 'nimchesko AI studio — Guide Complet',
-          heroSub: 'Espace de travail IA local minimaliste Bordeaux & Crème pour Ollama, projets isolés, synchronisation des discussions et paquets desktop.',
-          c1Title: '01. Fonctionnalités',
-          c1Body: 'Chaque projet dispose de ses propres règles, ressources et paramètres.',
+          heroSub:
+            'Espace de travail IA local multiplateforme pour tous vos modèles locaux (fichiers .gguf/.bin/.safetensors, Modelfiles et Ollama), comparaison côte à côte et projets isolés.',
+          c1Title: '01. Fonctionnement & Architecture',
+          c1Body: 'Exécution 100 % locale sans dépendance cloud :',
           c1List: [
-            'Projets isolés avec rules.md et fichiers de ressources',
-            'Dossiers glisser-déposer et bibliothèque Quick Prompts',
-            'Moniteur de contexte en direct et sauvegarde automatique',
-            'Models & Sync : téléchargement Ollama, import Modelfile/.gguf et .json'
+            'Tous les modèles locaux : détection automatique Ollama et import direct de fichiers .gguf/.bin/.safetensors ou Modelfiles',
+            'Onglet Compare : comparez vos prompts en séquentiel ou parallèle, inspectez /api/show et les vitesses tok/s',
+            'Projets isolés avec rules.md, fichiers ressources et dossiers glisser-déposer',
+            'Sauvegarde automatique, moniteur de contexte et synchronisation .json'
           ],
-          c2Title: '02. Démarrage Rapide (Windows & Linux)',
+          c2Title: '02. Démarrage Rapide (.zip)',
           c2Body: 'Extrayez nimchesko-ai-studio-app.zip et lancez directement :',
-          c2Code: '# Windows\nrun-windows.bat\n\n# Linux\nchmod +x run-linux.sh && ./run-linux.sh',
-          c3Title: '03. Connecter Ollama Local',
-          c3Body: 'Démarrez Ollama avec CORS activé pour localhost:11434 :',
-          c3Code: '# Linux / macOS\nOLLAMA_ORIGINS=* ollama serve\n\n# Windows PowerShell\n$env:OLLAMA_ORIGINS="*"; ollama serve',
-          c4Title: '04. Raccourcis & Droits GitHub',
-          c4Body: 'Raccourcis clavier et configuration GitHub Actions :',
+          c2Code:
+            '# Windows\nrun-windows.bat\n\n# Linux\nchmod +x run-linux.sh && ./run-linux.sh',
+          c3Title: '03. Connecter Ollama & Fichiers Locaux',
+          c3Body: 'Démarrez Ollama avec CORS activé puis importez vos modèles dans Models & Sync :',
+          c3Code:
+            '# Linux / macOS\nOLLAMA_ORIGINS=* ollama serve\n\n# Windows PowerShell\n$env:OLLAMA_ORIGINS="*"; ollama serve\n\nollama pull llama3.2:latest',
+          c4Title: '04. Comparaison & Productivité',
+          c4Body: 'Des outils pensés pour comparer efficacement vos modèles :',
           c4List: [
-            'Cmd/Ctrl + Entrée : Envoyer le message',
-            'Cmd/Ctrl + N : Nouvelle discussion',
-            'Cmd/Ctrl + K : Effacer la discussion',
-            'GitHub : Settings → Actions → General → Read and write permissions'
+            'Envoi direct de fichiers locaux vers Ollama (/api/blobs + /api/create)',
+            'Export Markdown des comparaisons et reprise directe dans le chat',
+            'Raccourcis : Cmd/Ctrl + Entrée, Cmd/Ctrl + N, Cmd/Ctrl + K',
+            'Thème Bordeaux & Crème Clair/Sombre synchronisé'
           ],
-          tableTitle: '05. Formats GitHub Actions CI/CD',
-          tableBody: 'Chaque push sur main/master ou exécution manuelle génère tous les installateurs :',
+          c5Title: '05. Formats & Accès',
+          c5Body: 'Choisissez le format adapté à votre poste :',
+          c5List: [
+            'Applications desktop (.exe / .deb / .rpm / .AppImage / .pkg) dans GitHub Releases',
+            'Web Studio dans le navigateur ou en mode PWA hors ligne',
+            'Code source accessible via Aller au Dépôt GitHub ci-dessus'
+          ],
+          c6Title: '06. Compiler depuis les Sources',
+          c6Body: 'Commandes pour le développement local :',
+          c6Code:
+            'git clone https://github.com/halfche/nimchesko-aistudio.git\ncd nimchesko-aistudio\nnpm install --legacy-peer-deps\nnpm run build',
+          tableTitle: '07. Formats GitHub Actions CI/CD',
+          tableBody: 'Paquets générés automatiquement dans GitHub Releases :',
           thOs: 'Plateforme',
           thFmt: 'Format',
           thCmd: 'Installation / Lancement',
-          footerText: 'nimchesko AI studio · Édition Bordeaux & Crème'
+          footerText: 'nimchesko AI studio · Édition Bordeaux & Crème · github.com/halfche/nimchesko-aistudio'
         },
         tr: {
           dir: 'ltr',
           themeLabel: 'Açık / Koyu',
+          navRepo: 'Ana Repo',
+          navStudio: 'Stüdyoyu Aç',
+          heroRepo: 'Ana GitHub Reposuna Git',
+          heroStudio: 'Web Stüdyoyu Başlat',
           zipBtn: 'İndir (.zip)',
+          releasesBtn: 'Masaüstü Sürümleri',
           heroTitle: 'nimchesko AI studio — Tam Kılavuz',
-          heroSub: 'Ollama modelleri, izole proje beyinleri, veri eşitleme ve masaüstü paketleri için Bordo & Krem yerel yapay zeka stüdyosu.',
-          c1Title: '01. Temel Özellikler',
-          c1Body: 'Her proje kendi kurallarına, kaynak dosyalarına ve model ayarlarına sahiptir.',
+          heroSub:
+            'Tüm yerel modeller (.gguf/.bin/.safetensors dosyaları, Modelfile ve Ollama) için yan yana model karşılaştırması, izole proje beyinleri ve masaüstü paketleri sunan yerel yapay zeka stüdyosu.',
+          c1Title: '01. Nasıl Çalışır ve Mimari',
+          c1Body: 'Bulut zorunluluğu olmadan %100 yerel çalışma:',
           c1List: [
-            'Özel rules.md ve kaynak dosyalarıyla izole projeler',
-            'Sürükle-bırak klasörler ve Hızlı İstemler (Quick Prompts)',
-            'Canlı bağlam izleyici ve otomatik kaydetme',
-            'Models & Sync: Ollama indirme, Modelfile/.gguf ve .json eşitleme'
+            'Tüm Yerel Modeller: Ollama modellerini otomatik algılar veya yerel .gguf/.bin/.safetensors ve Modelfile dosyalarını içe aktarır',
+            'Compare Sekmesi: istemleri sıralı veya paralel çalıştırın, /api/show ayrıntılarını ve tok/s hızını kıyaslayın',
+            'İzole Projeler: her proje için ayrı rules.md, kaynak dosyaları ve sürükle-bırak klasörler',
+            'Otomatik kaydetme, canlı bağlam izleyici ve .json dosya eşitleme'
           ],
-          c2Title: '02. Hızlı Başlangıç (Windows & Linux)',
-          c2Body: 'nimchesko-ai-studio-app.zip dosyasını çıkarın ve başlatın:',
-          c2Code: '# Windows\nrun-windows.bat\n\n# Linux\nchmod +x run-linux.sh && ./run-linux.sh',
-          c3Title: '03. Yerel Ollama Bağlantısı',
-          c3Body: 'Tarayıcı erişimi için Ollama’yı CORS izniyle başlatın:',
-          c3Code: '# Linux / macOS\nOLLAMA_ORIGINS=* ollama serve\n\n# Windows PowerShell\n$env:OLLAMA_ORIGINS="*"; ollama serve',
-          c4Title: '04. Kısayollar ve GitHub İzinleri',
-          c4Body: 'Klavye kısayolları ve GitHub Actions ayarları:',
+          c2Title: '02. Hızlı Başlangıç (.zip Paketi)',
+          c2Body: 'nimchesko-ai-studio-app.zip dosyasını çıkarın ve hemen çalıştırın:',
+          c2Code:
+            '# Windows\nrun-windows.bat\n\n# Linux\nchmod +x run-linux.sh && ./run-linux.sh',
+          c3Title: '03. Ollama ve Yerel Dosya Bağlantısı',
+          c3Body: 'Ollama’yı CORS izniyle başlatın ve Models & Sync üzerinden modellerinizi ekleyin:',
+          c3Code:
+            '# Linux / macOS\nOLLAMA_ORIGINS=* ollama serve\n\n# Windows PowerShell\n$env:OLLAMA_ORIGINS="*"; ollama serve\n\nollama pull llama3.2:latest',
+          c4Title: '04. Karşılaştırma ve Verimlilik',
+          c4Body: 'Modelleri kıyaslamak ve düzenli çalışmak için:',
           c4List: [
-            'Cmd/Ctrl + Enter: Mesaj gönder',
-            'Cmd/Ctrl + N: Yeni sohbet başlat',
-            'Cmd/Ctrl + K: Mevcut sohbeti temizle',
-            'GitHub: Settings → Actions → General → Read and write permissions'
+            'Yerel ağırlık dosyalarını doğrudan Ollama’ya yükleyin (/api/blobs + /api/create)',
+            'Karşılaştırma sonuçlarını Markdown olarak dışa aktarın ve sohbete devam edin',
+            'Kısayollar: Cmd/Ctrl + Enter (Gönder), Cmd/Ctrl + N (Yeni), Cmd/Ctrl + K (Temizle)',
+            'Uygulama ile senkronize Bordo & Krem Açık/Koyu tema'
           ],
-          tableTitle: '05. GitHub Actions CI/CD Çıktı Biçimleri',
-          tableBody: 'main/master dalına push yapıldığında tüm paketler Releases altında üretilir:',
+          c5Title: '05. Masaüstü ve Web Kullanımı',
+          c5Body: 'Size en uygun çalıştırma yöntemini seçin:',
+          c5List: [
+            'GitHub Releases üzerinden yerel kurulumlar (.exe / .deb / .rpm / .AppImage / .pkg)',
+            'Tarayıcıda Web Stüdyo veya çevrimdışı PWA kurulumu',
+            'Kaynak koda ulaşmak için yukarıdaki Ana GitHub Reposuna Git düğmesine tıklayın'
+          ],
+          c6Title: '06. Kaynaktan Derleme',
+          c6Body: 'Yerel geliştirme ve paketleme komutları:',
+          c6Code:
+            'git clone https://github.com/halfche/nimchesko-aistudio.git\ncd nimchesko-aistudio\nnpm install --legacy-peer-deps\nnpm run build',
+          tableTitle: '07. GitHub Actions CI/CD Çıktı Biçimleri',
+          tableBody: 'Tüm platformlar için otomatik oluşturulan paketler:',
           thOs: 'Platform',
           thFmt: 'Biçim',
           thCmd: 'Kurulum / Çalıştırma',
-          footerText: 'nimchesko AI studio · Bordo & Krem Sürümü'
+          footerText: 'nimchesko AI studio · Bordo & Krem Sürümü · github.com/halfche/nimchesko-aistudio'
         }
       };
 
@@ -713,7 +948,12 @@
         document.documentElement.lang = currentLang;
         document.documentElement.dir = t.dir;
         document.getElementById('themeToggle').textContent = t.themeLabel;
+        document.getElementById('navRepoBtn').textContent = t.navRepo;
+        document.getElementById('navStudioBtn').textContent = t.navStudio;
+        document.getElementById('heroRepoBtn').textContent = t.heroRepo;
+        document.getElementById('heroStudioBtn').textContent = t.heroStudio;
         document.getElementById('zipBtn').textContent = t.zipBtn;
+        document.getElementById('releasesBtn').textContent = t.releasesBtn;
         document.getElementById('heroTitle').textContent = t.heroTitle;
         document.getElementById('heroSub').textContent = t.heroSub;
         document.getElementById('c1Title').textContent = t.c1Title;
@@ -728,6 +968,12 @@
         document.getElementById('c4Title').textContent = t.c4Title;
         document.getElementById('c4Body').textContent = t.c4Body;
         setList('c4List', t.c4List);
+        document.getElementById('c5Title').textContent = t.c5Title;
+        document.getElementById('c5Body').textContent = t.c5Body;
+        setList('c5List', t.c5List);
+        document.getElementById('c6Title').textContent = t.c6Title;
+        document.getElementById('c6Body').textContent = t.c6Body;
+        document.getElementById('c6Code').textContent = t.c6Code;
         document.getElementById('tableTitle').textContent = t.tableTitle;
         document.getElementById('tableBody').textContent = t.tableBody;
         document.getElementById('thOs').textContent = t.thOs;
@@ -754,6 +1000,7 @@
         localStorage.setItem('gemma_studio_theme_v1', isDark ? 'dark' : 'light');
       });
 
+      resolveRuntimeLinks();
       renderLang(currentLang, false);
     </script>
   </body>

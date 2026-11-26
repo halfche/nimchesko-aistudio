@@ -221,7 +221,7 @@ export function parseImportedChatFiles(
     try {
       const parsed = JSON.parse(trimmed) as unknown;
 
-      // 1. Full Gemma Studio Workspace Sync Bundle
+      // 1. Full nimchesko AI studio Workspace Sync Bundle
       if (
         parsed &&
         typeof parsed === 'object' &&
@@ -247,7 +247,7 @@ export function parseImportedChatFiles(
         };
       }
 
-      // 2. Array of conversations (e.g. ChatGPT conversations.json or Gemma Studio list)
+      // 2. Array of conversations (e.g. ChatGPT conversations.json or nimchesko AI studio list)
       if (Array.isArray(parsed)) {
         const importedConvs: Conversation[] = [];
         for (const item of parsed) {

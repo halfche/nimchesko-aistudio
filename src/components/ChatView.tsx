@@ -56,6 +56,7 @@ interface ChatViewProps {
   onOpenSkills: () => void;
   onOpenProjects: () => void;
   onOpenModels: () => void;
+  onOpenCompare: () => void;
   importedModels: ImportedModelProfile[];
   contextMonitorMode: boolean;
   onToggleContextMonitorMode: () => void;
@@ -69,13 +70,6 @@ interface ChatViewProps {
   pendingPrompt?: { id: number; text: string } | null;
   onConsumePendingPrompt?: () => void;
 }
-
-const SUGGESTED_MODELS = [
-  'gemma4:12b',
-  'gemma4:e4b',
-  'gemma4:26b',
-  'gemma4:31b',
-];
 
 const STARTER_PROMPTS = [
   {
@@ -161,6 +155,7 @@ export function ChatView({
   onOpenSkills,
   onOpenProjects,
   onOpenModels,
+  onOpenCompare,
   importedModels,
   contextMonitorMode,
   onToggleContextMonitorMode,
@@ -227,7 +222,7 @@ export function ChatView({
   const importedNames = importedModels.map((m) => m.name);
   const modelOptions = Array.from(
     new Set(
-      [conversation.model, ...installedNames, ...importedNames, ...SUGGESTED_MODELS].filter(
+      [conversation.model, project.defaultModel, ...installedNames, ...importedNames].filter(
         Boolean
       )
     )
@@ -338,8 +333,8 @@ export function ChatView({
                   type="text"
                   value={conversation.model}
                   onChange={(e) => onChangeModel(e.target.value)}
-                  placeholder="gemma4:12b"
-                  className="h-9 w-40 rounded-xl border border-[#6B1D2F]/18 dark:border-[#F3E7D8]/16 bg-[#FAF5EC]/80 dark:bg-[#19080E]/85 px-2.5 text-sm font-mono text-[#2B0F17] dark:text-[#F5ECE0] focus:border-[#6B1D2F]/60 dark:focus:border-[#E6B8A2]/50 focus:outline-none"
+                  placeholder="llama3.2:latest or local tag"
+                  className="h-9 w-44 rounded-xl border border-[#6B1D2F]/18 dark:border-[#F3E7D8]/16 bg-[#FAF5EC]/80 dark:bg-[#19080E]/85 px-2.5 text-sm font-mono text-[#2B0F17] dark:text-[#F5ECE0] focus:border-[#6B1D2F]/60 dark:focus:border-[#E6B8A2]/50 focus:outline-none"
                 />
                 <button
                   type="button"
@@ -364,6 +359,9 @@ export function ChatView({
                 }}
                 className="h-9 rounded-xl border border-[#6B1D2F]/18 dark:border-[#F3E7D8]/16 bg-[#FAF5EC]/80 dark:bg-[#19080E]/85 px-2.5 text-sm font-mono text-[#2B0F17] dark:text-[#F5ECE0] focus:border-[#6B1D2F]/60 dark:focus:border-[#E6B8A2]/50 focus:outline-none"
               >
+                {!conversation.model && (
+                  <option value="">Select or import local model...</option>
+                )}
                 {modelOptions.map((name) => {
                   const matched = diagnostic.models.find((m) => m.name === name);
                   const customProf = importedModels.find((m) => m.name === name);
@@ -381,8 +379,8 @@ export function ChatView({
                     </option>
                   );
                 })}
-                <option value="__import__">+ Import / pull model...</option>
-                <option value="__custom__">Custom tag...</option>
+                <option value="__import__">+ Add from local files or Ollama...</option>
+                <option value="__custom__">Enter custom model tag...</option>
               </select>
             )}
           </div>
@@ -695,15 +693,31 @@ export function ChatView({
               Isolated Workspace · {project.name}
             </div>
             <h1 className="mt-1 text-2xl sm:text-3xl font-semibold tracking-tight text-[#3A101B] dark:text-[#F5ECE0] [text-wrap:balance]">
-              Local {conversation.model}
+              {conversation.model ? `Local · ${conversation.model}` : 'Local Models Workspace'}
             </h1>
             <p className="mt-2 text-sm text-[#6E4A53] dark:text-[#CEB8AE] max-w-xl leading-relaxed">
               Direct streaming from{' '}
               <code className="font-mono text-xs px-1.5 py-0.5 rounded-md bg-[#FAF5EC]/80 dark:bg-[#230D14]/80 border border-[#6B1D2F]/12 dark:border-[#F3E7D8]/12 text-[#4D1422] dark:text-[#E6B8A2]">
                 {baseUrl}/api/chat
               </code>{' '}
-              with isolated project brain, context vault, skills, and connectors.
+              with any Ollama or local file model, side-by-side comparison, isolated project brain, and connectors.
             </p>
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={onOpenModels}
+                className="inline-flex h-8 items-center rounded-xl bg-[#6B1D2F] dark:bg-[#8C253E] px-3 text-xs font-medium text-[#FAF5EC] hover:bg-[#541524] dark:hover:bg-[#A02D49] transition-colors"
+              >
+                Import Local File / Pull from Ollama
+              </button>
+              <button
+                type="button"
+                onClick={onOpenCompare}
+                className="inline-flex h-8 items-center rounded-xl border border-[#6B1D2F]/20 dark:border-[#F3E7D8]/18 bg-[#FCF8F2]/80 dark:bg-[#19080E]/80 px-3 text-xs font-medium text-[#4D1422] dark:text-[#F5ECE0] hover:bg-[#FCF8F2] dark:hover:bg-[#2F121B] transition-colors"
+              >
+                Compare All Local Models
+              </button>
+            </div>
 
             {diagnostic.status === 'error' && (
               <div className="mt-6 rounded-2xl border border-[#6B1D2F]/25 dark:border-[#E6B8A2]/25 bg-[#FAF5EC]/75 dark:bg-[#230D14]/75 backdrop-blur-md p-4">

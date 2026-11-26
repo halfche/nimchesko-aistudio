@@ -12,6 +12,7 @@ import {
   HardDrive,
   Plus,
   RefreshCw,
+  Scale,
   Trash2,
   Upload,
 } from 'lucide-react';
@@ -30,6 +31,7 @@ import {
   parseModelfileText,
   pullOllamaModel,
   showOllamaModel,
+  uploadOllamaBlob,
   type PullOrCreateProgress,
 } from '../services/ollamaClient';
 import {
@@ -63,16 +65,17 @@ interface ModelsAndSyncViewProps {
   onLinkLocalSyncFile: () => Promise<void>;
   onPullFromLinkedSyncFile: () => Promise<string | null>;
   onUnlinkSyncFile: () => void;
+  onOpenCompare: () => void;
   onBackToChat: () => void;
 }
 
 const POPULAR_OLLAMA_TAGS = [
-  'gemma4:12b',
-  'gemma4:e4b',
-  'gemma4:26b',
+  'llama3.2:latest',
   'qwen3:8b',
-  'llama3.3:latest',
   'deepseek-r1:14b',
+  'mistral:latest',
+  'phi4:latest',
+  'gemma4:12b',
 ];
 
 function downloadJsonFile(filename: string, data: unknown) {
@@ -107,6 +110,7 @@ export function ModelsAndSyncView({
   onLinkLocalSyncFile,
   onPullFromLinkedSyncFile,
   onUnlinkSyncFile,
+  onOpenCompare,
   onBackToChat,
 }: ModelsAndSyncViewProps) {
   const [section, setSection] = useState<'models' | 'sync'>('models');
@@ -120,12 +124,15 @@ export function ModelsAndSyncView({
   const pullAbortRef = useRef<AbortController | null>(null);
 
   // File / Modelfile / GGUF import state
-  const [importSourceType, setImportSourceType] = useState<'modelfile' | 'gguf'>('modelfile');
+  const [importSourceType, setImportSourceType] = useState<
+    'modelfile' | 'gguf' | 'local-file'
+  >('gguf');
   const [customTag, setCustomTag] = useState('');
-  const [baseOrPath, setBaseOrPath] = useState('gemma4:12b');
+  const [baseOrPath, setBaseOrPath] = useState('');
   const [modelfileText, setModelfileText] = useState(
-    'FROM gemma4:12b\nPARAMETER temperature 0.6\nPARAMETER num_ctx 16384\nSYSTEM """You are a precise local engineering assistant."""'
+    'PARAMETER temperature 0.7\nPARAMETER num_ctx 16384\nSYSTEM """You are a precise local assistant."""'
   );
+  const [selectedLocalFile, setSelectedLocalFile] = useState<File | null>(null);
   const [selectedFileName, setSelectedFileName] = useState('');
   const [selectedFileSize, setSelectedFileSize] = useState<number | undefined>(undefined);
   const [isCreatingModel, setIsCreatingModel] = useState(false);
@@ -143,11 +150,19 @@ export function ModelsAndSyncView({
   const [syncNotice, setSyncNotice] = useState<string | null>(null);
   const [syncError, setSyncError] = useState<string | null>(null);
   const [importTargetModel, setImportTargetModel] = useState(
-    activeConversation?.model || activeProject.defaultModel || 'gemma4:12b'
+    activeConversation?.model ||
+      activeProject.defaultModel ||
+      diagnostic.models[0]?.name ||
+      importedModels[0]?.name ||
+      ''
   );
   const [selectedChatIds, setSelectedChatIds] = useState<string[]>([]);
   const [batchTargetModel, setBatchTargetModel] = useState(
-    activeConversation?.model || activeProject.defaultModel || 'gemma4:12b'
+    activeConversation?.model ||
+      activeProject.defaultModel ||
+      diagnostic.models[0]?.name ||
+      importedModels[0]?.name ||
+      ''
   );
   const syncFileInputRef = useRef<HTMLInputElement>(null);
 
@@ -161,6 +176,29 @@ export function ModelsAndSyncView({
       activeProject.defaultModel,
     ])
   ).filter(Boolean);
+
+  const handleImportAllDetectedFromOllama = () => {
+    if (diagnostic.models.length === 0) return;
+    const now = Date.now();
+    for (const m of diagnostic.models) {
+      onAddOrUpdateImportedModel({
+        id: `model-ollama-${m.name.replace(/[^a-z0-9._-]+/gi, '-')}`,
+        name: m.name,
+        sourceType: 'ollama',
+        fileSizeBytes: m.size,
+        family: m.details?.family,
+        parameterSize: m.details?.parameter_size,
+        quantization: m.details?.quantization_level,
+        syncedWithOllama: true,
+        createdAt: now,
+        updatedAt: now,
+      });
+    }
+    setPullSuccess(
+      `Imported ${diagnostic.models.length} local model(s) from Ollama into your workspace.`
+    );
+    setPullError(null);
+  };
 
   const handlePullModel = async (tagToPull?: string) => {
     const target = (tagToPull ?? pullTag).trim();
@@ -208,26 +246,71 @@ export function ModelsAndSyncView({
 
   const handleModelFileSelected = async (file: File | undefined) => {
     if (!file) return;
+    setSelectedLocalFile(file);
     setSelectedFileName(file.name);
     setSelectedFileSize(file.size);
     setCreateError(null);
+    setCreateProgress(null);
 
     const lower = file.name.toLowerCase();
-    if (lower.endsWith('.gguf') || lower.endsWith('.bin') || lower.endsWith('.safetensors')) {
+    if (
+      lower.endsWith('.gguf') ||
+      lower.endsWith('.bin') ||
+      lower.endsWith('.safetensors')
+    ) {
       setImportSourceType('gguf');
       const cleanStem = file.name
         .replace(/\.[^.]+$/, '')
         .toLowerCase()
         .replace(/[^a-z0-9._-]+/g, '-')
         .replace(/^-+|-+$/g, '');
-      if (!customTag.trim()) {
-        setCustomTag(cleanStem || 'local-gguf-model');
-      }
+      setCustomTag(cleanStem || 'local-gguf-model');
       const guessedPath = `./${file.name}`;
       setBaseOrPath(guessedPath);
       setModelfileText(
         `FROM ${guessedPath}\nPARAMETER temperature 0.7\nPARAMETER num_ctx 16384\nSYSTEM """You are a helpful local assistant."""`
       );
+    } else if (lower.endsWith('.json')) {
+      try {
+        const text = await file.text();
+        const parsed = JSON.parse(text) as
+          | Partial<ImportedModelProfile>
+          | Array<Partial<ImportedModelProfile>>;
+        const list = Array.isArray(parsed) ? parsed : [parsed];
+        let count = 0;
+        for (const item of list) {
+          if (item && typeof item.name === 'string' && item.name.trim()) {
+            onAddOrUpdateImportedModel({
+              id: `model-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+              name: item.name.trim(),
+              sourceType: item.sourceType || 'local-file',
+              baseModel: item.baseModel,
+              fileName: item.fileName || file.name,
+              fileSizeBytes: item.fileSizeBytes || file.size,
+              modelfileContent: item.modelfileContent,
+              systemPrompt: item.systemPrompt,
+              recommendedNumCtx: item.recommendedNumCtx,
+              family: item.family,
+              parameterSize: item.parameterSize,
+              quantization: item.quantization,
+              syncedWithOllama: diagnostic.models.some(
+                (m) => m.name === item.name?.trim()
+              ),
+              createdAt: Date.now(),
+              updatedAt: Date.now(),
+            });
+            count++;
+          }
+        }
+        if (count > 0) {
+          setImportSourceType('local-file');
+          setCreateProgress(`Imported ${count} model profile(s) from ${file.name}.`);
+          return;
+        }
+      } catch {
+        // Fall through to Modelfile text parsing
+      }
+      setImportSourceType('local-file');
     } else {
       setImportSourceType('modelfile');
       const text = await file.text();
@@ -236,20 +319,18 @@ export function ModelsAndSyncView({
       if (parsed.from) {
         setBaseOrPath(parsed.from);
       }
-      if (!customTag.trim()) {
-        const cleanStem = file.name
-          .replace(/\.[^.]+$/, '')
-          .toLowerCase()
-          .replace(/[^a-z0-9._-]+/g, '-');
-        setCustomTag(cleanStem && cleanStem !== 'modelfile' ? cleanStem : 'custom-gemma4');
-      }
+      const cleanStem = file.name
+        .replace(/\.[^.]+$/, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9._-]+/g, '-');
+      setCustomTag(cleanStem && cleanStem !== 'modelfile' ? cleanStem : 'custom-local-model');
     }
   };
 
   const handleSaveModelProfileOnly = () => {
     const name = customTag.trim();
     if (!name) {
-      setCreateError('Enter a model tag name first (e.g. gemma4-architect:latest).');
+      setCreateError('Enter a model tag name first (e.g. my-local-model:latest).');
       return;
     }
     const parsed = parseModelfileText(modelfileText);
@@ -272,7 +353,7 @@ export function ModelsAndSyncView({
       createdAt: Date.now(),
       updatedAt: Date.now(),
     });
-    setCreateProgress(`Saved "${name}" to your workspace model registry.`);
+    setCreateProgress(`Saved "${name}" to your local model registry.`);
     setCreateError(null);
   };
 
@@ -285,7 +366,7 @@ export function ModelsAndSyncView({
 
     setIsCreatingModel(true);
     setCreateError(null);
-    setCreateProgress(`Registering "${name}" in Ollama...`);
+    setCreateProgress(`Preparing "${name}" for Ollama...`);
 
     const parsed = parseModelfileText(modelfileText);
     const numCtxVal =
@@ -294,11 +375,25 @@ export function ModelsAndSyncView({
         : undefined;
 
     try {
+      let uploadedFiles: Record<string, string> | undefined;
+
+      // If user picked a binary weight file (.gguf / .bin / .safetensors), upload its blob directly to Ollama
+      if (selectedLocalFile && importSourceType === 'gguf') {
+        const digest = await uploadOllamaBlob(
+          activeProject.baseUrl,
+          selectedLocalFile,
+          (statusMsg) => setCreateProgress(statusMsg)
+        );
+        uploadedFiles = { [selectedLocalFile.name]: digest };
+      }
+
+      setCreateProgress(`Registering "${name}" in Ollama...`);
       await createOllamaModel(
         activeProject.baseUrl,
         {
           model: name,
-          from: baseOrPath.trim() || parsed.from,
+          from: uploadedFiles ? undefined : baseOrPath.trim() || parsed.from,
+          files: uploadedFiles,
           modelfile: modelfileText,
         },
         (prog) => setCreateProgress(prog.status)
@@ -470,14 +565,24 @@ export function ModelsAndSyncView({
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={onBackToChat}
-            className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-[#6B1D2F]/18 dark:border-[#F3E7D8]/16 bg-[#FAF5EC]/75 dark:bg-[#230D14]/75 px-3.5 text-xs font-medium text-[#4D1422] dark:text-[#F5ECE0] hover:bg-[#FCF8F2] dark:hover:bg-[#2F121B] transition-colors whitespace-nowrap shrink-0"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            <span>Back to Chat</span>
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={onOpenCompare}
+              className="inline-flex h-9 items-center gap-1.5 rounded-xl bg-[#6B1D2F] dark:bg-[#8C253E] px-3.5 text-xs font-medium text-[#FAF5EC] hover:bg-[#541524] dark:hover:bg-[#A02D49] transition-colors whitespace-nowrap shrink-0"
+            >
+              <Scale className="h-3.5 w-3.5" />
+              <span>Compare Models</span>
+            </button>
+            <button
+              type="button"
+              onClick={onBackToChat}
+              className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-[#6B1D2F]/18 dark:border-[#F3E7D8]/16 bg-[#FAF5EC]/75 dark:bg-[#230D14]/75 px-3.5 text-xs font-medium text-[#4D1422] dark:text-[#F5ECE0] hover:bg-[#FCF8F2] dark:hover:bg-[#2F121B] transition-colors whitespace-nowrap shrink-0"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              <span>Back to Chat</span>
+            </button>
+          </div>
         </div>
 
         {/* Sub-navigation */}
@@ -517,24 +622,36 @@ export function ModelsAndSyncView({
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <h2 className="text-base font-semibold text-[#3A101B] dark:text-[#F5ECE0]">
-                      01. Pull Model via Ollama
+                      01. Add or Pull from Ollama
                     </h2>
                     <p className="mt-0.5 text-xs text-[#6E4A53] dark:text-[#CEB8AE]">
-                      Streams <code className="font-mono">POST {activeProject.baseUrl}/api/pull</code> to download local weights.
+                      Pull any Ollama tag or <code className="font-mono">hf.co/user/repo</code> via <code className="font-mono">{activeProject.baseUrl}</code>.
                     </p>
                   </div>
-                  <button
-                    type="button"
-                    onClick={onProbeConnection}
-                    className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[#6B1D2F]/16 dark:border-[#F3E7D8]/16 px-2.5 text-xs font-medium text-[#4D1422] dark:text-[#F5ECE0] hover:bg-[#FCF8F2] dark:hover:bg-[#2F121B]"
-                  >
-                    <RefreshCw
-                      className={`h-3.5 w-3.5 ${
-                        diagnostic.status === 'checking' ? 'animate-spin' : ''
-                      }`}
-                    />
-                    <span>Refresh</span>
-                  </button>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {diagnostic.models.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={handleImportAllDetectedFromOllama}
+                        className="inline-flex h-8 items-center gap-1 rounded-lg border border-[#6B1D2F]/16 dark:border-[#F3E7D8]/16 px-2.5 text-xs font-medium text-[#4D1422] dark:text-[#F5ECE0] hover:bg-[#FCF8F2] dark:hover:bg-[#2F121B]"
+                      >
+                        <Plus className="h-3.5 w-3.5" />
+                        <span>Import All ({diagnostic.models.length})</span>
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={onProbeConnection}
+                      className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[#6B1D2F]/16 dark:border-[#F3E7D8]/16 px-2.5 text-xs font-medium text-[#4D1422] dark:text-[#F5ECE0] hover:bg-[#FCF8F2] dark:hover:bg-[#2F121B]"
+                    >
+                      <RefreshCw
+                        className={`h-3.5 w-3.5 ${
+                          diagnostic.status === 'checking' ? 'animate-spin' : ''
+                        }`}
+                      />
+                      <span>Refresh</span>
+                    </button>
+                  </div>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -545,7 +662,7 @@ export function ModelsAndSyncView({
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') void handlePullModel();
                     }}
-                    placeholder="e.g. gemma4:12b, qwen3:8b, llama3.3..."
+                    placeholder="e.g. llama3.2:latest, qwen3:8b, hf.co/..."
                     className="h-9 flex-1 rounded-xl border border-[#6B1D2F]/18 dark:border-[#F3E7D8]/16 bg-[#FCF8F2]/90 dark:bg-[#16080D]/85 px-3 text-xs font-mono text-[#2B0F17] dark:text-[#F5ECE0] focus:border-[#6B1D2F]/60 dark:focus:border-[#E6B8A2]/50 focus:outline-none"
                   />
                   {isPulling ? (
@@ -626,16 +743,16 @@ export function ModelsAndSyncView({
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <h2 className="text-base font-semibold text-[#3A101B] dark:text-[#F5ECE0]">
-                      02. Import Model File (.gguf / Modelfile)
+                      02. Import from Local Files (.gguf / Modelfile)
                     </h2>
                     <p className="mt-0.5 text-xs text-[#6E4A53] dark:text-[#CEB8AE]">
-                      Load a local <code className="font-mono">Modelfile</code> or <code className="font-mono">.gguf</code> weight reference and create it in Ollama.
+                      Select any local <code className="font-mono">.gguf</code>, <code className="font-mono">.safetensors</code>, <code className="font-mono">Modelfile</code>, or <code className="font-mono">.json</code> file to register directly in Ollama.
                     </p>
                   </div>
                   <input
                     ref={modelFileInputRef}
                     type="file"
-                    accept=".gguf,.modelfile,.txt,.bin,.safetensors,*"
+                    accept=".gguf,.modelfile,.txt,.bin,.safetensors,.json,*"
                     className="hidden"
                     onChange={(e) => {
                       void handleModelFileSelected(e.target.files?.[0]);
@@ -648,7 +765,7 @@ export function ModelsAndSyncView({
                     className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[#6B1D2F]/18 dark:border-[#F3E7D8]/16 bg-[#FCF8F2]/85 dark:bg-[#16080D]/80 px-2.5 text-xs font-medium text-[#4D1422] dark:text-[#F5ECE0] hover:bg-[#FCF8F2] dark:hover:bg-[#2F121B] whitespace-nowrap shrink-0"
                   >
                     <FileUp className="h-3.5 w-3.5 text-[#6B1D2F] dark:text-[#E6B8A2]" />
-                    <span>Select File</span>
+                    <span>Select Local File</span>
                   </button>
                 </div>
 
@@ -661,28 +778,46 @@ export function ModelsAndSyncView({
                       type="text"
                       value={customTag}
                       onChange={(e) => setCustomTag(e.target.value)}
-                      placeholder="e.g. gemma4-local:latest"
+                      placeholder="e.g. my-local-model:latest"
                       className="h-8 w-full rounded-lg border border-[#6B1D2F]/16 dark:border-[#F3E7D8]/16 bg-[#FCF8F2]/90 dark:bg-[#16080D]/85 px-2.5 text-xs font-mono text-[#2B0F17] dark:text-[#F5ECE0] focus:outline-none"
                     />
                   </div>
                   <div>
                     <label className="block text-[11px] font-medium text-[#4D1422] dark:text-[#E6B8A2] mb-1">
-                      FROM Base Tag or Local .gguf Path
+                      FROM Base Tag or Local File Path
                     </label>
                     <input
                       type="text"
                       value={baseOrPath}
                       onChange={(e) => setBaseOrPath(e.target.value)}
-                      placeholder="gemma4:12b or /models/model.gguf"
+                      placeholder="/path/to/model.gguf or llama3.2:latest"
                       className="h-8 w-full rounded-lg border border-[#6B1D2F]/16 dark:border-[#F3E7D8]/16 bg-[#FCF8F2]/90 dark:bg-[#16080D]/85 px-2.5 text-xs font-mono text-[#2B0F17] dark:text-[#F5ECE0] focus:outline-none"
                     />
                   </div>
                 </div>
 
                 {selectedFileName && (
-                  <div className="text-[11px] font-mono text-[#6E4A53] dark:text-[#C5AE9F]">
-                    Loaded file: {selectedFileName}
-                    {selectedFileSize ? ` (${formatBytes(selectedFileSize) || `${selectedFileSize} B`})` : ''}
+                  <div className="flex items-center justify-between gap-2 text-[11px] font-mono text-[#6E4A53] dark:text-[#C5AE9F]">
+                    <span className="truncate">
+                      Loaded file: {selectedFileName}
+                      {selectedFileSize ? ` (${formatBytes(selectedFileSize) || `${selectedFileSize} B`})` : ''}
+                      {selectedLocalFile && importSourceType === 'gguf'
+                        ? ' · Ready for direct blob upload'
+                        : ''}
+                    </span>
+                    {selectedLocalFile && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedLocalFile(null);
+                          setSelectedFileName('');
+                          setSelectedFileSize(undefined);
+                        }}
+                        className="text-[#6B1D2F] dark:text-[#E6B8A2] hover:underline shrink-0"
+                      >
+                        Clear
+                      </button>
+                    )}
                   </div>
                 )}
 
@@ -1001,7 +1136,7 @@ export function ModelsAndSyncView({
                     <span>Export Sync Bundle (.json)</span>
                   </button>
                   <a
-                    href="/nimchesko-ai-studio-app.zip"
+                    href="./nimchesko-ai-studio-app.zip"
                     download="nimchesko-ai-studio-app.zip"
                     className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-[#6B1D2F]/18 dark:border-[#F3E7D8]/16 bg-[#FCF8F2]/85 dark:bg-[#16080D]/80 px-3.5 text-xs font-medium text-[#4D1422] dark:text-[#F5ECE0] hover:bg-[#FCF8F2] dark:hover:bg-[#2F121B] transition-colors"
                   >

@@ -2,18 +2,19 @@
 
 # nimchesko AI studio
 
-> **Interactive Multilingual HTML Guide (Rendered Interface, Burgundy & Cream Theme):**
-> - **[Open Rendered Guide Now (HTML Preview)](https://htmlpreview.github.io/?https://github.com/halfche/nimchesko-aistudio/blob/main/public/guide.html)** *(renders `public/guide.html` directly as a webpage)*
-> - **[Open Guide on GitHub Pages](https://halfche.github.io/nimchesko-aistudio/guide.html)** · **[Open Live App on GitHub Pages](https://halfche.github.io/nimchesko-aistudio/)** *(requires **Settings → Pages → Source: GitHub Actions** enabled once)*
-> - Source file in repo: [`public/guide.html`](public/guide.html) *(supports English, فارسی, العربية, Deutsch, Español, Français, Türkçe + Light/Dark mode)*
+> **Interactive Multilingual HTML Guide (Opens Directly in Browser — No Raw Code):**
+> - **[Open Full Interactive Guide (`guide.html` on GitHub Pages)](https://halfche.github.io/nimchesko-aistudio/)** *(also at [guide.html](https://halfche.github.io/nimchesko-aistudio/guide.html) — includes a button back to this Main Repo & Web Studio)*
+> - **[Open Instant HTML Guide (CDN Mirror)](https://raw.githack.com/halfche/nimchesko-aistudio/main/public/guide.html)** · **[Launch Web Studio](https://halfche.github.io/nimchesko-aistudio/studio.html)** · **[Desktop Releases](https://github.com/halfche/nimchesko-aistudio/releases)**
+> - Supports English, فارسی, العربية, Deutsch, Español, Français, Türkçe + Light/Dark mode.
 
-Cross-platform local AI studio and integration workbench for Ollama (`gemma4:12b`, pulled Ollama tags, custom `Modelfile`s, and `.gguf` definitions), built with a minimal **Burgundy & Cream** aesthetic and Iranian architectural motifs.
+Cross-platform local AI studio, multi-model comparison workbench, and integration workspace for **all local models** (imported from **local files** like `.gguf`, `.bin`, `.safetensors`, `Modelfile`, `.json` or pulled/discovered via **Ollama**), built with a minimal **Burgundy & Cream** aesthetic and Iranian architectural motifs.
 
 ## Key Features
 
+- **Compare All Local Models (`Compare`):** Run prompts side-by-side across all selected or installed local models (Sequential VRAM-safe or Parallel), inspect `/api/show` specs, compare `tok/s` speed, latency, token counts, and reasoning traces, export Markdown reports, and continue any winner in Chat.
+- **Any Local Model Import (`Models & Sync`):** Add any local model from **local files** (stream `.gguf` / `.bin` / `.safetensors` weights straight into Ollama via `/api/blobs` + `/api/create`, import `Modelfile`s or `.json` profiles) or from **Ollama** (auto-discover `/api/tags`, one-click Import All, pull any tag or HuggingFace `hf.co/...` model).
 - **Isolated Project Workspaces:** Separate brains, `rules.md`, markdown/text resource files, system connectors, model parameters, and conversation histories per project.
-- **Local Models & Sync (`Models & Sync`):** Pull models from Ollama (`/api/pull`), inspect (`/api/show`), import `Modelfile` / `.gguf` definitions, export/smart-merge `.json` workspace sync bundles, link a local `.json` file on disk for automatic mirroring, and import `.json` / ChatGPT `conversations.json` / `.md` / `.txt` transcripts.
-- **Workspace Productivity:** Drag-and-drop sidebar folders, Quick Prompts library, live Context Monitor & pruning modal, debounced auto-save with composer drafts, and global shortcuts (`Cmd/Ctrl + Enter`, `Cmd/Ctrl + N`, `Cmd/Ctrl + K`).
+- **Workspace Sync & Productivity:** Export/smart-merge `.json` workspace sync bundles, link a local `.json` file on disk for automatic mirroring, import `.json` / ChatGPT `conversations.json` / `.md` / `.txt` transcripts, drag-and-drop folders, Quick Prompts, live Context Monitor, auto-save, and global shortcuts (`Cmd/Ctrl + Enter`, `Cmd/Ctrl + N`, `Cmd/Ctrl + K`).
 - **Light & Dark Themes:** Dual Burgundy & Cream Light/Dark palettes plus a standalone themed HTML guide (`public/guide.html`).
 - **Cross-Platform Packaging:** One-click combined web bundle (`nimchesko-ai-studio-app.zip`) and automated GitHub Actions CI/CD desktop installers (`.deb`, `.rpm`, `.pkg`, `.pkg.tar.zst`, `.tar`, `.tar.zst`, `.AppImage`, `.exe`).
 
@@ -31,7 +32,7 @@ Cross-platform local AI studio and integration workbench for Ollama (`gemma4:12b
 ## Local Development & Build from Source
 
 ```bash
-npm install
+npm install --legacy-peer-deps
 npm run dev      # Development server on http://localhost:3000
 npm run build    # Compiles dist/ and dist/nimchesko-ai-studio-app.zip
 ```

@@ -2,6 +2,11 @@
   "name": "nimchesko-ai-studio",
   "version": "1.0.0",
   "description": "nimchesko AI studio — Cross-platform local AI workspace for Ollama",
+  "homepage": "https://github.com/halfche/nimchesko-aistudio",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/halfche/nimchesko-aistudio.git"
+  },
   "author": {
     "name": "nimchesko",
     "email": "nimchesko@gmail.com"

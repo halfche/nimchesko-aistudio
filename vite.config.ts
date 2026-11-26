@@ -48,7 +48,7 @@ export default defineConfig(() => {
           name: 'nimchesko AI studio',
           short_name: 'nimchesko AI',
           description:
-            'Cross-platform local chatbot interface and integration workbench for Gemma 4 12B on Ollama.',
+            'Cross-platform local AI studio, multi-model comparison workbench, and Ollama/GGUF workspace.',
           theme_color: '#6B1D2F',
           background_color: '#F6EFE4',
           display: 'standalone',
@@ -77,6 +77,7 @@ export default defineConfig(() => {
         },
         workbox: {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
+          navigateFallbackDenylist: [/guide\.html$/i, /nimchesko-ai-studio-app\.zip$/i],
           runtimeCaching: [
             {
               urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,

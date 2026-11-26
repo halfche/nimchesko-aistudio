@@ -4,15 +4,15 @@
 
 # nimchesko AI studio
 
-> **دليل HTML متعدد اللغات (الواجهة التفاعلية):** **[فتح الدليل التفاعلي مباشرة](https://htmlpreview.github.io/?https://github.com/halfche/nimchesko-aistudio/blob/main/public/guide.html?lang=ar)** · **[GitHub Pages](https://halfche.github.io/nimchesko-aistudio/guide.html?lang=ar)** · [`public/guide.html`](public/guide.html)
+> **دليل HTML متعدد اللغات (يفتح مباشرة كصفحة ويب بدون عرض الكود):** **[فتح الدليل الكامل (GitHub Pages)](https://halfche.github.io/nimchesko-aistudio/#ar)** · **[المرآة الفورية (CDN)](https://raw.githack.com/halfche/nimchesko-aistudio/main/public/guide.html#ar)** · **[تشغيل الاستوديو](https://halfche.github.io/nimchesko-aistudio/studio.html)** · **[الإصدارات](https://github.com/halfche/nimchesko-aistudio/releases)**
 
-مساحة عمل محلية متعددة المنصات لتشغيل نماذج **Ollama** (`gemma4:12b`، والنماذج المحلية، وملفات `Modelfile` / `.gguf`) بتصميم بسيط بألوان **العنابي والكريمي**.
+مساحة عمل محلية متعددة المنصات لتشغيل ومقارنة **جميع النماذج المحلية** (الاستيراد من **الملفات المحلية** مثل `.gguf` و`.bin` و`.safetensors` و`Modelfile` و`.json` أو عبر **Ollama**) بتصميم بسيط بألوان **العنابي والكريمي**.
 
 ## الميزات الرئيسية
 
-- **مشاريع معزولة:** بيئة مستقلة لكل مشروع تشمل ملف القواعد `rules.md`، والموارد النصية، وإعدادات النموذج، وسجل المحادثات.
-- **إدارة النماذج والمزامنة (`Models & Sync`):** سحب النماذج من Ollama (`/api/pull`)، وفحصها (`/api/show`)، واستيراد `Modelfile` و`.gguf`، وتصدير ودمج حزم المزامنة `.json`، وربط ملف محلي للمزامنة التلقائية.
-- **إنتاجية متقدمة:** مجلدات جانبية بالسحب والإفلات، ومكتبة الأوامر السريعة، ومراقبة السياق المباشرة، والحفظ التلقائي، واختصارات لوحة المفاتيح (`Cmd/Ctrl + Enter`، `Cmd/Ctrl + N`، `Cmd/Ctrl + K`).
+- **مقارنة جميع النماذج المحلية (`Compare`):** تشغيل الأوامر جنباً إلى جنب بالتتابع أو بالتوازي، فحص المواصفات (`/api/show`)، ومقارنة السرعة (`tok/s`) وزمن الاستجابة وتصدير التقارير.
+- **استيراد أي نموذج محلي (`Models & Sync`):** إضافة النماذج من الملفات المحلية مباشرة إلى Ollama عبر `/api/blobs` و`/api/create` أو استيرادها وسحبها من Ollama (`/api/tags` و`/api/pull` و`hf.co/...`) مع مزامنة ملفات `.json`.
+- **مشاريع معزولة وإنتاجية متقدمة:** قواعد `rules.md` مستقلة، مجلدات بالسحب والإفلات، مكتبة الأوامر السريعة، مراقبة السياق، والحفظ التلقائي واختصارات لوحة المفاتيح (`Cmd/Ctrl + Enter`، `Cmd/Ctrl + N`، `Cmd/Ctrl + K`).
 - **تغليف متعدد المنصات:** حزمة ويب موحدة (`nimchesko-ai-studio-app.zip`) وبناء آلي عبر GitHub Actions بصيغ `.deb` و`.rpm` و`.pkg` و`.pkg.tar.zst` و`.tar` و`.tar.zst` و`.AppImage` و`.exe`.
 
 ## التشغيل السريع
@@ -27,7 +27,7 @@
 ## البناء من المصدر وإصدارات GitHub Actions
 
 ```bash
-npm install
+npm install --legacy-peer-deps
 npm run build
 ```
 

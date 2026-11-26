@@ -16,6 +16,7 @@ import { ProjectMotifIcon, ShamsehEmblem } from './components/PersianMotifs';
 import type {
   ChatAttachment,
   ChatMessage,
+  CompareRound,
   ConnectionDiagnostic,
   Conversation,
   ImportedModelProfile,
@@ -42,6 +43,7 @@ import {
   createWorkspaceProject,
 } from './data/presets';
 import { ChatView } from './components/ChatView';
+import { CompareView } from './components/CompareView';
 import { IntegrationGuide } from './components/IntegrationGuide';
 import { SkillsAndConnectorsView } from './components/SkillsAndConnectorsView';
 import { ProjectsView } from './components/ProjectsView';
@@ -61,6 +63,7 @@ const STORAGE_CONTEXT_MONITOR_KEY = 'gemma_studio_context_monitor_v1';
 const STORAGE_AUTOSAVE_KEY = 'gemma_studio_autosave_v1';
 const STORAGE_DRAFTS_KEY = 'gemma_studio_drafts_v1';
 const STORAGE_IMPORTED_MODELS_KEY = 'gemma_studio_imported_models_v1';
+const STORAGE_COMPARE_ROUNDS_KEY = 'local_studio_compare_rounds_v1';
 
 // Legacy v1 keys for smooth one-time migration
 const LEGACY_CONVERSATIONS_KEY = 'gemma_studio_conversations_v1';
@@ -80,7 +83,7 @@ function loadInitialProjects(): WorkspaceProject[] {
           conversations:
             Array.isArray(proj.conversations) && proj.conversations.length > 0
               ? proj.conversations
-              : [createConversation(proj.defaultModel || 'gemma4:12b')],
+              : [createConversation(proj.defaultModel || '')],
           folders: Array.isArray(proj.folders) ? proj.folders : [],
           contextItems: Array.isArray(proj.contextItems) ? proj.contextItems : [],
           prompts: Array.isArray(proj.prompts) ? proj.prompts : [],
@@ -172,6 +175,19 @@ function loadInitialImportedModels(): ImportedModelProfile[] {
   return [];
 }
 
+function loadInitialCompareRounds(): CompareRound[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_COMPARE_ROUNDS_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as CompareRound[];
+      if (Array.isArray(parsed)) return parsed;
+    }
+  } catch {
+    // Ignore corrupt compare rounds
+  }
+  return [];
+}
+
 interface SyncFileHandleLike {
   name: string;
   getFile: () => Promise<File>;
@@ -185,6 +201,9 @@ export default function App() {
   const [projects, setProjects] = useState<WorkspaceProject[]>(loadInitialProjects);
   const [importedModels, setImportedModels] = useState<ImportedModelProfile[]>(
     loadInitialImportedModels
+  );
+  const [compareRounds, setCompareRounds] = useState<CompareRound[]>(
+    loadInitialCompareRounds
   );
   const [drafts, setDrafts] = useState<Record<string, string>>(loadInitialDrafts);
   const [activeProjectId, setActiveProjectId] = useState<string>(() => {
@@ -214,7 +233,7 @@ export default function App() {
   });
 
   const [activeTab, setActiveTab] = useState<
-    'chat' | 'projects' | 'models' | 'skills' | 'guide'
+    'chat' | 'compare' | 'projects' | 'models' | 'skills' | 'guide'
   >('chat');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [projectMenuOpen, setProjectMenuOpen] = useState(false);
@@ -417,6 +436,62 @@ export default function App() {
     };
   }, [runProbe]);
 
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        STORAGE_COMPARE_ROUNDS_KEY,
+        JSON.stringify(compareRounds)
+      );
+    } catch {
+      // Ignore storage quota issues for compare rounds
+    }
+  }, [compareRounds]);
+
+  const firstDetectedLocalModel = useMemo(
+    () => diagnostic.models[0]?.name || importedModels[0]?.name || '',
+    [diagnostic.models, importedModels]
+  );
+
+  useEffect(() => {
+    if (!firstDetectedLocalModel) return;
+    const knownNames = new Set<string>([
+      ...diagnostic.models.map((m) => m.name),
+      ...importedModels.map((m) => m.name),
+    ]);
+    setProjects((prev) => {
+      let changed = false;
+      const next = prev.map((proj) => {
+        const defaultInvalid =
+          !proj.defaultModel ||
+          (proj.defaultModel === 'gemma4:12b' && !knownNames.has('gemma4:12b'));
+        const nextDefault = defaultInvalid
+          ? firstDetectedLocalModel
+          : proj.defaultModel;
+
+        let convChanged = false;
+        const nextConversations = proj.conversations.map((conv) => {
+          const convNeedsAutoModel =
+            !conv.model ||
+            (conv.model === 'gemma4:12b' &&
+              conv.messages.length === 0 &&
+              !knownNames.has('gemma4:12b'));
+          if (!convNeedsAutoModel) return conv;
+          convChanged = true;
+          return { ...conv, model: nextDefault };
+        });
+
+        if (!defaultInvalid && !convChanged) return proj;
+        changed = true;
+        return {
+          ...proj,
+          defaultModel: nextDefault,
+          conversations: nextConversations,
+        };
+      });
+      return changed ? next : prev;
+    });
+  }, [firstDetectedLocalModel, diagnostic.models, importedModels]);
+
   const updateProject = useCallback(
     (projectId: string, updater: (prev: WorkspaceProject) => WorkspaceProject) => {
       setProjects((prev) =>
@@ -545,7 +620,10 @@ export default function App() {
       setIsStreaming(false);
     }
     const next = createConversation(
-      activeConversation?.model || activeProject.defaultModel || 'gemma4:12b'
+      activeConversation?.model ||
+        activeProject.defaultModel ||
+        firstDetectedLocalModel ||
+        ''
     );
     updateActiveProject((proj) => ({
       ...proj,
@@ -617,7 +695,9 @@ export default function App() {
     updateActiveProject((proj) => {
       const filtered = proj.conversations.filter((c) => c.id !== convId);
       if (filtered.length === 0) {
-        const fresh = createConversation(proj.defaultModel || 'gemma4:12b');
+        const fresh = createConversation(
+          proj.defaultModel || firstDetectedLocalModel || ''
+        );
         return {
           ...proj,
           conversations: [fresh],
@@ -814,6 +894,15 @@ export default function App() {
   const handleSendMessage = async (text: string, attachments: ChatAttachment[]) => {
     if (!activeProject || !activeConversation || isStreaming) return;
 
+    const targetModel =
+      activeConversation.model.trim() ||
+      activeProject.defaultModel.trim() ||
+      firstDetectedLocalModel;
+    if (!targetModel) {
+      setActiveTab('models');
+      return;
+    }
+
     const userMsg: ChatMessage = {
       id: `msg-u-${Date.now()}`,
       role: 'user',
@@ -838,6 +927,7 @@ export default function App() {
 
     updateConversation(activeProject.id, activeConversation.id, (conv) => ({
       ...conv,
+      model: targetModel,
       title: derivedTitle,
       updatedAt: Date.now(),
       messages: [...nextMessages, assistantMsg],
@@ -846,7 +936,7 @@ export default function App() {
     await runAssistantGeneration(
       activeProject,
       activeConversation.id,
-      activeConversation.model,
+      targetModel,
       activeConversation.systemPrompt,
       nextMessages,
       assistantMsg.id
@@ -857,6 +947,15 @@ export default function App() {
     if (!activeProject || !activeConversation || isStreaming) return;
     const msgs = activeConversation.messages;
     if (msgs.length === 0) return;
+
+    const targetModel =
+      activeConversation.model.trim() ||
+      activeProject.defaultModel.trim() ||
+      firstDetectedLocalModel;
+    if (!targetModel) {
+      setActiveTab('models');
+      return;
+    }
 
     const last = msgs[msgs.length - 1];
     const historyWithoutLast = last.role === 'assistant' ? msgs.slice(0, -1) : msgs;
@@ -872,6 +971,7 @@ export default function App() {
 
     updateConversation(activeProject.id, activeConversation.id, (conv) => ({
       ...conv,
+      model: targetModel,
       updatedAt: Date.now(),
       messages: [...historyWithoutLast, assistantMsg],
     }));
@@ -879,7 +979,7 @@ export default function App() {
     await runAssistantGeneration(
       activeProject,
       activeConversation.id,
-      activeConversation.model,
+      targetModel,
       activeConversation.systemPrompt,
       historyWithoutLast,
       assistantMsg.id
@@ -918,7 +1018,7 @@ export default function App() {
       activeConversation.title
         .replace(/[^a-z0-9-_]+/gi, '_')
         .replace(/^_+|_+$/g, '')
-        .toLowerCase() || 'gemma-chat';
+        .toLowerCase() || 'local-chat';
     a.download = `${safeSlug}.md`;
     a.click();
     URL.revokeObjectURL(url);
@@ -961,6 +1061,17 @@ export default function App() {
             }`}
           >
             Chatbot
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('compare')}
+            className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors whitespace-nowrap shrink-0 ${
+              activeTab === 'compare'
+                ? 'bg-[#FCF8F2] dark:bg-[#8C253E] text-[#541524] dark:text-[#FAF5EC] shadow-[0_1px_4px_rgba(77,20,34,0.1)] border border-[#6B1D2F]/12 dark:border-transparent'
+                : 'text-[#6E4A53] dark:text-[#CEB8AE] hover:text-[#3A101B] dark:hover:text-[#FAF5EC]'
+            }`}
+          >
+            Compare
           </button>
           <button
             type="button"
@@ -1012,7 +1123,7 @@ export default function App() {
           <PWAInstallButton />
 
           <a
-            href="/nimchesko-ai-studio-app.zip"
+            href="./nimchesko-ai-studio-app.zip"
             download="nimchesko-ai-studio-app.zip"
             title="Download combined Windows & Linux app package (.zip)"
             aria-label="Download combined Windows and Linux app package"
@@ -1383,6 +1494,7 @@ export default function App() {
               onOpenSkills={() => setActiveTab('skills')}
               onOpenProjects={() => setActiveTab('projects')}
               onOpenModels={() => setActiveTab('models')}
+              onOpenCompare={() => setActiveTab('compare')}
               importedModels={importedModels}
               contextMonitorMode={contextMonitorMode}
               onToggleContextMonitorMode={() =>
@@ -1430,6 +1542,51 @@ export default function App() {
               }
               pendingPrompt={pendingPrompt}
               onConsumePendingPrompt={() => setPendingPrompt(null)}
+            />
+          ) : activeTab === 'compare' ? (
+            <CompareView
+              project={activeProject}
+              diagnostic={diagnostic}
+              importedModels={importedModels}
+              rounds={compareRounds}
+              onChangeRounds={setCompareRounds}
+              onProbeConnection={runProbe}
+              onOpenModels={() => setActiveTab('models')}
+              onOpenInChat={(model, prompt, response) => {
+                const now = Date.now();
+                const baseConv = createConversation(model);
+                const messages: ChatMessage[] = [
+                  {
+                    id: `msg-u-${now}`,
+                    role: 'user',
+                    content: prompt,
+                    createdAt: now,
+                  },
+                ];
+                if (response.trim()) {
+                  messages.push({
+                    id: `msg-a-${now + 1}`,
+                    role: 'assistant',
+                    content: response,
+                    createdAt: now + 1,
+                  });
+                }
+                const nextConv: Conversation = {
+                  ...baseConv,
+                  title: (prompt || model).slice(0, 46),
+                  messages,
+                  updatedAt: now,
+                };
+                updateActiveProject((proj) => ({
+                  ...proj,
+                  conversations: [nextConv, ...proj.conversations],
+                  activeConversationId: nextConv.id,
+                  updatedAt: now,
+                }));
+                setActiveTab('chat');
+                setSidebarOpen(false);
+              }}
+              onBackToChat={() => setActiveTab('chat')}
             />
           ) : activeTab === 'projects' ? (
             <ProjectsView
@@ -1575,6 +1732,7 @@ export default function App() {
                 syncFileHandleRef.current = null;
                 setLinkedSyncFileName(null);
               }}
+              onOpenCompare={() => setActiveTab('compare')}
               onBackToChat={() => setActiveTab('chat')}
             />
           ) : activeTab === 'skills' ? (

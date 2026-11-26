@@ -95,7 +95,7 @@ export function ProjectsView({
   const [newName, setNewName] = useState('');
   const [newDescription, setNewDescription] = useState('');
   const [newMotif, setNewMotif] = useState<MotifId>('isfahan');
-  const [newModel, setNewModel] = useState('gemma4:12b');
+  const [newModel, setNewModel] = useState('');
   const [newBrainPrompt, setNewBrainPrompt] = useState(
     'You operate strictly within this isolated project workspace. Follow project rules.md, resource files, and system connectors.'
   );
@@ -135,7 +135,7 @@ export function ProjectsView({
         newDescription.trim() ||
         'Isolated project workspace with dedicated chat histories, rules.md, resource files, prompts, and environment.',
       motif: newMotif,
-      defaultModel: newModel.trim() || 'gemma4:12b',
+      defaultModel: newModel.trim(),
       brainPrompt: newBrainPrompt.trim(),
     });
     setNewName('');
@@ -504,7 +504,7 @@ export function ProjectsView({
                   type="text"
                   value={newModel}
                   onChange={(e) => setNewModel(e.target.value)}
-                  placeholder="gemma4:12b"
+                  placeholder="llama3.2:latest or local tag"
                   className="h-9 w-full rounded-xl border border-[#6B1D2F]/18 dark:border-[#F3E7D8]/16 bg-white/80 dark:bg-[#16080D]/80 px-3 text-sm font-mono text-[#2B0F17] dark:text-[#F5ECE0] focus:border-[#6B1D2F]/60 dark:focus:border-[#E6B8A2]/50 focus:outline-none"
                 />
               </div>

@@ -109,7 +109,7 @@ export interface SystemConnector {
   id: string;
   name: string; // snake_case tool function name exposed to Ollama
   label: string; // Human-readable title
-  description: string; // Instructs Gemma 4 when & how to call this system
+  description: string; // Instructs the local model when & how to call this system
   kind: ConnectorKind;
   builtinId?: 'current_datetime' | 'evaluate_math' | 'fetch_url_json';
   method?: 'GET' | 'POST' | 'PUT';
@@ -186,13 +186,16 @@ export interface ConnectionDiagnostic {
 export interface ImportedModelProfile {
   id: string;
   name: string;
-  sourceType: 'ollama' | 'modelfile' | 'gguf';
+  sourceType: 'ollama' | 'modelfile' | 'gguf' | 'local-file';
   baseModel?: string;
   fileName?: string;
   fileSizeBytes?: number;
   modelfileContent?: string;
   systemPrompt?: string;
   recommendedNumCtx?: number;
+  family?: string;
+  parameterSize?: string;
+  quantization?: string;
   syncedWithOllama: boolean;
   createdAt: number;
   updatedAt: number;
@@ -204,6 +207,33 @@ export interface OllamaShowResponse {
   template?: string;
   details?: OllamaModelDetails;
   model_info?: Record<string, unknown>;
+}
+
+export type CompareRunStatus =
+  | 'queued'
+  | 'streaming'
+  | 'done'
+  | 'error'
+  | 'aborted';
+
+export interface CompareModelResult {
+  model: string;
+  status: CompareRunStatus;
+  content: string;
+  thinking: string;
+  metrics?: OllamaChatMetrics;
+  error?: string;
+  startedAt?: number;
+  finishedAt?: number;
+}
+
+export interface CompareRound {
+  id: string;
+  prompt: string;
+  executionMode: 'sequential' | 'parallel';
+  includeProjectBrain: boolean;
+  createdAt: number;
+  results: CompareModelResult[];
 }
 
 export interface WorkspaceSyncBundle {

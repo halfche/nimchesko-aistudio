@@ -20,6 +20,7 @@ files:
 linux:
   icon: build/icon.png
   category: Development;Utility;
+  vendor: nimchesko
   maintainer: nimchesko <nimchesko@gmail.com>
   synopsis: nimchesko AI studio — Local AI workspace for Ollama
   description: Cross-platform local AI chatbot, model manager, and workspace studio for Ollama.

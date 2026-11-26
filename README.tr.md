@@ -2,15 +2,15 @@
 
 # nimchesko AI studio
 
-> **Çok Dilli HTML Kılavuzu (Görsel Arayüz):** **[Etkileşimli kılavuzu şimdi aç](https://htmlpreview.github.io/?https://github.com/halfche/nimchesko-aistudio/blob/main/public/guide.html?lang=tr)** · **[GitHub Pages](https://halfche.github.io/nimchesko-aistudio/guide.html?lang=tr)** · [`public/guide.html`](public/guide.html)
+> **Çok Dilli HTML Kılavuzu (Doğrudan Tarayıcıda Açılır):** **[Tam Kılavuzu Aç (GitHub Pages)](https://halfche.github.io/nimchesko-aistudio/#tr)** · **[Anlık Ayna (CDN)](https://raw.githack.com/halfche/nimchesko-aistudio/main/public/guide.html#tr)** · **[Web Stüdyo](https://halfche.github.io/nimchesko-aistudio/studio.html)** · **[Sürümler](https://github.com/halfche/nimchesko-aistudio/releases)**
 
-**Ollama** (`gemma4:12b`, yerel modeller, `Modelfile` ve `.gguf`) için minimalist **Bordo & Krem** temalı ve İran mimari motifli çok platformlu yerel yapay zeka çalışma alanı.
+**Tüm yerel modelleri** (**yerel dosyalardan** `.gguf`, `.bin`, `.safetensors`, `Modelfile`, `.json` veya **Ollama** üzerinden) içe aktarmak, çalıştırmak ve karşılaştırmak için minimalist **Bordo & Krem** temalı ve İran mimari motifli çok platformlu yerel yapay zeka çalışma alanı.
 
 ## Öne Çıkan Özellikler
 
-- **İzole Projeler:** Her proje için ayrı `rules.md` kuralları, kaynak dosyaları, sistem bağlayıcıları, model parametreleri ve sohbet geçmişi.
-- **Modeller ve Eşitleme (`Models & Sync`):** Ollama'dan model indirin (`/api/pull`), inceleyin (`/api/show`), `Modelfile` / `.gguf` içe aktarın, `.json` eşitleme paketlerini dışa aktarın veya birleştirin.
-- **Verimlilik:** Sürükle-bırak klasörler, Hızlı İstemler (Quick Prompts), canlı bağlam izleyici, otomatik kaydetme ve klavye kısayolları (`Cmd/Ctrl + Enter`, `Cmd/Ctrl + N`, `Cmd/Ctrl + K`).
+- **Tüm Yerel Modelleri Karşılaştır (`Compare`):** İstemleri sıralı (VRAM dostu) veya paralel olarak yan yana çalıştırın, `/api/show` ayrıntılarını inceleyin, `tok/s` ve gecikmeleri karşılaştırıp Markdown olarak dışa aktarın.
+- **Herhangi Bir Yerel Modeli İçe Aktar (`Models & Sync`):** Yerel ağırlık dosyalarını doğrudan Ollama'ya yükleyin (`/api/blobs` + `/api/create`), `Modelfile`/`.json` içe aktarın veya Ollama ile `hf.co/...` etiketlerini indirin (`/api/pull`).
+- **İzole Projeler ve Verimlilik:** Ayrı `rules.md` kuralları, sürükle-bırak klasörler, Hızlı İstemler, canlı bağlam izleyici, otomatik kaydetme ve kısayollar (`Cmd/Ctrl + Enter`, `Cmd/Ctrl + N`, `Cmd/Ctrl + K`).
 - **Çok Platformlu Paketleme:** Tek tıkla birleştirilmiş web paketi (`nimchesko-ai-studio-app.zip`) ve GitHub Actions CI/CD masaüstü derlemeleri (`.deb`, `.rpm`, `.pkg`, `.pkg.tar.zst`, `.tar`, `.tar.zst`, `.AppImage`, `.exe`).
 
 ## Hızlı Başlangıç
@@ -25,7 +25,7 @@
 ## Yerel Derleme ve GitHub Actions CI/CD
 
 ```bash
-npm install
+npm install --legacy-peer-deps
 npm run build
 ```
 
