@@ -30,15 +30,23 @@ linux:
       Name: nimchesko AI studio
       StartupWMClass: nimchesko-ai-studio
   artifactName: nimchesko-ai-studio-${version}-${arch}.${ext}
+  # Build only the unpacked directory by default; desktop/scripts/build-linux.sh
+  # packages AppImage, .deb, .rpm, .tar, .tar.zst, and .pkg.tar.zst sequentially
+  # from isolated staging copies so targets never collide on release/linux-unpacked.
   target:
-    - target: AppImage
-      arch: [x64]
-    - target: deb
-      arch: [x64]
-    - target: rpm
-      arch: [x64]
     - target: dir
       arch: [x64]
+
+deb:
+  depends:
+    - libgtk-3-0
+    - libnotify4
+    - libnss3
+    - libxss1
+    - libxtst6
+    - xdg-utils
+    - libatspi2.0-0
+    - libuuid1
 
 rpm:
   depends:
@@ -50,10 +58,6 @@ rpm:
     - xdg-utils
     - at-spi2-core
     - libuuid
-  fpm:
-    - --rpm-compression
-    - gzip
-    - --rpm-rpmbuild-define=_build_id_links none
 
 win:
   icon: build/icon.ico

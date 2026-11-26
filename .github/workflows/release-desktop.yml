@@ -43,7 +43,7 @@ jobs:
         env:
           DEBUG: "electron-builder,electron-builder:*"
         run: |
-          rm -rf release desktop/dist
+          rm -rf release release-stage desktop/dist
           npm --prefix desktop install --legacy-peer-deps
           chmod +x desktop/scripts/build-linux.sh desktop/scripts/build-extra-linux-archives.sh
           npm --prefix desktop run dist:linux
