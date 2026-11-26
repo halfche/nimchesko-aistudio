@@ -1,5 +1,5 @@
 appId: com.nimchesko.aistudio
-productName: nimchesko AI studio
+productName: nimchesko-ai-studio
 executableName: nimchesko-ai-studio
 copyright: Copyright © 2026 nimchesko
 asar: true
@@ -22,8 +22,12 @@ linux:
   category: Development;Utility;
   vendor: nimchesko
   maintainer: nimchesko <nimchesko@gmail.com>
-  synopsis: nimchesko AI studio — Local AI workspace for Ollama
-  description: Cross-platform local AI chatbot, model manager, and workspace studio for Ollama.
+  synopsis: nimchesko AI studio - Local AI workspace for all local models
+  description: Cross-platform local AI studio, multi-model comparison workbench, and Ollama/GGUF workspace.
+  desktop:
+    entry:
+      Name: nimchesko AI studio
+      StartupWMClass: nimchesko-ai-studio
   artifactName: nimchesko-ai-studio-${version}-${arch}.${ext}
   target:
     - target: AppImage
@@ -59,6 +63,9 @@ mac:
   icon: build/icon.icns
   category: public.app-category.developer-tools
   identity: null
+  extendInfo:
+    CFBundleDisplayName: nimchesko AI studio
+    CFBundleName: nimchesko AI studio
   artifactName: nimchesko-ai-studio-${version}-mac-${arch}.${ext}
   target:
     - target: pkg
