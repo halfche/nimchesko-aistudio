@@ -447,7 +447,7 @@
           >
             Main Repo
           </a>
-          <a class="action-link" href="./studio.html" id="navStudioBtn">Open Studio</a>
+          <a class="action-link" href="#downloads" id="navStudioBtn">Download Files</a>
         </div>
       </header>
 
@@ -458,12 +458,9 @@
           <div class="hero-actions">
             <a
               class="action-link"
-              href="https://github.com/halfche/nimchesko-aistudio"
-              target="_blank"
-              rel="noopener noreferrer"
-              id="heroRepoBtn"
+              href="#downloads"
+              id="heroStudioBtn"
             ></a>
-            <a class="secondary-link" href="./studio.html" id="heroStudioBtn"></a>
             <a
               class="secondary-link"
               href="./nimchesko-ai-studio-app.zip"
@@ -476,6 +473,13 @@
               target="_blank"
               rel="noopener noreferrer"
               id="releasesBtn"
+            ></a>
+            <a
+              class="secondary-link"
+              href="https://github.com/halfche/nimchesko-aistudio"
+              target="_blank"
+              rel="noopener noreferrer"
+              id="heroRepoBtn"
             ></a>
           </div>
           <nav class="toc" aria-label="Guide sections">
@@ -615,9 +619,37 @@
         </article>
       </section>
 
-      <section class="card" style="margin-top: 16px;">
+      <section class="card" id="downloads" style="margin-top: 16px;">
         <h3 id="pkgTableTitle"></h3>
         <p id="pkgTableBody"></p>
+        <div class="hero-actions" style="margin: 12px 0 14px;">
+          <a
+            class="action-link"
+            href="https://github.com/halfche/nimchesko-aistudio/releases"
+            target="_blank"
+            rel="noopener noreferrer"
+            id="dlAllReleasesBtn"
+          ></a>
+          <a
+            class="secondary-link"
+            href="./nimchesko-ai-studio-app.zip"
+            download="nimchesko-ai-studio-app.zip"
+            id="dlZipBtn"
+          ></a>
+          <a
+            class="secondary-link"
+            href="https://github.com/halfche/nimchesko-aistudio/actions"
+            target="_blank"
+            rel="noopener noreferrer"
+            id="dlActionsBtn"
+          ></a>
+          <a
+            class="secondary-link"
+            href="./"
+            id="dlWebAppBtn"
+            style="display: none;"
+          ></a>
+        </div>
         <div class="table-wrap">
           <table>
             <thead>
@@ -724,12 +756,6 @@
           (proto === 'http:' || proto === 'https:') &&
           (host === 'localhost' || host === '127.0.0.1' || host.endsWith('.run.app'));
 
-        const studioHref = isGithubPages
-          ? './studio.html'
-          : isLocalServer
-            ? './'
-            : PAGES_STUDIO_URL;
-
         const zipHref =
           isGithubPages || isLocalServer
             ? './nimchesko-ai-studio-app.zip'
@@ -737,16 +763,37 @@
 
         ['navStudioBtn', 'heroStudioBtn'].forEach((id) => {
           const el = document.getElementById(id);
-          if (el) el.setAttribute('href', studioHref);
+          if (el) el.setAttribute('href', '#downloads');
         });
-        const zipEl = document.getElementById('zipBtn');
-        if (zipEl) zipEl.setAttribute('href', zipHref);
+        ['zipBtn', 'dlZipBtn'].forEach((id) => {
+          const el = document.getElementById(id);
+          if (el) el.setAttribute('href', zipHref);
+        });
         ['navRepoBtn', 'heroRepoBtn'].forEach((id) => {
           const el = document.getElementById(id);
           if (el) el.setAttribute('href', REPO_URL);
         });
-        const relEl = document.getElementById('releasesBtn');
-        if (relEl) relEl.setAttribute('href', RELEASES_URL);
+        ['releasesBtn', 'dlAllReleasesBtn'].forEach((id) => {
+          const el = document.getElementById(id);
+          if (el) el.setAttribute('href', RELEASES_URL);
+        });
+
+        const webAppBtn = document.getElementById('dlWebAppBtn');
+        if (webAppBtn) {
+          if (isLocalServer) {
+            webAppBtn.setAttribute('href', './');
+            webAppBtn.style.display = 'inline-flex';
+          } else if (isGithubPages && typeof fetch === 'function') {
+            fetch('./studio.html', { method: 'HEAD' })
+              .then((res) => {
+                if (res.ok) {
+                  webAppBtn.setAttribute('href', './studio.html');
+                  webAppBtn.style.display = 'inline-flex';
+                }
+              })
+              .catch(() => {});
+          }
+        }
       }
 
       const COPY = {
@@ -754,11 +801,15 @@
           dir: 'ltr',
           themeLabel: 'Light / Dark',
           navRepo: 'Main Repo',
-          navStudio: 'Open Studio',
+          navStudio: 'Download Files',
           heroRepo: 'Go to Main GitHub Repo',
-          heroStudio: 'Launch Web Studio',
+          heroStudio: 'Download Installers (Win / Mac / Linux)',
           zipBtn: 'Download App (.zip)',
           releasesBtn: 'Desktop Releases',
+          dlAllReleasesBtn: 'Open GitHub Releases (Win / Mac / Linux)',
+          dlZipBtn: 'Download Offline Web App (.zip)',
+          dlActionsBtn: 'View GitHub Actions Builds',
+          dlWebAppBtn: 'Open Web App',
           tocWhat: '1. What It Is',
           tocFeatures: '2. Features',
           tocCompare: '3. Tool Comparison',
@@ -934,11 +985,15 @@
           dir: 'rtl',
           themeLabel: 'تم روشن / تاریک',
           navRepo: 'مخزن اصلی گیت‌هاب',
-          navStudio: 'باز کردن استودیو',
+          navStudio: 'دانلود فایل‌ها',
           heroRepo: 'رفتن به مخزن اصلی (GitHub)',
-          heroStudio: 'اجرای نسخه وب استودیو',
+          heroStudio: 'دانلود نصاب‌های ویندوز، مک و لینوکس',
           zipBtn: 'دانلود بسته برنامه (.zip)',
           releasesBtn: 'نسخه‌های دسکتاپ',
+          dlAllReleasesBtn: 'باز کردن صفحه Releases در گیت‌هاب',
+          dlZipBtn: 'دانلود نسخه آفلاین وب (.zip)',
+          dlActionsBtn: 'مشاهده ساخت‌های GitHub Actions',
+          dlWebAppBtn: 'باز کردن نسخه وب',
           tocWhat: '۱. معرفی پروژه',
           tocFeatures: '۲. تمام قابلیت‌ها',
           tocCompare: '۳. مقایسه با ابزارها',
@@ -1114,11 +1169,15 @@
           dir: 'rtl',
           themeLabel: 'فاتح / داكن',
           navRepo: 'المستودع الرئيسي',
-          navStudio: 'فتح الاستوديو',
+          navStudio: 'تنزيل الملفات',
           heroRepo: 'الانتقال إلى المستودع الرئيسي (GitHub)',
-          heroStudio: 'تشغيل استوديو الويب',
+          heroStudio: 'تنزيل مثبتات ويندوز وماك ولينكس',
           zipBtn: 'تنزيل الحزمة (.zip)',
           releasesBtn: 'إصدارات سطح المكتب',
+          dlAllReleasesBtn: 'فتح GitHub Releases (ويندوز / ماك / لينكس)',
+          dlZipBtn: 'تنزيل حزمة الويب دون إنترنت (.zip)',
+          dlActionsBtn: 'عرض ملفات GitHub Actions',
+          dlWebAppBtn: 'فتح تطبيق الويب',
           tocWhat: '١. ما هو المشروع',
           tocFeatures: '٢. الميزات الكاملة',
           tocCompare: '٣. المقارنة',
@@ -1293,11 +1352,15 @@
           dir: 'ltr',
           themeLabel: 'Hell / Dunkel',
           navRepo: 'Haupt-Repo',
-          navStudio: 'Studio öffnen',
+          navStudio: 'Dateien laden',
           heroRepo: 'Zum Haupt-Repo (GitHub)',
-          heroStudio: 'Web-Studio starten',
+          heroStudio: 'Installer laden (Win / Mac / Linux)',
           zipBtn: 'App laden (.zip)',
           releasesBtn: 'Desktop-Releases',
+          dlAllReleasesBtn: 'GitHub Releases öffnen (Win / Mac / Linux)',
+          dlZipBtn: 'Offline-Web-Bundle laden (.zip)',
+          dlActionsBtn: 'GitHub-Actions-Builds ansehen',
+          dlWebAppBtn: 'Web-App öffnen',
           tocWhat: '1. Überblick',
           tocFeatures: '2. Funktionen',
           tocCompare: '3. Tool-Vergleich',
@@ -1472,11 +1535,15 @@
           dir: 'ltr',
           themeLabel: 'Claro / Oscuro',
           navRepo: 'Repo Principal',
-          navStudio: 'Abrir Studio',
+          navStudio: 'Descargar Archivos',
           heroRepo: 'Ir al Repo Principal (GitHub)',
-          heroStudio: 'Abrir Web Studio',
+          heroStudio: 'Descargar Instaladores (Win / Mac / Linux)',
           zipBtn: 'Descargar App (.zip)',
           releasesBtn: 'Versiones Desktop',
+          dlAllReleasesBtn: 'Abrir GitHub Releases (Win / Mac / Linux)',
+          dlZipBtn: 'Descargar App Web Sin Conexión (.zip)',
+          dlActionsBtn: 'Ver Compilaciones en Actions',
+          dlWebAppBtn: 'Abrir App Web',
           tocWhat: '1. Qué es',
           tocFeatures: '2. Funciones',
           tocCompare: '3. Comparativa',
@@ -1651,11 +1718,15 @@
           dir: 'ltr',
           themeLabel: 'Clair / Sombre',
           navRepo: 'Dépôt Principal',
-          navStudio: 'Ouvrir Studio',
+          navStudio: 'Télécharger',
           heroRepo: 'Aller au Dépôt GitHub',
-          heroStudio: 'Lancer Web Studio',
+          heroStudio: 'Télécharger les Installeurs (Win / Mac / Linux)',
           zipBtn: 'Télécharger (.zip)',
           releasesBtn: 'Versions Desktop',
+          dlAllReleasesBtn: 'Ouvrir GitHub Releases (Win / Mac / Linux)',
+          dlZipBtn: 'Télécharger l’App Web Hors Ligne (.zip)',
+          dlActionsBtn: 'Voir les Builds GitHub Actions',
+          dlWebAppBtn: 'Ouvrir l’App Web',
           tocWhat: '1. Présentation',
           tocFeatures: '2. Fonctionnalités',
           tocCompare: '3. Comparatif',
@@ -1830,11 +1901,15 @@
           dir: 'ltr',
           themeLabel: 'Açık / Koyu',
           navRepo: 'Ana Repo',
-          navStudio: 'Stüdyoyu Aç',
+          navStudio: 'Dosyaları İndir',
           heroRepo: 'Ana GitHub Reposuna Git',
-          heroStudio: 'Web Stüdyoyu Başlat',
+          heroStudio: 'Kurulum Dosyalarını İndir (Win / Mac / Linux)',
           zipBtn: 'İndir (.zip)',
           releasesBtn: 'Masaüstü Sürümleri',
+          dlAllReleasesBtn: 'GitHub Releases Sayfasını Aç (Win / Mac / Linux)',
+          dlZipBtn: 'Çevrimdışı Web Paketi İndir (.zip)',
+          dlActionsBtn: 'GitHub Actions Derlemelerini Gör',
+          dlWebAppBtn: 'Web Uygulamasını Aç',
           tocWhat: '1. Proje Nedir?',
           tocFeatures: '2. Özellikler',
           tocCompare: '3. Araç Karşılaştırması',
@@ -2074,6 +2149,10 @@
           heroStudioBtn: t.heroStudio,
           zipBtn: t.zipBtn,
           releasesBtn: t.releasesBtn,
+          dlAllReleasesBtn: t.dlAllReleasesBtn,
+          dlZipBtn: t.dlZipBtn,
+          dlActionsBtn: t.dlActionsBtn,
+          dlWebAppBtn: t.dlWebAppBtn,
           tocWhat: t.tocWhat,
           tocFeatures: t.tocFeatures,
           tocCompare: t.tocCompare,
