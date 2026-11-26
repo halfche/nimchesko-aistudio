@@ -35,6 +35,7 @@ jobs:
       - name: Install web dependencies & build dist
         shell: bash
         run: |
+          rm -rf dist
           npm install --legacy-peer-deps
           npm run build
 
@@ -43,7 +44,9 @@ jobs:
         env:
           DEBUG: "electron-builder,electron-builder:*"
         run: |
-          rm -rf release release-stage desktop/dist
+          free -h || true
+          df -h || true
+          rm -rf release release-stage desktop/dist desktop/build desktop/node_modules/.cache ~/.cache/electron-builder/fpm /tmp/package-rpm-build-*
           npm --prefix desktop install --legacy-peer-deps
           chmod +x desktop/scripts/build-linux.sh desktop/scripts/build-extra-linux-archives.sh
           npm --prefix desktop run dist:linux

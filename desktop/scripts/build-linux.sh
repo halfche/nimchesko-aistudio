@@ -26,6 +26,12 @@ verify_unpacked_dir() {
     "chrome-sandbox"
   )
 
+  if [[ ! -x "${dir}/nimchesko-ai-studio" ]]; then
+    echo "Error: Binary is missing or not executable: ${dir}/nimchesko-ai-studio" >&2
+    ls -la "${dir}" || true
+    exit 1
+  fi
+
   for rel_path in "${required_files[@]}"; do
     if [[ ! -f "${dir}/${rel_path}" ]]; then
       echo "Error: Missing expected Electron file: ${dir}/${rel_path}" >&2
@@ -166,8 +172,8 @@ EOF
 
 cd "${DESKTOP_DIR}"
 
-echo "==> Cleaning previous release and stage directories..."
-rm -rf "${RELEASE_DIR}" "${DESKTOP_DIR}/dist" "${STAGE_BASE}"
+echo "==> Cleaning previous release, build, and stage directories..."
+rm -rf "${RELEASE_DIR}" "${DESKTOP_DIR}/dist" "${DESKTOP_DIR}/build" "${DESKTOP_DIR}/node_modules/.cache" "${STAGE_BASE}"
 mkdir -p "${RELEASE_DIR}" "${STAGE_BASE}"
 npm run prepare:icons
 
@@ -176,6 +182,7 @@ npx electron-builder --linux dir --x64 --publish never --config electron-builder
 verify_unpacked_dir "${UNPACKED_DIR}"
 
 echo "==> Verified unpacked app contents:"
+find "${UNPACKED_DIR}" -maxdepth 2 -type f | head -n 25
 ls -lh "${UNPACKED_DIR}"
 ls -lh "${UNPACKED_DIR}/resources"
 
