@@ -24,6 +24,11 @@ verify_unpacked_dir() {
     "LICENSE.electron.txt"
     "LICENSES.chromium.html"
     "chrome-sandbox"
+    "icudtl.dat"
+    "libEGL.so"
+    "libGLESv2.so"
+    "libffmpeg.so"
+    "chrome_100_percent.pak"
   )
 
   if [[ ! -x "${dir}/nimchesko-ai-studio" ]]; then
