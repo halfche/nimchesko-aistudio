@@ -4,29 +4,34 @@
 
 > **Mehrsprachiger HTML-Leitfaden (Direkt im Browser öffnen):** **[Vollständigen Leitfaden öffnen (GitHub Pages)](https://halfche.github.io/nimchesko-aistudio/#de)** · **[Sofort-Mirror (CDN)](https://raw.githack.com/halfche/nimchesko-aistudio/main/public/guide.html#de)** · **[Web-Studio](https://halfche.github.io/nimchesko-aistudio/studio.html)** · **[Releases](https://github.com/halfche/nimchesko-aistudio/releases)**
 
-Plattformübergreifender lokaler KI-Arbeitsbereich zum Ausführen, Importieren und Vergleichen **aller lokalen Modelle** (über **lokale Dateien** wie `.gguf`, `.bin`, `.safetensors`, `Modelfile`, `.json` oder via **Ollama**) im minimalistischen **Burgunderrot- & Creme-Design** mit persischen Architekturmotiven.
+Plattformübergreifender, zu 100 % lokaler KI-Arbeitsbereich für **alle lokalen Modelle** (`.gguf`, `.bin`, `.safetensors`, `Modelfile`, `.json` oder **Ollama**) im **Burgunderrot- & Creme-Design** ohne Docker- oder Cloud-Zwang.
 
 ## Hauptfunktionen
 
-- **Alle lokalen Modelle vergleichen (`Compare`):** Prompts sequenziell oder parallel über beliebig viele lokale Modelle testen, `/api/show`-Details prüfen, `tok/s` und Latenzen vergleichen und als Markdown exportieren.
-- **Beliebige lokale Modelle importieren (`Models & Sync`):** Lokale Gewichtsdateien direkt per `/api/blobs` + `/api/create` in Ollama laden oder Ollama-Tags & `hf.co/...`-Modelle verwalten (`/api/pull`, `/api/show`), inklusive `.json`-Sync und Chat-Import (`.json`, `.md`, `.txt`).
-- **Isolierte Projekte & Produktivität:** Eigene Regeln (`rules.md`), Ressourcen, System-Konnektoren, Drag-and-Drop-Ordner, Quick-Prompts, Live-Kontextmonitor, automatisches Speichern und Tastenkürzel (`Cmd/Ctrl + Enter`, `Cmd/Ctrl + N`, `Cmd/Ctrl + K`).
-- **Plattformübergreifende Pakete:** Kombiniertes Web-Archiv (`nimchesko-ai-studio-app.zip`) und automatisierte GitHub Actions CI/CD-Builds (`.deb`, `.rpm`, `.pkg`, `.pkg.tar.zst`, `.tar`, `.tar.zst`, `.AppImage`, `.exe`).
+- **Beliebige lokale Modelle (`Models & Sync`):** Ollama-Tags automatisch erkennen, `.gguf`/`.bin`/`.safetensors` direkt via `/api/blobs` + `/api/create` laden oder `hf.co/...` ziehen.
+- **Multi-Modell-Chat & Pflichtbenennung (`Chat`):** Mehrere Modelle parallel in einem Chat befragen, klare Chat-Namen erzwingen und in Ordnern organisieren.
+- **Modellvergleich (`Compare`):** Sequenziell (VRAM-schonend) oder parallel vergleichen, `tok/s` prüfen und als Markdown exportieren.
+- **Hyper Mode:** Higher-Architect + Lower-Builder-Pipeline mit automatischer `.md`-Speicherung in `Desktop/Hyper Mode Markdown Files`.
+- **Journal & Skills:** `Side A -> Side B`-Workflows, Links und Dateien als Skills in `Desktop/Journal & Skill Mode` sichern und an Projekte koppeln.
+- **Universelle Datei-Uploads (`*/*`) & Isolierte Projekte:** Code, PDF, Office, JSON, `.zip`, Medien, `rules.md`, Kontextmonitor und `.json`-Sync / ChatGPT-Import.
 
-## Schnellstart
+## Vergleich mit ähnlichen Tools
 
-1. **`nimchesko-ai-studio-app.zip`** herunterladen und entpacken.
-2. **Windows:** `run-windows.bat` per Doppelklick starten. **Linux:** `chmod +x run-linux.sh && ./run-linux.sh`.
-3. Ollama mit aktiviertem CORS starten:
-   ```bash
-   OLLAMA_ORIGINS=* ollama serve
-   ```
+| Funktion | **nimchesko AI studio** | Ollama CLI | Open WebUI | LM Studio | AnythingLLM | Jan / Msty |
+| --- | --- | --- | --- | --- | --- | --- |
+| Open Source & ohne Docker | **Ja (MIT)** | Nur CLI | Docker/Python | Closed | Schwerer | Gemischt |
+| Direkt-Compare + Multi-Modell-Chat | **Ja** | Nein | Teilweise | Einzeln | Nein | Begrenzt |
+| Hyper Mode + Journal & Skills `.md` | **Ja** | Nein | Nein | Nein | Nein | Nein |
+| `.deb` / `.rpm` / `.AppImage` / `.pkg.tar.zst` / `.exe` / `.pkg` + PWA | **Alle Formate** | CLI | Web/Docker | Auswahl | Auswahl | Auswahl |
 
-## Lokale Entwicklung & GitHub Actions CI/CD
+## Schnellstart & Build
 
 ```bash
-npm install --legacy-peer-deps
-npm run build
+# Ollama mit CORS starten
+OLLAMA_ORIGINS=* ollama serve
+
+# Aus Quellcode bauen
+npm install --legacy-peer-deps && npm run build
 ```
 
-Aktivieren Sie unter **Settings → Actions → General → Workflow permissions** die Option **Read and write permissions**, damit `.github/workflows/release-desktop.yml` alle Pakete automatisch als GitHub Release bereitstellt.
+Oder **`nimchesko-ai-studio-app.zip`** entpacken (`run-windows.bat` / `./run-linux.sh`) bzw. Desktop-Installer aus **Releases** laden.

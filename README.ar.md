@@ -6,31 +6,34 @@
 
 > **دليل HTML متعدد اللغات (يفتح مباشرة كصفحة ويب بدون عرض الكود):** **[فتح الدليل الكامل (GitHub Pages)](https://halfche.github.io/nimchesko-aistudio/#ar)** · **[المرآة الفورية (CDN)](https://raw.githack.com/halfche/nimchesko-aistudio/main/public/guide.html#ar)** · **[تشغيل الاستوديو](https://halfche.github.io/nimchesko-aistudio/studio.html)** · **[الإصدارات](https://github.com/halfche/nimchesko-aistudio/releases)**
 
-مساحة عمل محلية متعددة المنصات لتشغيل ومقارنة **جميع النماذج المحلية** (الاستيراد من **الملفات المحلية** مثل `.gguf` و`.bin` و`.safetensors` و`Modelfile` و`.json` أو عبر **Ollama**) بتصميم بسيط بألوان **العنابي والكريمي**.
+بيئة عمل محلية ١٠٠٪ متعددة المنصات لتشغيل ومقارنة **جميع النماذج المحلية** (`.gguf`، `.bin`، `.safetensors`، `Modelfile`، `.json` أو عبر **Ollama**) بتصميم **العنابي والكريمي** وزخارف معمارية إيرانية بدون Docker أو سحابة.
 
 ## الميزات الرئيسية
 
-- **مقارنة جميع النماذج المحلية (`Compare`):** تشغيل الأوامر جنباً إلى جنب بالتتابع أو بالتوازي، فحص المواصفات (`/api/show`)، ومقارنة السرعة (`tok/s`) وزمن الاستجابة وتصدير التقارير.
-- **استيراد أي نموذج محلي (`Models & Sync`):** إضافة النماذج من الملفات المحلية مباشرة إلى Ollama عبر `/api/blobs` و`/api/create` أو استيرادها وسحبها من Ollama (`/api/tags` و`/api/pull` و`hf.co/...`) مع مزامنة ملفات `.json`.
-- **مشاريع معزولة وإنتاجية متقدمة:** قواعد `rules.md` مستقلة، مجلدات بالسحب والإفلات، مكتبة الأوامر السريعة، مراقبة السياق، والحفظ التلقائي واختصارات لوحة المفاتيح (`Cmd/Ctrl + Enter`، `Cmd/Ctrl + N`، `Cmd/Ctrl + K`).
-- **تغليف متعدد المنصات:** حزمة ويب موحدة (`nimchesko-ai-studio-app.zip`) وبناء آلي عبر GitHub Actions بصيغ `.deb` و`.rpm` و`.pkg` و`.pkg.tar.zst` و`.tar` و`.tar.zst` و`.AppImage` و`.exe`.
+- **استيراد أي نموذج محلي (`Models & Sync`):** اكتشاف `/api/tags` ورفع ملفات `.gguf`/`.bin`/`.safetensors` مباشرة عبر `/api/blobs` + `/api/create` أو سحب `hf.co/...`.
+- **محادثة متعددة النماذج وتسمية إلزامية (`Chat`):** تشغيل عدة نماذج في نفس المحادثة مع تسمية إلزامية ومجلدات بالسحب والإفلات.
+- **مقارنة جميع النماذج (`Compare`):** تشغيل متسلسل (موفر للذاكرة VRAM) أو متوازٍ، مقارنة `tok/s`، وتصدير Markdown.
+- **وضع `Hyper Mode`:** دمج نموذج معماري أعلى مع نموذج تنفيذ أسرع وحفظ ملفات `.md` تلقائياً في `Desktop/Hyper Mode Markdown Files`.
+- **وضع `Journal & Skills`:** إنشاء مهارات وجسور `Side A -> Side B` مع الروابط والمرفقات وحفظها في `Desktop/Journal & Skill Mode` وربطها بالمشروع.
+- **رفع كافة الملفات (`*/*`) ومشاريع معزولة:** دعم PDF وOffice وJSON وZIP والأكواد والوسائط، مع `rules.md` ومزامنة `.json` واستيراد ChatGPT.
+
+## مقارنة سريعة مع الأدوات المشابهة
+
+| الميزة | **nimchesko AI studio** | Ollama CLI | Open WebUI | LM Studio | AnythingLLM | Jan / Msty |
+| --- | --- | --- | --- | --- | --- | --- |
+| مجاني ومفتوح المصدر (MIT) | **نعم** | نعم | ترخيص مخصص | مغلق | نعم | مختلط |
+| بدون Docker / خادم ثقيل | **نعم** | CLI فقط | يتطلب Docker | تطبيق | أثقل | تطبيق |
+| مقارنة شاملة + محادثة متعددة النماذج | **نعم** | لا | جزئي | لا | لا | محدود |
+| `Hyper Mode` + `Journal & Skills` | **نعم** | لا | لا | لا | لا | لا |
+| `.deb` / `.rpm` / `.AppImage` / `.pkg.tar.zst` / `.exe` / `.pkg` + PWA | **نعم** | CLI | ويب/Docker | جزئي | جزئي | جزئي |
 
 ## التشغيل السريع
 
-1. نزّل **`nimchesko-ai-studio-app.zip`** وفك الضغط عنه.
-2. **ويندوز:** انقر نقراً مزدوجاً على `run-windows.bat`. **لينكس:** نفّذ `chmod +x run-linux.sh && ./run-linux.sh`.
-3. شغّل Ollama مع تفعيل CORS:
+1. نزّل **`nimchesko-ai-studio-app.zip`** وفك الضغط ثم شغّل `run-windows.bat` أو `chmod +x run-linux.sh && ./run-linux.sh`.
+2. شغّل Ollama مع CORS:
    ```bash
    OLLAMA_ORIGINS=* ollama serve
    ```
-
-## البناء من المصدر وإصدارات GitHub Actions
-
-```bash
-npm install --legacy-peer-deps
-npm run build
-```
-
-تأكد من تفعيل **Read and write permissions** تحت **Settings ← Actions ← General ← Workflow permissions** ليتمكن ملف `.github/workflows/release-desktop.yml` من إنشاء الإصدارات تلقائياً.
+3. للبناء من المصدر: `npm install --legacy-peer-deps && npm run build`.
 
 </div>

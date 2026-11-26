@@ -4,20 +4,31 @@
 
 > **Guide HTML Multilingue (Ouverture directe dans le navigateur) :** **[Ouvrir le guide complet (GitHub Pages)](https://halfche.github.io/nimchesko-aistudio/#fr)** · **[Miroir Instantané (CDN)](https://raw.githack.com/halfche/nimchesko-aistudio/main/public/guide.html#fr)** · **[Web Studio](https://halfche.github.io/nimchesko-aistudio/studio.html)** · **[Releases](https://github.com/halfche/nimchesko-aistudio/releases)**
 
-Espace de travail IA local multiplateforme pour exécuter, importer et comparer **tous les modèles locaux** (depuis des **fichiers locaux** `.gguf`, `.bin`, `.safetensors`, `Modelfile`, `.json` ou via **Ollama**), conçu avec une esthétique minimaliste **Bordeaux & Crème** et des motifs architecturaux iraniens.
+Espace de travail IA 100 % local pour **tous vos modèles locaux** (`.gguf`, `.bin`, `.safetensors`, `Modelfile`, `.json` ou **Ollama**) au design **Bordeaux & Crème**, sans Docker ni serveur complexe.
 
 ## Fonctionnalités Clés
 
-- **Comparer tous les modèles locaux (`Compare`) :** Exécutez des prompts côte à côte en mode séquentiel ou parallèle, inspectez `/api/show`, comparez les `tok/s` et latences, et exportez en Markdown.
-- **Importer tout modèle local (`Models & Sync`) :** Chargez des fichiers de poids locaux dans Ollama (`/api/blobs` + `/api/create`), importez des `Modelfile`/`.json` ou téléchargez depuis Ollama et `hf.co/...` (`/api/pull`), avec synchronisation `.json`.
-- **Projets Isolés & Productivité :** Règles (`rules.md`), dossiers glisser-déposer, Quick Prompts, moniteur de contexte, sauvegarde automatique et raccourcis (`Cmd/Ctrl + Entrée`, `Cmd/Ctrl + N`, `Cmd/Ctrl + K`).
-- **Paquets Multiplateformes :** Archive web (`nimchesko-ai-studio-app.zip`) et builds GitHub Actions CI/CD (`.deb`, `.rpm`, `.pkg`, `.pkg.tar.zst`, `.tar`, `.tar.zst`, `.AppImage`, `.exe`).
+- **Tout Modèle Local (`Models & Sync`) :** Détection `/api/tags`, téléversement direct `.gguf`/`.bin`/`.safetensors` (`/api/blobs` + `/api/create`) et `hf.co/...`.
+- **Chat Multi-Modèles & Nommage Requis (`Chat`) :** Interrogez plusieurs modèles dans un même fil avec nommage obligatoire et dossiers.
+- **Comparateur (`Compare`) :** Exécution séquentielle (VRAM) ou parallèle, `tok/s` et export Markdown.
+- **Hyper Mode :** Pipeline Architecte -> Exécutant enregistré en `.md` dans `Desktop/Hyper Mode Markdown Files`.
+- **Journal & Skills :** Ponts `Side A -> Side B`, liens et fichiers sauvegardés dans `Desktop/Journal & Skill Mode` et liés au projet actif.
+- **Pièces Jointes Universelles (`*/*`) & Projets Isolés :** Code, PDF, Office, JSON, `.zip`, média, `rules.md`, moniteur de contexte et sync `.json` / ChatGPT.
+
+## Comparatif Rapide
+
+| Critère | **nimchesko AI studio** | Ollama CLI | Open WebUI | LM Studio | AnythingLLM | Jan / Msty |
+| --- | --- | --- | --- | --- | --- | --- |
+| Open Source sans Docker | **Oui (MIT)** | CLI | Docker/Python | Fermé | Lourd | Mixte |
+| Compare + Chat Multi-Modèles | **Oui** | Non | Partiel | Unique | Non | Limité |
+| Hyper Mode + Journal & Skills | **Oui** | Non | Non | Non | Non | Non |
+| `.deb`/`.rpm`/`.AppImage`/`.pkg.tar.zst`/`.exe`/`.pkg` + PWA | **Tous** | CLI | Web/Docker | Partiel | Partiel | Partiel |
 
 ## Démarrage Rapide
 
-1. Téléchargez et extrayez **`nimchesko-ai-studio-app.zip`**.
-2. **Windows :** double-cliquez sur `run-windows.bat`. **Linux :** exécutez `chmod +x run-linux.sh && ./run-linux.sh`.
-3. Démarrez Ollama avec CORS activé :
-   ```bash
-   OLLAMA_ORIGINS=* ollama serve
-   ```
+```bash
+OLLAMA_ORIGINS=* ollama serve
+npm install --legacy-peer-deps && npm run build
+```
+
+Ou extrayez **`nimchesko-ai-studio-app.zip`** (`run-windows.bat` / `./run-linux.sh`) ou installez via **Releases**.

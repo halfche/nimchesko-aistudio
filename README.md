@@ -2,31 +2,53 @@
 
 # nimchesko AI studio
 
-> **Interactive Multilingual HTML Guide (Opens Directly in Browser — No Raw Code):**
+> **Interactive Multilingual HTML Guide (Opens Directly in Browser — No Raw Code or 404):**
 > - **[Open Full Interactive Guide (`guide.html` on GitHub Pages)](https://halfche.github.io/nimchesko-aistudio/)** *(also at [guide.html](https://halfche.github.io/nimchesko-aistudio/guide.html) — includes a button back to this Main Repo & Web Studio)*
 > - **[Open Instant HTML Guide (CDN Mirror)](https://raw.githack.com/halfche/nimchesko-aistudio/main/public/guide.html)** · **[Launch Web Studio](https://halfche.github.io/nimchesko-aistudio/studio.html)** · **[Desktop Releases](https://github.com/halfche/nimchesko-aistudio/releases)**
-> - Supports English, فارسی, العربية, Deutsch, Español, Français, Türkçe + Light/Dark mode.
+> - Available in English, فارسی, العربية, Deutsch, Español, Français, and Türkçe with synced Light/Dark themes.
 
-Cross-platform local AI studio, multi-model comparison workbench, and integration workspace for **all local models** (imported from **local files** like `.gguf`, `.bin`, `.safetensors`, `Modelfile`, `.json` or pulled/discovered via **Ollama**), built with a minimal **Burgundy & Cream** aesthetic and Iranian architectural motifs.
+## What Is nimchesko AI studio?
 
-## Key Features
+**nimchesko AI studio** is a 100% local, model-agnostic AI studio, multi-model comparison workbench, and creative pipeline workspace for **all local models** (imported from **local files** such as `.gguf`, `.bin`, `.safetensors`, `Modelfile`, `.json` or pulled/discovered via **Ollama**). Built with React, TypeScript, Vite, and Electron in a **Burgundy & Cream** aesthetic with Iranian architectural motifs, it runs offline with zero Docker or cloud requirement.
 
-- **Compare All Local Models (`Compare`):** Run prompts side-by-side across all selected or installed local models (Sequential VRAM-safe or Parallel), inspect `/api/show` specs, compare `tok/s` speed, latency, token counts, and reasoning traces, export Markdown reports, and continue any winner in Chat.
-- **Any Local Model Import (`Models & Sync`):** Add any local model from **local files** (stream `.gguf` / `.bin` / `.safetensors` weights straight into Ollama via `/api/blobs` + `/api/create`, import `Modelfile`s or `.json` profiles) or from **Ollama** (auto-discover `/api/tags`, one-click Import All, pull any tag or HuggingFace `hf.co/...` model).
-- **Isolated Project Workspaces:** Separate brains, `rules.md`, markdown/text resource files, system connectors, model parameters, and conversation histories per project.
-- **Workspace Sync & Productivity:** Export/smart-merge `.json` workspace sync bundles, link a local `.json` file on disk for automatic mirroring, import `.json` / ChatGPT `conversations.json` / `.md` / `.txt` transcripts, drag-and-drop folders, Quick Prompts, live Context Monitor, auto-save, and global shortcuts (`Cmd/Ctrl + Enter`, `Cmd/Ctrl + N`, `Cmd/Ctrl + K`).
-- **Light & Dark Themes:** Dual Burgundy & Cream Light/Dark palettes plus a standalone themed HTML guide (`public/guide.html`).
-- **Cross-Platform Packaging:** One-click combined web bundle (`nimchesko-ai-studio-app.zip`) and automated GitHub Actions CI/CD desktop installers (`.deb`, `.rpm`, `.pkg`, `.pkg.tar.zst`, `.tar`, `.tar.zst`, `.AppImage`, `.exe`).
+## Complete Feature Set
 
-## Quick Start (Pre-Built Combined Package)
+- **Any Local Model Import (`Models & Sync`):** Auto-discover `/api/tags`, stream local `.gguf` / `.bin` / `.safetensors` weights straight into Ollama via `/api/blobs` + `/api/create`, import `Modelfile`s or `.json` profiles, pull Ollama tags or `hf.co/...` models, and inspect `/api/show` specs.
+- **Multi-Model Chat & Mandatory Naming (`Chat`):** Query one or several local models inside a single conversation, require descriptive chat names (with auto-suggestion), inspect live `tok/s` & token telemetry, and organize threads in drag-and-drop folders.
+- **Side-by-Side Model Comparison (`Compare`):** Run prompts across 2+ or all local models Sequentially (VRAM-safe) or in Parallel, compare `tok/s` speed, latency, token counts, and reasoning traces, export Markdown reports, and continue any winner in Chat.
+- **Hyper Mode — Dual-Model Pipeline (`Hyper Mode`):** Pair a Higher Architect model with a fast Lower Builder model, require a session name, choose your Markdown output language (English, فارسی, العربية, Code, etc.), and auto-save formatted specs to `Desktop/Hyper Mode Markdown Files`.
+- **Journal & Skill Mode (`Journal & Skills`):** Author named skills/notes with `Side A -> Side B` workflow bridges, reference links, and universal file uploads; let a local model expand them into Markdown skills; save to `Desktop/Journal & Skill Mode`; and attach directly to your active Project.
+- **Universal File Uploads (`*/*`):** Attach code, Markdown, PDF, Office (`.docx`, `.xlsx`, `.csv`), JSON, archives (`.zip`), images, audio, and video across Chat, Compare, Hyper Mode, Journal & Skills, and Projects (plus drag-and-drop folders).
+- **Isolated Project Workspaces (`Projects`):** Separate system brains, `rules.md`, resource files, environment variables, model parameters (`temperature`, `num_ctx`, `top_p`, `seed`), and tool/System Connectors per project.
+- **Sync, Backup & Themes:** Export/smart-merge `.json` bundles, link a local `.json` mirror on disk, import ChatGPT `conversations.json`, monitor context usage live, use global shortcuts (`Cmd/Ctrl + Enter`, `Cmd/Ctrl + N`, `Cmd/Ctrl + K`), and switch between Light/Dark Burgundy & Cream themes.
 
-1. Download **`nimchesko-ai-studio-app.zip`** from the app header (**Download App (.zip)**) or from GitHub **Releases**.
-2. Extract the archive:
-   - **Windows:** Double-click `run-windows.bat` (uses Python, Node.js, or built-in PowerShell automatically).
+## Comparison With Similar Tools
+
+| Capability | **nimchesko AI studio** | Ollama CLI | Open WebUI | LM Studio | AnythingLLM | Jan / Msty |
+| --- | --- | --- | --- | --- | --- | --- |
+| 100% Free & Open Source | **Yes (MIT)** | Yes (MIT) | Custom License | Closed Source | Yes (MIT) | Mixed |
+| Zero Docker / Zero Backend Setup | **Yes (Static / Electron / `.zip`)** | CLI Only | No (Docker / Python) | Desktop App | Heavier Stack | Desktop App |
+| Direct `.gguf` / `.safetensors` + Ollama Auto-Discover | **Yes (`/api/tags` + `/api/blobs`)** | CLI `create` | Ollama Only | Built-in GGUF | Via Provider | Built-in |
+| Side-by-Side All-Model Compare (VRAM-safe Sequential) | **Yes (`Compare` Tab)** | No | Split View Only | Single Active | No | Limited (Msty) |
+| Multi-Model Responses Inside One Chat | **Yes (Multi-Select)** | No | Partial | Single Model | Single Model | Single Model |
+| Dual-Model `Hyper Mode` -> Desktop `.md` Specs | **Yes (Auto-Saved)** | No | No | No | No | No |
+| `Journal & Skills` (`Side A -> Side B`) -> Project Sync | **Yes (Auto-Saved)** | No | Prompts Only | No | Docs / Agents | No |
+| Universal `*/*` File Uploads Everywhere | **Yes** | Manual Path | RAG Docs | Text / Images | RAG Workspaces | Limited |
+| `.deb` / `.rpm` / `.AppImage` / `.pkg.tar.zst` / `.exe` / `.pkg` + PWA | **Yes (All Formats)** | CLI | Web / Docker | Subset | Subset | Subset |
+
+## Quick Start (Zero-Setup `.zip` Package)
+
+1. Download **`nimchesko-ai-studio-app.zip`** from the app header (**Download App (.zip)**), the [Interactive Guide](https://halfche.github.io/nimchesko-aistudio/), or GitHub **Releases**.
+2. Extract the archive and run:
+   - **Windows:** Double-click `run-windows.bat` (automatically uses Python, Node.js, or PowerShell).
    - **Linux:** Run `chmod +x run-linux.sh && ./run-linux.sh`.
 3. Enable local Ollama browser access before starting Ollama:
    ```bash
+   # Linux / macOS
    OLLAMA_ORIGINS=* ollama serve
+
+   # Windows PowerShell
+   $env:OLLAMA_ORIGINS="*"; ollama serve
    ```
 
 ## Local Development & Build from Source
@@ -39,11 +61,9 @@ npm run build    # Compiles dist/ and dist/nimchesko-ai-studio-app.zip
 
 ## GitHub Actions CI/CD Desktop Releases
 
-Workflow file: `.github/workflows/release-desktop.yml`
+Workflow file: `.github/workflows/release-desktop.yml` (Pages deployment: `.github/workflows/deploy-pages.yml`).
 
-Before running on a new repository, enable **Settings → Actions → General → Workflow permissions → Read and write permissions**.
-
-Every push to `main` / `master`, version tag (`v*`), or manual **Run workflow** dispatch builds:
+Before running on a fork or new repository, enable **Settings → Actions → General → Workflow permissions → Read and write permissions**, and set **Settings → Pages → Source → GitHub Actions**.
 
 | Platform / Distro | Format(s) | Install / Run |
 | --- | --- | --- |

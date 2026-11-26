@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>nimchesko AI studio — Full Multilingual Guide</title>
+    <title>nimchesko AI studio — Full Overview, Tool Comparison, Install & Usage Guide</title>
     <meta
       name="description"
-      content="Complete multilingual interactive guide for nimchesko AI studio — local AI workspace for Ollama, local .gguf/.safetensors/Modelfile models, and side-by-side model comparison."
+      content="Complete multilingual interactive guide for nimchesko AI studio — what it is, full features (Multi-Model Chat, Compare Arena, Hyper Mode, Journal & Skills, Universal File Uploads, Isolated Projects), comparison with similar tools, and complete install/usage instructions."
     />
     <link
       rel="icon"
@@ -18,8 +18,8 @@
         --bg: #f6efe4;
         --bg-radial-1: rgba(107, 29, 47, 0.11);
         --bg-radial-2: rgba(183, 134, 72, 0.13);
-        --surface: rgba(252, 248, 242, 0.88);
-        --surface-soft: rgba(250, 245, 236, 0.78);
+        --surface: rgba(252, 248, 242, 0.9);
+        --surface-soft: rgba(250, 245, 236, 0.8);
         --border: rgba(107, 29, 47, 0.16);
         --text: #2b0f17;
         --text-muted: #6e4a53;
@@ -27,6 +27,10 @@
         --accent-hover: #541524;
         --accent-contrast: #faf5ec;
         --code-bg: rgba(43, 15, 23, 0.06);
+        --highlight-col: rgba(107, 29, 47, 0.06);
+        --ok: #1b6b3a;
+        --warn: #9a6515;
+        --no: #8b3b44;
         --shadow: 0 12px 36px rgba(77, 20, 34, 0.08);
       }
 
@@ -34,8 +38,8 @@
         --bg: #14070b;
         --bg-radial-1: rgba(140, 37, 62, 0.24);
         --bg-radial-2: rgba(230, 184, 162, 0.08);
-        --surface: rgba(30, 10, 17, 0.88);
-        --surface-soft: rgba(35, 13, 20, 0.78);
+        --surface: rgba(30, 10, 17, 0.9);
+        --surface-soft: rgba(35, 13, 20, 0.8);
         --border: rgba(243, 231, 216, 0.15);
         --text: #f5ece0;
         --text-muted: #ceb8ae;
@@ -43,11 +47,19 @@
         --accent-hover: #a02d49;
         --accent-contrast: #faf5ec;
         --code-bg: rgba(245, 236, 224, 0.08);
+        --highlight-col: rgba(230, 184, 162, 0.08);
+        --ok: #6ee7a8;
+        --warn: #fbbf24;
+        --no: #fda4af;
         --shadow: 0 14px 40px rgba(0, 0, 0, 0.44);
       }
 
       * {
         box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
       }
 
       body {
@@ -64,7 +76,7 @@
       }
 
       .container {
-        max-width: 1060px;
+        max-width: 1120px;
         margin: 0 auto;
         padding: 20px 18px 64px;
       }
@@ -83,7 +95,7 @@
         box-shadow: var(--shadow);
         position: sticky;
         top: 12px;
-        z-index: 20;
+        z-index: 25;
       }
 
       .brand {
@@ -124,7 +136,8 @@
       .lang-btn,
       .theme-btn,
       .action-link,
-      .secondary-link {
+      .secondary-link,
+      .toc-link {
         border: 1px solid transparent;
         border-radius: 9px;
         padding: 7px 11px;
@@ -143,7 +156,8 @@
 
       .lang-btn:hover,
       .theme-btn:hover,
-      .secondary-link:hover {
+      .secondary-link:hover,
+      .toc-link:hover {
         color: var(--text);
         background: var(--code-bg);
       }
@@ -154,7 +168,8 @@
       }
 
       .theme-btn,
-      .secondary-link {
+      .secondary-link,
+      .toc-link {
         border: 1px solid var(--border);
         background: var(--surface-soft);
         color: var(--text);
@@ -184,7 +199,7 @@
         align-items: center;
       }
 
-      @media (max-width: 760px) {
+      @media (max-width: 780px) {
         .hero {
           grid-template-columns: 1fr;
         }
@@ -195,6 +210,13 @@
         display: flex;
         flex-wrap: wrap;
         gap: 10px;
+      }
+
+      .toc {
+        margin-top: 16px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
       }
 
       .motifs {
@@ -211,7 +233,7 @@
 
       h1 {
         margin: 0 0 8px;
-        font-size: clamp(1.5rem, 3vw, 2.1rem);
+        font-size: clamp(1.5rem, 3vw, 2.15rem);
         letter-spacing: -0.02em;
       }
 
@@ -219,13 +241,42 @@
         margin: 0;
         color: var(--text-muted);
         font-size: 0.96rem;
-        max-width: 66ch;
+        max-width: 70ch;
+      }
+
+      .section-heading {
+        margin: 30px 0 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .section-heading h2 {
+        margin: 0;
+        font-size: 1.28rem;
+        color: var(--accent);
+        letter-spacing: -0.01em;
+      }
+
+      html.dark .section-heading h2 {
+        color: #e6b8a2;
+      }
+
+      .section-heading p {
+        margin: 0;
+        font-size: 0.92rem;
+        color: var(--text-muted);
       }
 
       .grid {
-        margin-top: 22px;
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+        gap: 16px;
+      }
+
+      .grid-2 {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
         gap: 16px;
       }
 
@@ -238,16 +289,13 @@
         box-shadow: var(--shadow);
       }
 
-      .card h2 {
-        margin: 0 0 10px;
-        font-size: 1.05rem;
-        display: flex;
-        align-items: center;
-        gap: 8px;
+      .card h3 {
+        margin: 0 0 8px;
+        font-size: 1.02rem;
         color: var(--accent);
       }
 
-      html.dark .card h2 {
+      html.dark .card h3 {
         color: #e6b8a2;
       }
 
@@ -258,7 +306,8 @@
         margin: 6px 0;
       }
 
-      .card ul {
+      .card ul,
+      .card ol {
         padding-inline-start: 18px;
         margin: 8px 0 0;
       }
@@ -285,40 +334,83 @@
         border: 1px solid var(--border);
         background: var(--code-bg);
         overflow-x: auto;
-        font-size: 0.82rem;
+        font-size: 0.81rem;
         line-height: 1.5;
         direction: ltr;
         text-align: left;
       }
 
+      .table-wrap {
+        overflow-x: auto;
+        margin-top: 10px;
+      }
+
       table {
         width: 100%;
         border-collapse: collapse;
-        margin-top: 10px;
-        font-size: 0.86rem;
+        font-size: 0.85rem;
         font-variant-numeric: tabular-nums;
       }
 
       th,
       td {
-        padding: 9px 10px;
+        padding: 10px 10px;
         border-bottom: 1px solid var(--border);
         text-align: start;
+        vertical-align: top;
       }
 
       th {
         color: var(--accent);
-        font-weight: 600;
+        font-weight: 700;
+        white-space: nowrap;
       }
 
       html.dark th {
         color: #e6b8a2;
       }
 
+      .col-ours {
+        background: var(--highlight-col);
+        font-weight: 600;
+        color: var(--text);
+      }
+
+      .badge-yes {
+        color: var(--ok);
+        font-weight: 700;
+      }
+
+      .badge-part {
+        color: var(--warn);
+        font-weight: 600;
+      }
+
+      .badge-no {
+        color: var(--no);
+        font-weight: 600;
+      }
+
+      .step-num {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        border-radius: 7px;
+        background: var(--accent);
+        color: var(--accent-contrast);
+        font-size: 0.76rem;
+        font-weight: 700;
+        margin-inline-end: 8px;
+      }
+
       .footer {
-        margin-top: 28px;
+        margin-top: 36px;
+        padding-top: 18px;
+        border-top: 1px solid var(--border);
         text-align: center;
-        font-size: 0.82rem;
+        font-size: 0.84rem;
         color: var(--text-muted);
       }
     </style>
@@ -386,6 +478,13 @@
               id="releasesBtn"
             ></a>
           </div>
+          <nav class="toc" aria-label="Guide sections">
+            <a class="toc-link" href="#what-is" id="tocWhat"></a>
+            <a class="toc-link" href="#features" id="tocFeatures"></a>
+            <a class="toc-link" href="#comparison" id="tocCompare"></a>
+            <a class="toc-link" href="#install" id="tocInstall"></a>
+            <a class="toc-link" href="#usage" id="tocUsage"></a>
+          </nav>
         </div>
         <div class="motifs" aria-hidden="true">
           <svg width="36" height="44" viewBox="0 0 40 56" fill="none">
@@ -402,93 +501,209 @@
         </div>
       </section>
 
+      <!-- Section 1: What It Is -->
+      <div class="section-heading" id="what-is">
+        <h2 id="whatTitle"></h2>
+        <p id="whatSub"></p>
+      </div>
+      <section class="grid-2">
+        <article class="card">
+          <h3 id="whatOverviewTitle"></h3>
+          <p id="whatOverviewBody"></p>
+          <ul id="whatOverviewList"></ul>
+        </article>
+        <article class="card">
+          <h3 id="whatArchTitle"></h3>
+          <p id="whatArchBody"></p>
+          <ul id="whatArchList"></ul>
+        </article>
+      </section>
+
+      <!-- Section 2: Features -->
+      <div class="section-heading" id="features">
+        <h2 id="featTitle"></h2>
+        <p id="featSub"></p>
+      </div>
       <section class="grid">
         <article class="card">
-          <h2 id="c1Title"></h2>
-          <p id="c1Body"></p>
-          <ul id="c1List"></ul>
+          <h3 id="f1Title"></h3>
+          <p id="f1Body"></p>
+          <ul id="f1List"></ul>
         </article>
-
         <article class="card">
-          <h2 id="c2Title"></h2>
-          <p id="c2Body"></p>
-          <pre id="c2Code"></pre>
+          <h3 id="f2Title"></h3>
+          <p id="f2Body"></p>
+          <ul id="f2List"></ul>
         </article>
-
         <article class="card">
-          <h2 id="c3Title"></h2>
-          <p id="c3Body"></p>
-          <pre id="c3Code"></pre>
+          <h3 id="f3Title"></h3>
+          <p id="f3Body"></p>
+          <ul id="f3List"></ul>
         </article>
-
         <article class="card">
-          <h2 id="c4Title"></h2>
-          <p id="c4Body"></p>
-          <ul id="c4List"></ul>
+          <h3 id="f4Title"></h3>
+          <p id="f4Body"></p>
+          <ul id="f4List"></ul>
         </article>
-
         <article class="card">
-          <h2 id="c5Title"></h2>
-          <p id="c5Body"></p>
-          <ul id="c5List"></ul>
+          <h3 id="f5Title"></h3>
+          <p id="f5Body"></p>
+          <ul id="f5List"></ul>
         </article>
-
         <article class="card">
-          <h2 id="c6Title"></h2>
-          <p id="c6Body"></p>
-          <pre id="c6Code"></pre>
+          <h3 id="f6Title"></h3>
+          <p id="f6Body"></p>
+          <ul id="f6List"></ul>
+        </article>
+        <article class="card">
+          <h3 id="f7Title"></h3>
+          <p id="f7Body"></p>
+          <ul id="f7List"></ul>
+        </article>
+        <article class="card">
+          <h3 id="f8Title"></h3>
+          <p id="f8Body"></p>
+          <ul id="f8List"></ul>
+        </article>
+      </section>
+
+      <!-- Section 3: Comparison With Similar Tools -->
+      <div class="section-heading" id="comparison">
+        <h2 id="cmpTitle"></h2>
+        <p id="cmpSub"></p>
+      </div>
+      <section class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th id="cmpThCap"></th>
+                <th class="col-ours" id="cmpThOurs"></th>
+                <th id="cmpThOllama"></th>
+                <th id="cmpThOpenWebUI"></th>
+                <th id="cmpThLmStudio"></th>
+                <th id="cmpThAnything"></th>
+                <th id="cmpThJan"></th>
+              </tr>
+            </thead>
+            <tbody id="cmpBody"></tbody>
+          </table>
+        </div>
+        <p id="cmpNote" style="margin-top: 12px;"></p>
+      </section>
+
+      <!-- Section 4: Installation Guide -->
+      <div class="section-heading" id="install">
+        <h2 id="instTitle"></h2>
+        <p id="instSub"></p>
+      </div>
+      <section class="grid">
+        <article class="card">
+          <h3 id="i1Title"></h3>
+          <p id="i1Body"></p>
+          <pre id="i1Code"></pre>
+        </article>
+        <article class="card">
+          <h3 id="i2Title"></h3>
+          <p id="i2Body"></p>
+          <pre id="i2Code"></pre>
+        </article>
+        <article class="card">
+          <h3 id="i3Title"></h3>
+          <p id="i3Body"></p>
+          <pre id="i3Code"></pre>
         </article>
       </section>
 
       <section class="card" style="margin-top: 16px;">
-        <h2 id="tableTitle"></h2>
-        <p id="tableBody"></p>
-        <table>
-          <thead>
-            <tr>
-              <th id="thOs"></th>
-              <th id="thFmt"></th>
-              <th id="thCmd"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Debian / Ubuntu</td>
-              <td><code>.deb</code></td>
-              <td><code>sudo apt install ./nimchesko-ai-studio-*.deb</code></td>
-            </tr>
-            <tr>
-              <td>Fedora / RHEL / openSUSE</td>
-              <td><code>.rpm</code></td>
-              <td><code>sudo dnf install ./nimchesko-ai-studio-*.rpm</code></td>
-            </tr>
-            <tr>
-              <td>Arch Linux</td>
-              <td><code>.pkg.tar.zst</code></td>
-              <td><code>sudo pacman -U ./nimchesko-ai-studio-*.pkg.tar.zst</code></td>
-            </tr>
-            <tr>
-              <td>Linux Universal</td>
-              <td><code>.AppImage</code>, <code>.tar</code>, <code>.tar.zst</code></td>
-              <td><code>chmod +x *.AppImage &amp;&amp; ./*.AppImage</code></td>
-            </tr>
-            <tr>
-              <td>Windows</td>
-              <td><code>.exe</code> (Setup &amp; Portable)</td>
-              <td><code>nimchesko-ai-studio-*-win-x64-setup.exe</code></td>
-            </tr>
-            <tr>
-              <td>macOS</td>
-              <td><code>.pkg</code></td>
-              <td><code>open nimchesko-ai-studio-*-mac-universal.pkg</code></td>
-            </tr>
-            <tr>
-              <td>Offline Web Bundle</td>
-              <td><code>.zip</code></td>
-              <td><code>run-windows.bat</code> / <code>./run-linux.sh</code></td>
-            </tr>
-          </tbody>
-        </table>
+        <h3 id="pkgTableTitle"></h3>
+        <p id="pkgTableBody"></p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th id="thOs"></th>
+                <th id="thFmt"></th>
+                <th id="thCmd"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Debian / Ubuntu</td>
+                <td><code>.deb</code></td>
+                <td><code>sudo apt install ./nimchesko-ai-studio-*.deb</code></td>
+              </tr>
+              <tr>
+                <td>Fedora / RHEL / openSUSE</td>
+                <td><code>.rpm</code></td>
+                <td><code>sudo dnf install ./nimchesko-ai-studio-*.rpm</code></td>
+              </tr>
+              <tr>
+                <td>Arch Linux</td>
+                <td><code>.pkg.tar.zst</code></td>
+                <td><code>sudo pacman -U ./nimchesko-ai-studio-*.pkg.tar.zst</code></td>
+              </tr>
+              <tr>
+                <td>Linux Universal</td>
+                <td><code>.AppImage</code>, <code>.tar</code>, <code>.tar.zst</code></td>
+                <td><code>chmod +x *.AppImage &amp;&amp; ./*.AppImage</code></td>
+              </tr>
+              <tr>
+                <td>Windows</td>
+                <td><code>.exe</code> (Setup &amp; Portable)</td>
+                <td><code>nimchesko-ai-studio-*-win-x64-setup.exe</code></td>
+              </tr>
+              <tr>
+                <td>macOS</td>
+                <td><code>.pkg</code> (Universal Apple Silicon + Intel)</td>
+                <td><code>open nimchesko-ai-studio-*-mac-universal.pkg</code></td>
+              </tr>
+              <tr>
+                <td>Offline Web Bundle</td>
+                <td><code>nimchesko-ai-studio-app.zip</code></td>
+                <td><code>run-windows.bat</code> / <code>./run-linux.sh</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Section 5: Complete Usage Guide -->
+      <div class="section-heading" id="usage">
+        <h2 id="useTitle"></h2>
+        <p id="useSub"></p>
+      </div>
+      <section class="grid">
+        <article class="card">
+          <h3><span class="step-num">1</span><span id="u1Title"></span></h3>
+          <p id="u1Body"></p>
+          <ul id="u1List"></ul>
+        </article>
+        <article class="card">
+          <h3><span class="step-num">2</span><span id="u2Title"></span></h3>
+          <p id="u2Body"></p>
+          <ul id="u2List"></ul>
+        </article>
+        <article class="card">
+          <h3><span class="step-num">3</span><span id="u3Title"></span></h3>
+          <p id="u3Body"></p>
+          <ul id="u3List"></ul>
+        </article>
+        <article class="card">
+          <h3><span class="step-num">4</span><span id="u4Title"></span></h3>
+          <p id="u4Body"></p>
+          <ul id="u4List"></ul>
+        </article>
+        <article class="card">
+          <h3><span class="step-num">5</span><span id="u5Title"></span></h3>
+          <p id="u5Body"></p>
+          <ul id="u5List"></ul>
+        </article>
+        <article class="card">
+          <h3><span class="step-num">6</span><span id="u6Title"></span></h3>
+          <p id="u6Body"></p>
+          <ul id="u6List"></ul>
+        </article>
       </section>
 
       <footer class="footer" id="footerText"></footer>
@@ -544,51 +759,177 @@
           heroStudio: 'Launch Web Studio',
           zipBtn: 'Download App (.zip)',
           releasesBtn: 'Desktop Releases',
-          heroTitle: 'nimchesko AI studio — Complete User & Developer Guide',
+          tocWhat: '1. What It Is',
+          tocFeatures: '2. Features',
+          tocCompare: '3. Tool Comparison',
+          tocInstall: '4. Install Guide',
+          tocUsage: '5. How to Use',
+          heroTitle: 'nimchesko AI studio — Complete Overview, Comparison & User Guide',
           heroSub:
-            'Cross-platform local AI studio for all local models (local .gguf/.bin/.safetensors files, Modelfiles, and Ollama). Import any model, compare all local models side-by-side, organize isolated project brains, and run locally on Windows, Linux, macOS, or browser.',
-          c1Title: '01. How It Works & Core Architecture',
-          c1Body: '100% local execution with zero mandatory cloud dependency:',
-          c1List: [
-            'All Local Models: auto-discovers installed Ollama tags or lets you import any local weight file (.gguf, .bin, .safetensors), Modelfile, or .json profile',
-            'Compare Tab: run prompts across all selected local models sequentially (VRAM-safe) or in parallel, inspect /api/show specs, compare tok/s speed & reasoning traces, and continue any winner in Chat',
-            'Isolated Projects: separate system Brain, rules.md, markdown/text resource files, API connectors, and drag-and-drop folders per project',
-            'Local Persistence & Sync: auto-save + drafts, live Context Monitor pruning, and local .json file mirroring'
+            'A model-agnostic, 100% local AI workbench for every local model (.gguf, .bin, .safetensors, Modelfile, and Ollama). Chat with multiple models at once, benchmark models side-by-side, chain Higher Architect -> Lower Builder models into Desktop Markdown blueprints, craft reusable Journal Skills, attach any file type, and run offline across Linux, Windows, macOS, and Browser/PWA.',
+          whatTitle: '01. What nimchesko AI studio Is',
+          whatSub: 'Why this project exists and how it works under the hood without cloud lock-in or Docker overhead.',
+          whatOverviewTitle: 'Project Purpose & Philosophy',
+          whatOverviewBody:
+            'nimchesko AI studio is an open-source, cross-platform local AI command center built with React, TypeScript, Vite, and Electron in a Burgundy & Cream aesthetic with Iranian architectural motifs.',
+          whatOverviewList: [
+            'Not locked to one model family: works equally with Llama, Qwen, DeepSeek, Mistral, Gemma, Phi, CodeGemma, custom Modelfiles, and raw weight files.',
+            '100% private & offline-ready: prompts, uploaded files, projects, skills, and chat history stay on your machine (localStorage + local Desktop folders + local Ollama daemon).',
+            'Zero heavy server stack required: runs directly from a static web folder, PWA, standalone .zip launcher, or native Desktop app (.deb, .rpm, .AppImage, .pkg.tar.zst, .exe, .pkg).'
           ],
-          c2Title: '02. Quick Start (Zero-Setup .zip Package)',
-          c2Body: 'Download nimchesko-ai-studio-app.zip, extract it anywhere, and launch offline:',
-          c2Code:
-            '# Windows (double-click or PowerShell)\nrun-windows.bat\n\n# Linux (Terminal)\nchmod +x run-linux.sh && ./run-linux.sh',
-          c3Title: '03. Connect Ollama & Local Model Files',
-          c3Body: 'Start Ollama with CORS allowed, then pull any model or import local .gguf files inside Models & Sync:',
-          c3Code:
-            '# Linux / macOS\nOLLAMA_ORIGINS=* ollama serve\n\n# Windows PowerShell\n$env:OLLAMA_ORIGINS="*"; ollama serve\n\n# Pull any model or HuggingFace GGUF\nollama pull llama3.2:latest\nollama pull hf.co/<user>/<repo>:<quant>',
-          c4Title: '04. Compare & Workspace Productivity',
-          c4Body: 'Built for everyday engineering, benchmarking, and prompt workflows:',
-          c4List: [
-            'Models & Sync: upload local .gguf/.bin/.safetensors weights directly into Ollama (/api/blobs + /api/create) or import all detected Ollama tags in one click',
-            'Compare Arena: export full Markdown comparison reports and open any model output straight into a new Chat',
-            'Shortcuts: Cmd/Ctrl + Enter (Send), Cmd/Ctrl + N (New Chat), Cmd/Ctrl + K (Clear Chat)',
-            'Themes: synced Burgundy & Cream Light and Dark modes across the app and this guide'
+          whatArchTitle: 'Core System Architecture',
+          whatArchBody: 'Every module connects directly to your local Ollama HTTP API and Desktop filesystem:',
+          whatArchList: [
+            'Model Layer: auto-discovers /api/tags, inspects parameters with /api/show, pulls tags or hf.co/... models via /api/pull, and streams local weights via /api/blobs + /api/create.',
+            'Execution Modes: Chat (single or multi-model), Compare Arena (sequential VRAM-safe or parallel), Hyper Mode (Higher Architect -> Lower Builder), Journal & Skills, and Isolated Projects.',
+            'Native File Saving: Electron IPC + local Vite bridge writes outputs straight to Desktop/Hyper Mode Markdown Files and Desktop/Journal & Skill Mode (with browser download fallback).'
           ],
-          c5Title: '05. How to Use With Desktop & Web',
-          c5Body: 'Choose the best way to run nimchesko AI studio on your machine:',
-          c5List: [
-            'Desktop App (.exe / .deb / .rpm / .AppImage / .pkg): download from GitHub Releases and install natively with built-in static server',
-            'Web Studio in Browser: click Launch Web Studio above or install it as an offline PWA',
-            'Repo Access: click Go to Main GitHub Repo above anytime to inspect source code, issues, or workflows'
+          featTitle: '02. Complete Feature Breakdown',
+          featSub: 'All workspaces and tools shipped in nimchesko AI studio.',
+          f1Title: 'Any Local Model Import (Models & Sync)',
+          f1Body: 'Add and organize every local model without touching hardcoded defaults:',
+          f1List: [
+            'Auto-discover all running Ollama models and import them in one click.',
+            'Stream local .gguf, .bin, or .safetensors weight files directly to Ollama.',
+            'Import Modelfile definitions or custom .json model profiles and inspect /api/show metadata.'
           ],
-          c6Title: '06. Build From Source & GitHub Actions',
-          c6Body: 'Run locally from source or enable automated Releases & Pages in GitHub:',
-          c6Code:
-            'git clone https://github.com/halfche/nimchesko-aistudio.git\ncd nimchesko-aistudio\nnpm install --legacy-peer-deps\nnpm run dev      # http://localhost:3000\nnpm run build    # outputs dist/ & nimchesko-ai-studio-app.zip',
-          tableTitle: '07. GitHub Actions CI/CD Desktop & Offline Formats',
-          tableBody: 'Automated releases build installers for every major OS in GitHub Releases:',
+          f2Title: 'Multi-Model Chat & Mandatory Naming',
+          f2Body: 'Flexible everyday AI conversations with clear organization:',
+          f2List: [
+            'Assign one or multiple local models inside the same chat (checkbox multi-select) and get attributed responses in parallel or sequentially.',
+            'Enforces descriptive chat titles when starting or sending so workspaces stay organized (auto-suggested from prompts or quick-entered).',
+            'Drag-and-drop conversation folders, live tok/s & token speed badge, and quick reply actions.'
+          ],
+          f3Title: 'Side-by-Side Compare Arena',
+          f3Body: 'Benchmark any selection of local models fairly before picking a winner:',
+          f3List: [
+            'Switch between Parallel and VRAM-safe Sequential execution across 2+ or all installed models.',
+            'Compare tok/s speed, total latency, prompt/completion tokens, and reasoning traces.',
+            'Export Markdown comparison reports or promote the best model answer straight into Chat.'
+          ],
+          f4Title: 'Hyper Mode (Dual-Model Blueprint Pipeline)',
+          f4Body: 'Pair a strong Higher Architect model with a fast/smaller Lower Builder model:',
+          f4List: [
+            'Requires a session name and lets you attach universal files or reference prompts.',
+            'Higher model designs an architecture/prompt blueprint; Lower model executes it cleanly.',
+            'Generates formatted Markdown in your chosen output language (English, Persian, Arabic, Code, etc.) and auto-saves into Desktop/Hyper Mode Markdown Files.'
+          ],
+          f5Title: 'Journal & Skill Mode (Bridge Authoring)',
+          f5Body: 'Document repeatable workflows, connect ideas, and turn notes into live AI skills:',
+          f5List: [
+            'Create named entries with Side A -> Side B workflow bridges, reference URLs, and attachments.',
+            'Use a chosen local model to expand notes into structured Markdown skills.',
+            'Save directly to Desktop/Journal & Skill Mode and attach/sync into any Project brain.'
+          ],
+          f6Title: 'Universal File Uploads (*/*)',
+          f6Body: 'Attach almost any real-world file inside Chat, Compare, Hyper Mode, Journal & Projects:',
+          f6List: [
+            'Accepts source code, Markdown, PDF, Office docs (.docx, .xlsx, .csv), JSON, archives (.zip), images, audio, and video.',
+            'Inspects text, structured metadata, dimensions, hashes, and binary signatures cleanly.',
+            'Drag-and-drop entire folders or attach files directly via toolbar buttons.'
+          ],
+          f7Title: 'Isolated Projects, Rules & Parameters',
+          f7Body: 'Keep unrelated codebases, writing projects, and personas cleanly separated:',
+          f7List: [
+            'Per-project rules.md system instructions, knowledge resource files, and env variables.',
+            'Per-project default model parameters (temperature, num_ctx, top_p, seed, repeat_penalty).',
+            'Custom System Connectors / tool schemas toggleable per project.'
+          ],
+          f8Title: 'Sync, Backup, Context Monitor & Themes',
+          f8Body: 'Safe persistence and fast keyboard-driven control:',
+          f8List: [
+            'Full .json workspace bundle export/smart-merge + ChatGPT conversations.json importer.',
+            'Link a local .json file on disk for automatic background mirroring.',
+            'Live Context Monitor, Auto-save drafts, Cmd/Ctrl+Enter / N / K shortcuts, and synced Burgundy & Cream Light/Dark theme.'
+          ],
+          cmpTitle: '03. Comparison With Similar Tools',
+          cmpSub: 'How nimchesko AI studio compares against popular local AI clients and interfaces.',
+          cmpThCap: 'Capability',
+          cmpThOurs: 'nimchesko AI studio',
+          cmpThOllama: 'Ollama CLI',
+          cmpThOpenWebUI: 'Open WebUI',
+          cmpThLmStudio: 'LM Studio',
+          cmpThAnything: 'AnythingLLM',
+          cmpThJan: 'Jan / Msty',
+          cmpRows: [
+            ['100% Free & Open-Source', ['yes', 'MIT Open Source'], ['yes', 'MIT'], ['part', 'Custom License'], ['no', 'Closed Source'], ['yes', 'MIT'], ['part', 'Mixed']],
+            ['Zero Docker / Zero Backend Setup', ['yes', 'Static / Electron / .zip'], ['yes', 'CLI Only'], ['no', 'Docker / Python'], ['yes', 'Desktop App'], ['part', 'Heavy App / Server'], ['yes', 'Desktop App']],
+            ['Auto-Discover Ollama + Direct .gguf / .safetensors Upload', ['yes', '/api/tags + /api/blobs'], ['yes', 'CLI create'], ['part', 'Ollama Only'], ['yes', 'Built-in GGUF'], ['part', 'Via Provider'], ['yes', 'Built-in']],
+            ['Side-by-Side All-Model Compare (Sequential VRAM-safe + tok/s)', ['yes', 'Dedicated Compare Tab'], ['no', 'None'], ['part', 'Split View Only'], ['no', 'Single Active'], ['no', 'None'], ['part', 'Limited (Msty)']],
+            ['Multi-Model Responses in One Chat Thread', ['yes', 'Multi-Select Inside Chat'], ['no', 'Single Model'], ['part', 'Partial'], ['no', 'Single Model'], ['no', 'Single Model'], ['no', 'Single Model']],
+            ['Dual-Model Higher->Lower Pipeline Saving Desktop .md Specs', ['yes', 'Hyper Mode'], ['no', 'None'], ['no', 'None'], ['no', 'None'], ['no', 'None'], ['no', 'None']],
+            ['Journal & Skill Side A -> Side B Bridges Synced to Projects', ['yes', 'Journal & Skills'], ['no', 'None'], ['no', 'Prompts Only'], ['no', 'None'], ['part', 'Agents/Docs'], ['no', 'None']],
+            ['Universal */* File Uploads (Docs, Archives, Media, Code)', ['yes', 'All Workspaces'], ['no', 'Manual Path'], ['yes', 'RAG / Docs'], ['part', 'Text / Images'], ['yes', 'RAG Workspaces'], ['part', 'Limited']],
+            ['Native .deb / .rpm / .AppImage / .pkg.tar.zst / .exe / .pkg + PWA', ['yes', 'All 7+ Formats'], ['yes', 'CLI'], ['no', 'Web/Docker'], ['part', 'AppImage/Win/Mac'], ['part', 'AppImage/Win/Mac'], ['part', 'Deb/AppImage/Win/Mac']]
+          ],
+          cmpNote:
+            'Summary: Ollama CLI lacks a GUI; Open WebUI shines for team servers but requires Python/Docker; LM Studio and Jan do not include multi-model Hyper pipelines or Side-A->Side-B Desktop skill authoring; nimchesko AI studio focuses on lightweight, zero-server local workflows and side-by-side multi-model orchestration.',
+          instTitle: '04. Complete Installation Guide',
+          instSub: 'Follow Method A (Ollama CORS), choose Desktop / .zip / Web Studio, or build from source.',
+          i1Title: 'Step A: Start Ollama With CORS Allowed',
+          i1Body: 'Required once so browser, PWA, and Desktop modes can talk cleanly to http://localhost:11434:',
+          i1Code:
+            '# Linux / macOS\nOLLAMA_ORIGINS=* ollama serve\n\n# Windows PowerShell\n$env:OLLAMA_ORIGINS="*"; ollama serve\n\n# Pull any starter model or HuggingFace GGUF\nollama pull llama3.2:latest\nollama pull qwen2.5-coder:7b\nollama pull hf.co/<user>/<repo>:<quant>',
+          i2Title: 'Step B: Instant Launch (.zip Bundle or Web/PWA)',
+          i2Body: 'No installer needed — extract nimchesko-ai-studio-app.zip or click Launch Web Studio above:',
+          i2Code:
+            '# Windows (uses Python, Node.js, or PowerShell automatically)\nrun-windows.bat\n\n# Linux\nchmod +x run-linux.sh && ./run-linux.sh\n\n# Opens local studio in your browser immediately',
+          i3Title: 'Step C: Build & Run From Source (Developers)',
+          i3Body: 'Clone the repository, compile web + offline bundle, or package native Electron installers:',
+          i3Code:
+            'git clone https://github.com/halfche/nimchesko-aistudio.git\ncd nimchesko-aistudio\nnpm install --legacy-peer-deps\nnpm run dev     # http://localhost:3000\nnpm run build   # builds dist/ & dist/nimchesko-ai-studio-app.zip',
+          pkgTableTitle: 'Native Desktop Installers (GitHub Releases)',
+          pkgTableBody: 'Download the native installer built automatically by GitHub Actions for your OS:',
           thOs: 'Platform / Distro',
-          thFmt: 'Format',
-          thCmd: 'Install / Run',
+          thFmt: 'Format(s)',
+          thCmd: 'Install / Run Command',
+          useTitle: '05. Complete Step-by-Step Usage Guide',
+          useSub: 'How to get the best workflow out of every tab inside nimchesko AI studio.',
+          u1Title: 'Connect & Import Models (Models & Sync)',
+          u1Body: 'Verify your Ollama endpoint and bring all your local models into the studio:',
+          u1List: [
+            'Open Models & Sync in the top navigation bar and confirm http://localhost:11434 shows Connected.',
+            'Click Auto-Discover Ollama Models to import everything from /api/tags at once.',
+            'To use local weight files, pick any .gguf, .bin, or .safetensors file to stream straight into Ollama (/api/blobs + /api/create), or pull any tag / hf.co/... model.'
+          ],
+          u2Title: 'Chat With Multi-Model & Naming (Chat)',
+          u2Body: 'Organize every conversation cleanly and query more than one model in a thread:',
+          u2List: [
+            'Before or when sending your first message, enter a Chat Name (the app requires named chats and auto-suggests one from your prompt).',
+            'Use the multi-model selector in the composer/header to run one or several models inside the same conversation.',
+            'Click the Attach button to upload any file (*/*) — code, PDF, Excel, ZIP, images, audio — and organize threads into folders.'
+          ],
+          u3Title: 'Benchmark Local Models (Compare)',
+          u3Body: 'Compare speed, reasoning quality, and adherence across any models you have installed:',
+          u3List: [
+            'Open Compare, tick 2 or more local models (or click Select All), and pick Sequential (saves VRAM) or Parallel mode.',
+            'Enter a prompt (optionally attach files) and watch side-by-side live streaming cards with tok/s and token counts.',
+            'Export a full Markdown report or click Continue in Chat on the winning answer.'
+          ],
+          u4Title: 'Run Dual-Model Blueprints (Hyper Mode)',
+          u4Body: 'Combine a smart architect model with a fast execution model to save Desktop specs:',
+          u4List: [
+            'Open Hyper Mode, give your session a clear Session Name (used for the filename), and pick Higher Architect Model + Lower Builder Model.',
+            'Select your target Markdown output language (English, فارسی, العربية, Code, etc.) and attach reference files if needed.',
+            'Click Run Hyper Pipeline: the result saves cleanly as <session>.md inside Desktop/Hyper Mode Markdown Files.'
+          ],
+          u5Title: 'Build Bridges & Skills (Journal & Skills)',
+          u5Body: 'Turn working notes and web references into project-ready AI skills:',
+          u5List: [
+            'Open Journal & Skills, enter a Skill Name, describe Side A -> Side B workflow logic, add URLs, or upload files.',
+            'Let a selected local model synthesize a clean Markdown skill specification and save it into Desktop/Journal & Skill Mode.',
+            'Click Attach to Active Project so that skill automatically guides future Chat and Hyper Mode sessions.'
+          ],
+          u6Title: 'Isolate Projects & Backup (.json Sync)',
+          u6Body: 'Keep workspaces cleanly scoped and never lose your work:',
+          u6List: [
+            'Switch or create workspaces in Projects with dedicated rules.md, temperature/context settings, and resource files.',
+            'Use Context Monitor in the sidebar when long threads grow near num_ctx limits.',
+            'Visit Models & Sync to export .json bundles, link a local mirror file, or import ChatGPT conversations.json.'
+          ],
           footerText: 'nimchesko AI studio · Burgundy & Cream Edition · github.com/halfche/nimchesko-aistudio'
         },
+
         fa: {
           dir: 'rtl',
           themeLabel: 'تم روشن / تاریک',
@@ -598,51 +939,177 @@
           heroStudio: 'اجرای نسخه وب استودیو',
           zipBtn: 'دانلود بسته برنامه (.zip)',
           releasesBtn: 'نسخه‌های دسکتاپ',
-          heroTitle: 'راهنمای جامع nimchesko AI studio',
+          tocWhat: '۱. معرفی پروژه',
+          tocFeatures: '۲. تمام قابلیت‌ها',
+          tocCompare: '۳. مقایسه با ابزارها',
+          tocInstall: '۴. راهنمای نصب',
+          tocUsage: '۵. آموزش کار',
+          heroTitle: 'راهنمای جامع nimchesko AI studio — معرفی، مقایسه و آموزش کامل',
           heroSub:
-            'محیط کاری کراس‌پلتفرم برای تمام مدل‌های لوکال (فایل‌های .gguf/.bin/.safetensors، Modelfile و Ollama). هر مدلی را ایمپورت کنید، همه مدل‌ها را هم‌زمان مقایسه کنید، پروژه‌های ایزوله بسازید و روی ویندوز، لینوکس، مک یا مرورگر اجرا کنید.',
-          c1Title: '۰۱. نحوه عملکرد و ساختار برنامه',
-          c1Body: 'اجرای ۱۰۰٪ محلی بدون نیاز به سرویس‌های ابری:',
-          c1List: [
-            'پشتیبانی از تمام مدل‌های لوکال: تشخیص خودکار مدل‌های Ollama یا ایمپورت مستقیم فایل‌های .gguf، .bin، .safetensors و Modelfile',
-            'تب مقایسه (Compare): اجرای هم‌زمان یا ترتیبی (بهینه برای VRAM) روی تمام مدل‌های انتخاب‌شده، مشاهده مشخصات /api/show و سرعت tok/s و ادامه چت با مدل برتر',
-            'پروژه‌های ایزوله: مغز مستقل، فایل قوانین rules.md، فایل‌های منبع، ابزارها و پوشه‌بندی Drag & Drop',
-            'ذخیره خودکار و همگام‌سازی: نگهداری پیش‌نویس‌ها، مانیتورینگ زنده کانتکست و اتصال فایل .json روی دیسک'
+            'یک محیط کاری ۱۰۰٪ محلی و مستقل از مدل برای اجرای تمام مدل‌های لوکال (.gguf، .bin، .safetensors، Modelfile و Ollama). گفت‌وگوی چندمدله در یک چت، مقایسه هم‌زمان مدل‌ها، زنجیره Hyper Mode برای تولید فایل .md روی دسکتاپ، مهارت‌نویسی در Journal & Skills، آپلود هر نوع فایل و اجرای آفلاین روی لینوکس، ویندوز، مک و مرورگر.',
+          whatTitle: '۰۱. پروژه nimchesko AI studio چیست؟',
+          whatSub: 'هدف این پروژه، فلسفه حریم خصوصی ۱۰۰٪ محلی و ساختار فنی بدون نیاز به سرور ابری یا Docker.',
+          whatOverviewTitle: 'چیستی و هدف پروژه',
+          whatOverviewBody:
+            'nimchesko AI studio یک مرکز فرماندهی متن‌باز و کراس‌پلتفرم برای کار با مدل‌های هوش مصنوعی محلی است که با React، TypeScript، Vite و Electron و طراحی زرشکی و کرم با نقوش معماری ایرانی ساخته شده است.',
+          whatOverviewList: [
+            'وابسته به یک مدل خاص نیست: با Llama، Qwen، DeepSeek، Mistral، Gemma، Phi، فایل‌های وزن خام و Modelfileهای شخصی یکسان کار می‌کند.',
+            '۱۰۰٪ خصوصی و آفلاین: تمام پرامپت‌ها، فایل‌ها، پروژه‌ها، مهارت‌ها و تاریخچه چت فقط روی سیستم خودتان باقی می‌مانند.',
+            'بدون نیاز به Docker یا سرور پیچیده: مستقیماً از فایل وب استاتیک، PWA، بسته آماده .zip یا نصاب بومی دسکتاپ اجرا می‌شود.'
           ],
-          c2Title: '۰۲. اجرای سریع (بسته آماده .zip بدون نیاز به نصب)',
-          c2Body: 'فایل nimchesko-ai-studio-app.zip را دانلود و استخراج کرده و اجرا کنید:',
-          c2Code:
-            '# ویندوز (دابل‌کلیک یا PowerShell)\nrun-windows.bat\n\n# لینوکس (ترمینال)\nchmod +x run-linux.sh && ./run-linux.sh',
-          c3Title: '۰۳. اتصال به Ollama و فایل‌های مدل محلی',
-          c3Body: 'ابتدا Ollama را با دسترسی CORS اجرا کنید و سپس مدل‌ها را از تب Models & Sync اضافه کنید:',
-          c3Code:
-            '# Linux / macOS\nOLLAMA_ORIGINS=* ollama serve\n\n# Windows PowerShell\n$env:OLLAMA_ORIGINS="*"; ollama serve\n\n# دانلود هر مدل دلخواه از Ollama یا HuggingFace\nollama pull llama3.2:latest\nollama pull hf.co/<user>/<repo>:<quant>',
-          c4Title: '۰۴. مقایسه مدل‌ها و ابزارهای بهره‌وری',
-          c4Body: 'امکانات کاربردی برای کار روزانه و بنچمارک مدل‌های لوکال:',
-          c4List: [
-            'Models & Sync: آپلود مستقیم فایل‌های .gguf/.bin/.safetensors به Ollama (/api/blobs + /api/create) یا ایمپورت یکجای مدل‌ها',
-            'خروجی گزارش Markdown از جدول مقایسه و انتقال پاسخ هر مدل به چت جدید با یک کلیک',
-            'کلیدهای میانبر: Cmd/Ctrl + Enter (ارسال)، Cmd/Ctrl + N (چت جدید)، Cmd/Ctrl + K (پاک‌سازی چت)',
-            'تم زرشکی و کرم هماهنگ در حالت روشن و تاریک بین برنامه و این راهنما'
+          whatArchTitle: 'معماری فنی سیستم',
+          whatArchBody: 'تمامی بخش‌ها مستقیماً با سرویس محلی Ollama و پوشه دسکتاپ سیستم شما در ارتباط هستند:',
+          whatArchList: [
+            'لایه مدل: تشخیص خودکار /api/tags، بررسی جزئیات با /api/show، دانلود مدل‌ها و hf.co/... با /api/pull و آپلود مستقیم فایل‌های .gguf با /api/blobs و /api/create.',
+            'حالت‌های کاری: Chat (تکی یا چندمدله)، Compare Arena، Hyper Mode (مدل قوی ← مدل ضعیف)، Journal & Skills و پروژه‌های ایزوله.',
+            'ذخیره مستقیم روی دسکتاپ: در نسخه Electron و سرور محلی فایل‌های Markdown مستقیم در پوشه‌های Desktop/Hyper Mode Markdown Files و Desktop/Journal & Skill Mode ذخیره می‌شوند.'
           ],
-          c5Title: '۰۵. روش‌های استفاده (دسکتاپ و وب)',
-          c5Body: 'به هر روشی که راحت‌ترید برنامه را اجرا کنید:',
-          c5List: [
-            'نسخه دسکتاپ (.exe / .deb / .rpm / .AppImage / .pkg): دانلود از بخش Releases گیت‌هاب و نصب مستقیم',
-            'نسخه وب در مرورگر: کلیک روی «اجرای نسخه وب استودیو» در بالا یا نصب به صورت PWA',
-            'مشاهده سورس در گیت‌هاب: کلیک روی دکمه «رفتن به مخزن اصلی (GitHub)» در بالای صفحه'
+          featTitle: '۰۲. تمام قابلیت‌های برنامه',
+          featSub: 'معرفی کامل ابزارها و تب‌های موجود در nimchesko AI studio.',
+          f1Title: 'پشتیبانی از هر مدل لوکال (Models & Sync)',
+          f1Body: 'افزودن و مدیریت هر مدل دلخواه بدون محدودیت پیش‌فرض:',
+          f1List: [
+            'کشف خودکار تمام مدل‌های نصب‌شده روی Ollama و ایمپورت با یک کلیک.',
+            'آپلود مستقیم فایل‌های محلی .gguf، .bin و .safetensors به Ollama.',
+            'ایمپورت Modelfile یا پروفایل .json و مشاهده مشخصات فنی /api/show.'
           ],
-          c6Title: '۰۶. ساخت از سورس و GitHub Actions',
-          c6Body: 'مراحل کلون کردن و ساخت برنامه از سورس کد:',
-          c6Code:
-            'git clone https://github.com/halfche/nimchesko-aistudio.git\ncd nimchesko-aistudio\nnpm install --legacy-peer-deps\nnpm run dev      # http://localhost:3000\nnpm run build    # ساخت dist/ و فایل .zip',
-          tableTitle: '۰۷. فرمت‌های خروجی دسکتاپ و وب',
-          tableBody: 'همه بسته‌های نصبی به صورت خودکار در بخش Releases مخزن منتشر می‌شوند:',
+          f2Title: 'چت چندمدله و نام‌گذاری اجباری (Chat)',
+          f2Body: 'مدیریت دقیق گفت‌وگوها و استفاده هم‌زمان از چند مدل در یک چت:',
+          f2List: [
+            'انتخاب چند مدل به‌صورت هم‌زمان در یک چت و دریافت پاسخ با برچسب نام هر مدل.',
+            'الزام نام‌گذاری چت هنگام ساخت یا ارسال پیام (به همراه پیشنهاد خودکار عنوان).',
+            'پوشه‌بندی Drag & Drop، نمایش زنده سرعت tok/s و دکمه‌های کپی و ادامه.'
+          ],
+          f3Title: 'میدان مقایسه مدل‌ها (Compare)',
+          f3Body: 'محک زدن مدل‌های محلی کنار هم برای انتخاب دقیق‌ترین و سریع‌ترین مدل:',
+          f3List: [
+            'اجرای ترتیبی (بهینه برای VRAM) یا موازی روی ۲ تا تمام مدل‌های انتخاب‌شده.',
+            'مقایسه سرعت tok/s، زمان پاسخ، تعداد توکن‌ها و متن استدلال مدل‌ها.',
+            'خروجی گزارش Markdown و ادامه مستقیم پاسخ برتر در تب Chat.'
+          ],
+          f4Title: 'حالت هایپر (Hyper Mode — پایپلاین دو مدله)',
+          f4Body: 'ترکیب یک مدل معمار قوی (Higher) با یک مدل اجرایی سریع (Lower):',
+          f4List: [
+            'دریافت نام اجباری سشن و پشتیبانی کامل از پیوست هر نوع فایل.',
+            'مدل قوی ساختار و نقشه راه را می‌چیند و مدل دوم خروجی نهایی را تولید می‌کند.',
+            'تولید فایل Markdown به زبان دلخواه (فارسی، انگلیسی، عربی، کد و...) و ذخیره خودکار در Desktop/Hyper Mode Markdown Files.'
+          ],
+          f5Title: 'حالت ژورنال و مهارت (Journal & Skills)',
+          f5Body: 'ثبت فرآیندهای پل‌زنی (Side A ← Side B) و تبدیل یادداشت‌ها به مهارت قابل استفاده:',
+          f5List: [
+            'ثبت نام مهارت، مسیر Side A -> Side B، لینک‌های مرجع و فایل‌های پیوست.',
+            'تولید و تکمیل فایل مهارت Markdown توسط مدل محلی منتخب.',
+            'ذخیره خودکار در Desktop/Journal & Skill Mode و اتصال یک‌کلیکی به پروژه فعال.'
+          ],
+          f6Title: 'آپلود همه‌جانبه فایل (*/*)',
+          f6Body: 'پیوست کردن تقریباً هر فرمت فایل در تمامی تب‌ها (Chat، Compare، Hyper، Journal، Projects):',
+          f6List: [
+            'پشتیبانی از سورس‌کد، Markdown، PDF، فایل‌های آفیس (.docx، .xlsx، .csv)، JSON، آرشیو .zip، تصویر، صدا و ویدیو.',
+            'استخراج محتوای متنی، متادیتا، ابعاد و امضای باینری برای مدل.',
+            'پشتیبانی از Drag & Drop کامل پوشه‌ها و دکمه پیوست سریع.'
+          ],
+          f7Title: 'پروژه‌های ایزوله و قوانین (Projects)',
+          f7Body: 'جداسازی کامل حافظه، قوانین و فایل‌های هر پروژه:',
+          f7List: [
+            'فایل rules.md اختصاصی، منابع متنی و متغیرهای محیطی مجزا برای هر پروژه.',
+            'تنظیمات پارامتر مدل (temperature، num_ctx، top_p، seed) مخصوص هر پروژه.',
+            'تعریف و فعال‌سازی System Connectors و ابزارهای دلخواه.'
+          ],
+          f8Title: 'همگام‌سازی، مانیتور کانتکست و تم',
+          f8Body: 'بکاپ مطمئن و سرعت کار بالا:',
+          f8List: [
+            'خروجی و ادغام هوشمند فایل .json + ایمپورت آرشیو ChatGPT (conversations.json).',
+            'اتصال فایل .json روی دیسک برای همگام‌سازی خودکار.',
+            'مانیتورینگ زنده کانتکست، ذخیره خودکار پیش‌نویس، میانبرهای صفحه‌کلید و تم زرشکی و کرم.'
+          ],
+          cmpTitle: '۰۳. مقایسه با ابزارهای مشابه',
+          cmpSub: 'تفاوت‌های کلیدی nimchesko AI studio با سایر کلاینت‌ها و رابط‌های هوش مصنوعی محلی.',
+          cmpThCap: 'ویژگی / قابلیت',
+          cmpThOurs: 'nimchesko AI studio',
+          cmpThOllama: 'Ollama CLI',
+          cmpThOpenWebUI: 'Open WebUI',
+          cmpThLmStudio: 'LM Studio',
+          cmpThAnything: 'AnythingLLM',
+          cmpThJan: 'Jan / Msty',
+          cmpRows: [
+            ['۱۰۰٪ رایگان و متن‌باز', ['yes', 'متن‌باز MIT'], ['yes', 'MIT'], ['part', 'لایسنس اختصاصی'], ['no', 'کد بسته'], ['yes', 'MIT'], ['part', 'ترکیبی']],
+            ['اجرا بدون Docker و سرور سنگین', ['yes', 'وب / دسکتاپ / .zip'], ['yes', 'فقط ترمینال'], ['no', 'نیازمند Docker/Python'], ['yes', 'نرم‌افزار دسکتاپ'], ['part', 'سنگین‌تر'], ['yes', 'نرم‌افزار دسکتاپ']],
+            ['کشف Ollama + آپلود مستقیم .gguf / .safetensors', ['yes', 'کامل'], ['yes', 'دستور CLI'], ['part', 'فقط Ollama'], ['yes', 'داخلی'], ['part', 'غیرمستقیم'], ['yes', 'داخلی']],
+            ['مقایسه هم‌زمان تمام مدل‌ها (ترتیبی بهینه VRAM)', ['yes', 'تب اختصاصی Compare'], ['no', 'ندارد'], ['part', 'فقط دوپنجره‌ای'], ['no', 'تک‌مدله'], ['no', 'ندارد'], ['part', 'محدود در Msty']],
+            ['پاسخ چند مدل در یک رشته چت واحد', ['yes', 'چندمدله در چت'], ['no', 'ندارد'], ['part', 'محدود'], ['no', 'تک‌مدله'], ['no', 'تک‌مدله'], ['no', 'تک‌مدله']],
+            ['پایپلاین دو مدله Hyper Mode با ذخیره .md دسکتاپ', ['yes', 'کامل و خودکار'], ['no', 'ندارد'], ['no', 'ندارد'], ['no', 'ندارد'], ['no', 'ندارد'], ['no', 'ندارد']],
+            ['مهارت‌نویسی Journal (Side A -> Side B) و اتصال به پروژه', ['yes', 'کامل'], ['no', 'ندارد'], ['no', 'فقط پرامپت'], ['no', 'ندارد'], ['part', 'اسناد/ایجنت'], ['no', 'ندارد']],
+            ['آپلود همه‌جانبه */* (کد، PDF، اکسل، ZIP، رسانه)', ['yes', 'در همه تب‌ها'], ['no', 'مسیر دستی'], ['yes', 'RAG'], ['part', 'متن و تصویر'], ['yes', 'RAG'], ['part', 'محدود']],
+            ['نصاب .deb / .rpm / .AppImage / .pkg.tar.zst / .exe / .pkg + PWA', ['yes', 'تمامی فرمت‌ها'], ['yes', 'CLI'], ['no', 'Docker/Web'], ['part', 'محدودتر'], ['part', 'محدودتر'], ['part', 'محدودتر']]
+          ],
+          cmpNote:
+            'جمع‌بندی: Ollama CLI رابط گرافیکی ندارد؛ Open WebUI برای سرور و تیم عالی است اما Docker/Python می‌خواهد؛ LM Studio و Jan ابزار ساده تک‌مدله هستند. nimchesko AI studio برای کار سریع، مقایسه چندمدله، زنجیره Hyper Mode و مهارت‌نویسی بدون سرور اضافی طراحی شده است.',
+          instTitle: '۰۴. راهنمای کامل نصب و راه‌اندازی',
+          instSub: 'ابتدا Ollama را با CORS اجرا کنید، سپس یکی از روش‌های دسکتاپ، بسته .zip یا وب را برگزینید.',
+          i1Title: 'گام اول: اجرای Ollama با دسترسی CORS',
+          i1Body: 'برای اتصال مرورگر، PWA و نسخه دسکتاپ به پورت پیش‌فرض http://localhost:11434:',
+          i1Code:
+            '# لینوکس و مک\nOLLAMA_ORIGINS=* ollama serve\n\n# ویندوز PowerShell\n$env:OLLAMA_ORIGINS="*"; ollama serve\n\n# دانلود مدل دلخواه یا فایل GGUF از HuggingFace\nollama pull llama3.2:latest\nollama pull qwen2.5-coder:7b\nollama pull hf.co/<user>/<repo>:<quant>',
+          i2Title: 'گام دوم: اجرای فوری بدون نصب (بسته .zip)',
+          i2Body: 'فایل nimchesko-ai-studio-app.zip را از بخش دانلود بگیرید، اکسترکت و اجرا کنید:',
+          i2Code:
+            '# ویندوز (تشخیص خودکار Python / Node / PowerShell)\nrun-windows.bat\n\n# لینوکس\nchmod +x run-linux.sh && ./run-linux.sh',
+          i3Title: 'گام سوم: ساخت از سورس کد (توسعه‌دهندگان)',
+          i3Body: 'اجرای محیط توسعه یا کامپایل بسته نهایی وب و دسکتاپ:',
+          i3Code:
+            'git clone https://github.com/halfche/nimchesko-aistudio.git\ncd nimchesko-aistudio\nnpm install --legacy-peer-deps\nnpm run dev     # http://localhost:3000\nnpm run build   # ساخت پوشه dist و فایل .zip',
+          pkgTableTitle: 'نصاب‌های بومی دسکتاپ (GitHub Releases)',
+          pkgTableBody: 'فایل نصاب متناسب با سیستم‌عامل خود را از بخش Releases دریافت کنید:',
           thOs: 'سیستم‌عامل / توزیع',
-          thFmt: 'فرمت',
+          thFmt: 'فرمت خروجی',
           thCmd: 'دستور نصب / اجرا',
+          useTitle: '۰۵. آموزش گام‌به‌گام استفاده از تمام بخش‌ها',
+          useSub: 'چطور از هر تب nimchesko AI studio بیشترین بازده را بگیرید.',
+          u1Title: 'اتصال و ایمپورت مدل‌ها (Models & Sync)',
+          u1Body: 'اتصال Ollama را بررسی کنید و تمام مدل‌های لوکال را وارد کنید:',
+          u1List: [
+            'وارد تب Models & Sync شوید و مطمئن شوید وضعیت http://localhost:11434 متصل (Connected) است.',
+            'روی Auto-Discover Ollama Models بزنید تا همه مدل‌های /api/tags یکجا اضافه شوند.',
+            'برای مدل‌های روی هارد، فایل .gguf، .bin یا .safetensors را مستقیم انتخاب کنید تا در Ollama ثبت شود.'
+          ],
+          u2Title: 'گفت‌وگو با نام‌گذاری و چند مدل (Chat)',
+          u2Body: 'چت‌های منظم بسازید و از چند مدل هم‌زمان پاسخ بگیرید:',
+          u2List: [
+            'هنگام شروع یا ارسال پیام، نام چت را وارد کنید (نام‌گذاری برای نظم پروژه الزامی است و پیشنهاد خودکار نیز دارد).',
+            'از منوی انتخاب چندمدله، چند مدل را هم‌زمان تیک بزنید تا پاسخ هر مدل جداگانه نمایش داده شود.',
+            'با دکمه پیوست هر نوع فایل (*/*) شامل کد، PDF، اکسل، ZIP، عکس یا صوت را به پیام ضمیمه کنید.'
+          ],
+          u3Title: 'مقایسه مدل‌ها کنار هم (Compare)',
+          u3Body: 'مدل‌ها را با یک پرامپت واحد بسنجید و برنده را پیدا کنید:',
+          u3List: [
+            'در تب Compare دو یا چند مدل را انتخاب کنید و حالت ترتیبی (کم‌مصرف VRAM) یا موازی را برگزینید.',
+            'پرامپت خود را اجرا کرده و سرعت tok/s، تاخیر و دقت استدلال هر مدل را مقایسه کنید.',
+            'خروجی Markdown بگیرید یا پاسخ مدل برتر را با یک کلیک به تب Chat منتقل کنید.'
+          ],
+          u4Title: 'تولید معماری با Hyper Mode',
+          u4Body: 'قدرت مدل بزرگ و سرعت مدل کوچک را ترکیب کرده و خروجی Markdown تمیز بگیرید:',
+          u4List: [
+            'نام سشن را بنویسید، مدل قوی‌تر (Higher) و مدل اجرایی (Lower) را انتخاب کنید.',
+            'زبان خروجی Markdown (فارسی، انگلیسی، عربی، کد و...) را برگزینید و در صورت نیاز فایل پیوست کنید.',
+            'خروجی نهایی به‌صورت خودکار در پوشه Desktop/Hyper Mode Markdown Files ذخیره می‌شود.'
+          ],
+          u5Title: 'ساخت مهارت در Journal & Skills',
+          u5Body: 'دانش و لینک‌های پراکنده را به مهارت قابل استفاده در پروژه‌ها تبدیل کنید:',
+          u5List: [
+            'نام مهارت، ارتباط Side A -> Side B، لینک‌ها و فایل‌های مرجع را وارد کنید.',
+            'با کمک مدل محلی، سند Markdown آن را تولید کنید تا در Desktop/Journal & Skill Mode ذخیره شود.',
+            'گزینه اتصال به پروژه فعال را بزنید تا در تمام چت‌های آن پروژه اعمال شود.'
+          ],
+          u6Title: 'مدیریت پروژه‌ها و همگام‌سازی (.json)',
+          u6Body: 'تفکیک پروژه‌ها و پشتیبان‌گیری همیشگی:',
+          u6List: [
+            'در Projects برای هر کار، فایل rules.md و پارامترهای مدل جدا تعریف کنید.',
+            'در چت‌های طولانی از Context Monitor برای سبک‌سازی تاریخچه استفاده کنید.',
+            'در Models & Sync از کل محیط کاری بکاپ .json بگیرید یا چت‌های ChatGPT را ایمپورت کنید.'
+          ],
           footerText: 'nimchesko AI studio · نسخه زرشکی و کرم · github.com/halfche/nimchesko-aistudio'
         },
+
         ar: {
           dir: 'rtl',
           themeLabel: 'فاتح / داكن',
@@ -652,51 +1119,176 @@
           heroStudio: 'تشغيل استوديو الويب',
           zipBtn: 'تنزيل الحزمة (.zip)',
           releasesBtn: 'إصدارات سطح المكتب',
-          heroTitle: 'الدليل الكامل لـ nimchesko AI studio',
+          tocWhat: '١. ما هو المشروع',
+          tocFeatures: '٢. الميزات الكاملة',
+          tocCompare: '٣. المقارنة',
+          tocInstall: '٤. التثبيت',
+          tocUsage: '٥. طريقة الاستخدام',
+          heroTitle: 'الدليل الكامل لـ nimchesko AI studio — التعريف، المقارنة والاستخدام',
           heroSub:
-            'مساحة عمل محلية متعددة المنصات لجميع النماذج المحلية (ملفات .gguf/.bin/.safetensors وModelfile وOllama) مع مقارنة النماذج جنباً إلى جنب ومشاريع معزولة.',
-          c1Title: '٠١. آلية العمل والبنية الأساسية',
-          c1Body: 'تشغيل محلي بالكامل بدون أي اعتماد إلزامي على السحابة:',
-          c1List: [
-            'جميع النماذج المحلية: اكتشاف تلقائي لنماذج Ollama أو استيراد أي ملف محلي (.gguf, .bin, .safetensors) أو Modelfile',
-            'تبويب المقارنة (Compare): تشغيل الأوامر بالتتابع أو بالتوازي وفحص المواصفات (/api/show) ومقارنة السرعة (tok/s)',
-            'مشاريع معزولة: ملف قواعد rules.md مستقل ومجلدات بالسحب والإفلات',
-            'الحفظ التلقائي ومزامنة ملفات .json ومراقبة السياق المباشرة'
+            'بيئة عمل محلية ١٠٠٪ لجميع النماذج المحلية (.gguf، .bin، .safetensors، Modelfile وOllama). محادثة متعددة النماذج، مقارنة جنباً إلى جنب، وضع Hyper Mode لإنتاج ملفات .md على سطح المكتب، وضع Journal & Skills، رفع كافة الملفات والعمل دون إنترنت.',
+          whatTitle: '٠١. ما هو nimchesko AI studio؟',
+          whatSub: 'تطبيق محلي بالكامل بدون سحابة إلزامية أو Docker.',
+          whatOverviewTitle: 'فكرة المشروع وفلسفته',
+          whatOverviewBody:
+            'nimchesko AI studio مركز عمل مفتوح المصدر مبني بتقنيات React وTypeScript وElectron بتصميم عنابي وكريمي مع زخارف معمارية إيرانية.',
+          whatOverviewList: [
+            'يدعم أي نموذج محلي (Llama، Qwen، DeepSeek، Mistral، Gemma، Phi وملفات الأوزان المباشرة).',
+            'خصوصية تامة: جميع المحادثات والملفات والمشاريع تبقى محلياً على جهازك.',
+            'يعمل عبر المتصفح أو PWA أو ملف .zip أو مثبتات سطح المكتب الأصلية.'
           ],
-          c2Title: '٠٢. التشغيل السريع (حزمة .zip)',
-          c2Body: 'نزّل nimchesko-ai-studio-app.zip وفك الضغط ثم شغّله مباشرة:',
-          c2Code:
-            '# Windows\nrun-windows.bat\n\n# Linux\nchmod +x run-linux.sh && ./run-linux.sh',
-          c3Title: '٠٣. الاتصال بـ Ollama والملفات المحلية',
-          c3Body: 'شغّل Ollama مع تفعيل CORS ثم أضف النماذج من Models & Sync:',
-          c3Code:
-            '# Linux / macOS\nOLLAMA_ORIGINS=* ollama serve\n\n# Windows PowerShell\n$env:OLLAMA_ORIGINS="*"; ollama serve\n\nollama pull llama3.2:latest',
-          c4Title: '٠٤. المقارنة والأدوات الإنتاجية',
-          c4Body: 'ميزات مصممة لاختبار النماذج والعمل اليومي:',
-          c4List: [
-            'رفع ملفات الأوزان المحلية مباشرة إلى Ollama عبر /api/blobs و/api/create',
-            'تصدير تقارير المقارنة بصيغة Markdown ومتابعة أي نتيجة في محادثة جديدة',
-            'الاختصارات: Cmd/Ctrl + Enter للإرسال، Cmd/Ctrl + N لمحادثة جديدة، Cmd/Ctrl + K للمسح',
-            'مظهر العنابي والكريمي الفاتح والداكن متزامن مع الدليل'
+          whatArchTitle: 'البنية التقنية',
+          whatArchBody: 'يتصل مباشرة بواجهة Ollama المحلية ونظام ملفات سطح المكتب:',
+          whatArchList: [
+            'كشف النماذج تلقائياً عبر /api/tags وفحصها عبر /api/show ورفع ملفات .gguf عبر /api/blobs.',
+            'أوضاع العمل: Chat وCompare وHyper Mode وJournal & Skills وProjects.',
+            'حفظ تلقائي للملفات في Desktop/Hyper Mode Markdown Files وDesktop/Journal & Skill Mode.'
           ],
-          c5Title: '٠٥. طرق التشغيل المتاحة',
-          c5Body: 'اختر الطريقة الأنسب لجهازك:',
-          c5List: [
-            'تطبيق سطح المكتب (.exe / .deb / .rpm / .AppImage / .pkg) من صفحة Releases',
-            'استوديو الويب مباشرة من المتصفح أو تثبيته كـ PWA',
-            'الوصول المباشر للكود المصدري عبر زر الانتقال إلى المستودع الرئيسي أعلاه'
+          featTitle: '٠٢. جميع الميزات الرئيسية',
+          featSub: 'كل الأدوات المدمجة في استوديو nimchesko.',
+          f1Title: 'استيراد أي نموذج محلي (Models & Sync)',
+          f1Body: 'أضف جميع نماذجك بسهولة:',
+          f1List: [
+            'استيراد جميع نماذج Ollama بنقرة واحدة.',
+            'رفع ملفات .gguf و.bin و.safetensors مباشرة إلى Ollama.',
+            'استيراد Modelfile وملفات .json وسحب نماذج hf.co/...'
           ],
-          c6Title: '٠٦. البناء من المصدر',
-          c6Body: 'لتشغيل المشروع أو تعديله محلياً من الكود المصدري:',
-          c6Code:
-            'git clone https://github.com/halfche/nimchesko-aistudio.git\ncd nimchesko-aistudio\nnpm install --legacy-peer-deps\nnpm run build',
-          tableTitle: '٠٧. صيغ إصدارات سطح المكتب والويب',
-          tableBody: 'تُبنى جميع الصيغ التالية تلقائياً وتُنشر في GitHub Releases:',
-          thOs: 'المنصة',
+          f2Title: 'دردشة متعددة النماذج وتسمية إلزامية',
+          f2Body: 'تنظيم المحادثات وتشغيل أكثر من نموذج في نفس المحادثة:',
+          f2List: [
+            'اختيار عدة نماذج معاً وعرض رد كل نموذج مع اسمه.',
+            'تسمية إلزامية للمحادثات مع اقتراح تلقائي للعنوان.',
+            'مجلدات بالسحب والإفلات ومراقبة السرعة tok/s.'
+          ],
+          f3Title: 'مقارنة النماذج جنباً إلى جنب (Compare)',
+          f3Body: 'اختبر النماذج المحلية وقارن أداءها:',
+          f3List: [
+            'وضع متسلسل (موفر للذاكرة VRAM) أو متوازٍ.',
+            'مقارنة tok/s وزمن الاستجابة وتصدير تقارير Markdown.',
+            'متابعة أفضل إجابة في محادثة جديدة.'
+          ],
+          f4Title: 'وضع Hyper Mode (نموذج أعلى ← نموذج منفّذ)',
+          f4Body: 'دمج نموذج معماري قوي مع نموذج سريع:',
+          f4List: [
+            'تسمية الجلسة وإرفاق أي ملفات مرجعية.',
+            'إنتاج ملفات Markdown بلغة الإخراج المختارة (العربية، الإنجليزية، الفارسية، البرمجة...).',
+            'الحفظ التلقائي في Desktop/Hyper Mode Markdown Files.'
+          ],
+          f5Title: 'وضع Journal & Skills',
+          f5Body: 'إنشاء جسور عمل (Side A -> Side B) ومهارات قابلة للربط بالمشاريع:',
+          f5List: [
+            'إضافة روابط مرجعية ومرفقات ملفات متعددة.',
+            'صياغة مهارة Markdown بواسطة النموذج المحلي.',
+            'الحفظ في Desktop/Journal & Skill Mode والربط بالمشروع النشط.'
+          ],
+          f6Title: 'رفع كافة أنواع الملفات (*/*)',
+          f6Body: 'إرفاق الملفات في جميع أوضاع الاستوديو:',
+          f6List: [
+            'يدعم الأكواد وPDF وOffice وCSV وJSON وZIP والصور والصوت والفيديو.',
+            'تحليل تلقائي للنصوص والبيانات الوصفية.',
+            'سحب وإفلات المجلدات بسهولة.'
+          ],
+          f7Title: 'مشاريع معزولة وقواعد خاصة',
+          f7Body: 'فصل كامل لكل مشروع:',
+          f7List: [
+            'ملف rules.md مستقل وموارد خاصة بكل مشروع.',
+            'ضبط temperature وnum_ctx وtop_p لكل مشروع.',
+            'موصلات نظام وأدوات مخصصة.'
+          ],
+          f8Title: 'المزامنة، مراقبة السياق والمظهر',
+          f8Body: 'حفظ آمن وأداء سريع:',
+          f8List: [
+            'تصدير واستيراد .json واستيراد محادثات ChatGPT.',
+            'مراقب السياق Context Monitor والحفظ التلقائي.',
+            'اختصارات Cmd/Ctrl+Enter وN وK مع المظهر الفاتح والداكن.'
+          ],
+          cmpTitle: '٠٣. مقارنة مع الأدوات المشابهة',
+          cmpSub: 'مقارنة سريعة بين nimchesko AI studio وأبرز البدائل المحلية.',
+          cmpThCap: 'الميزة',
+          cmpThOurs: 'nimchesko AI studio',
+          cmpThOllama: 'Ollama CLI',
+          cmpThOpenWebUI: 'Open WebUI',
+          cmpThLmStudio: 'LM Studio',
+          cmpThAnything: 'AnythingLLM',
+          cmpThJan: 'Jan / Msty',
+          cmpRows: [
+            ['مجاني ومفتوح المصدر', ['yes', 'MIT'], ['yes', 'MIT'], ['part', 'ترخيص مخصص'], ['no', 'مغلق'], ['yes', 'MIT'], ['part', 'مختلط']],
+            ['تشغيل بدون Docker', ['yes', 'ويب/سطح المكتب/.zip'], ['yes', 'طرفية فقط'], ['no', 'Docker/Python'], ['yes', 'تطبيق'], ['part', 'أثقل'], ['yes', 'تطبيق']],
+            ['استيراد Ollama + ملفات .gguf', ['yes', 'مدمج'], ['yes', 'CLI'], ['part', 'Ollama فقط'], ['yes', 'مدمج'], ['part', 'غير مباشر'], ['yes', 'مدمج']],
+            ['مقارنة كل النماذج (توفير VRAM)', ['yes', 'تبويب Compare'], ['no', 'لا'], ['part', 'نافذتان فقط'], ['no', 'نموذج واحد'], ['no', 'لا'], ['part', 'محدود']],
+            ['ردود عدة نماذج في محادثة واحدة', ['yes', 'مدمج'], ['no', 'لا'], ['part', 'جزئي'], ['no', 'لا'], ['no', 'لا'], ['no', 'لا']],
+            ['وضع Hyper Mode وحفظ .md على سطح المكتب', ['yes', 'كامل'], ['no', 'لا'], ['no', 'لا'], ['no', 'لا'], ['no', 'لا'], ['no', 'لا']],
+            ['مهارات Journal & Skills مرتبطة بالمشاريع', ['yes', 'كامل'], ['no', 'لا'], ['no', 'أوامر فقط'], ['no', 'لا'], ['part', 'مستندات'], ['no', 'لا']],
+            ['رفع جميع الملفات */* في كل الأقسام', ['yes', 'كامل'], ['no', 'يدوي'], ['yes', 'RAG'], ['part', 'محدود'], ['yes', 'RAG'], ['part', 'محدود']],
+            ['دعم .deb/.rpm/.AppImage/.pkg.tar.zst/.exe/.pkg + PWA', ['yes', 'الكل'], ['yes', 'CLI'], ['no', 'Docker/Web'], ['part', 'جزئي'], ['part', 'جزئي'], ['part', 'جزئي']]
+          ],
+          cmpNote:
+            'الخلاصة: يوفر nimchesko AI studio مقارنة النماذج وتشغيل عدة نماذج ووضع Hyper Mode والمهارات دون الحاجة إلى Docker أو خوادم معقدة.',
+          instTitle: '٠٤. دليل التثبيت الكامل',
+          instSub: 'شغّل Ollama مع CORS ثم اختر مثبت سطح المكتب أو حزمة .zip أو استوديو الويب.',
+          i1Title: 'الخطوة ١: تشغيل Ollama مع CORS',
+          i1Body: 'للسماح بالاتصال من المتصفح وسطح المكتب عبر http://localhost:11434:',
+          i1Code:
+            '# Linux / macOS\nOLLAMA_ORIGINS=* ollama serve\n\n# Windows PowerShell\n$env:OLLAMA_ORIGINS="*"; ollama serve\n\nollama pull llama3.2:latest\nollama pull qwen2.5-coder:7b',
+          i2Title: 'الخطوة ٢: التشغيل السريع (.zip)',
+          i2Body: 'فك ضغط nimchesko-ai-studio-app.zip ثم شغّل الملف المناسب لنظامك:',
+          i2Code: '# Windows\nrun-windows.bat\n\n# Linux\nchmod +x run-linux.sh && ./run-linux.sh',
+          i3Title: 'الخطوة ٣: البناء من المصدر',
+          i3Body: 'أوامر التشغيل والتجميع للمطورين:',
+          i3Code:
+            'git clone https://github.com/halfche/nimchesko-aistudio.git\ncd nimchesko-aistudio\nnpm install --legacy-peer-deps\nnpm run dev\nnpm run build',
+          pkgTableTitle: 'صيغ سطح المكتب الجاهزة (GitHub Releases)',
+          pkgTableBody: 'اختر الحزمة المناسبة لنظام التشغيل الخاص بك:',
+          thOs: 'النظام / التوزيعة',
           thFmt: 'الصيغة',
           thCmd: 'التثبيت / التشغيل',
+          useTitle: '٠٥. دليل الاستخدام الكامل خطوة بخطوة',
+          useSub: 'طريقة الاستفادة من كل قسم داخل البرنامج.',
+          u1Title: 'ربط واستيراد النماذج (Models & Sync)',
+          u1Body: 'تأكد من حالة الاتصال ثم أضف نماذجك المحلية:',
+          u1List: [
+            'تحقق من اتصال http://localhost:11434 في Models & Sync.',
+            'اضغط Auto-Discover لاستيراد كل نماذج Ollama.',
+            'أو ارفع ملفات .gguf و.safetensors مباشرة إلى Ollama.'
+          ],
+          u2Title: 'المحادثة المتعددة والتسمية (Chat)',
+          u2Body: 'أدر محادثاتك بدقة:',
+          u2List: [
+            'أدخل اسماً واضحاً للمحادثة قبل الإرسال.',
+            'حدّد نموذجاً واحداً أو عدة نماذج معاً داخل نفس المحادثة.',
+            'أرفق أي نوع من الملفات عبر زر الإرفاق.'
+          ],
+          u3Title: 'مقارنة الأداء (Compare)',
+          u3Body: 'اختبر النماذج معاً واختر الأفضل:',
+          u3List: [
+            'اختر نموذجين أو أكثر وحدّد التشغيل المتسلسل أو المتوازي.',
+            'قارن السرعة tok/s وعدد التوكنات.',
+            'صدّر تقريراً بصيغة Markdown أو أكمل في الدردشة.'
+          ],
+          u4Title: 'تشغيل Hyper Mode',
+          u4Body: 'اربط نموذج تخطيط قوي بنموذج تنفيذ سريع:',
+          u4List: [
+            'أدخل اسم الجلسة وحدد النموذج الأعلى والأدنى.',
+            'اختر لغة ملف Markdown الناتج وأرفق الملفات.',
+            'يُحفظ الناتج تلقائياً في Desktop/Hyper Mode Markdown Files.'
+          ],
+          u5Title: 'المهارات والجسور (Journal & Skills)',
+          u5Body: 'نظّم المهارات واربطها بالمشاريع:',
+          u5List: [
+            'حدد الاسم وجسر Side A -> Side B والروابط والملفات.',
+            'أنشئ ملف المهارة واحفظه في Desktop/Journal & Skill Mode.',
+            'اربطه بالمشروع النشط بضغطة واحدة.'
+          ],
+          u6Title: 'المشاريع والمزامنة',
+          u6Body: 'حافظ على استقلالية المشاريع ونسخها الاحتياطية:',
+          u6List: [
+            'اضبط rules.md والإعدادات الخاصة لكل مشروع.',
+            'راقب السياق عبر Context Monitor.',
+            'صدّر نسخة .json أو استورد سجل ChatGPT.'
+          ],
           footerText: 'nimchesko AI studio · إصدار العنابي والكريمي · github.com/halfche/nimchesko-aistudio'
         },
+
         de: {
           dir: 'ltr',
           themeLabel: 'Hell / Dunkel',
@@ -706,51 +1298,176 @@
           heroStudio: 'Web-Studio starten',
           zipBtn: 'App laden (.zip)',
           releasesBtn: 'Desktop-Releases',
-          heroTitle: 'nimchesko AI studio — Vollständiger Leitfaden',
+          tocWhat: '1. Überblick',
+          tocFeatures: '2. Funktionen',
+          tocCompare: '3. Tool-Vergleich',
+          tocInstall: '4. Installation',
+          tocUsage: '5. Bedienung',
+          heroTitle: 'nimchesko AI studio — Überblick, Vergleich & vollständiger Leitfaden',
           heroSub:
-            'Plattformübergreifender lokaler KI-Arbeitsbereich für alle lokalen Modelle (.gguf/.bin/.safetensors-Dateien, Modelfiles & Ollama) inklusive Modellvergleich und isolierten Projekten.',
-          c1Title: '01. Funktionsweise & Architektur',
-          c1Body: '100 % lokal ohne verpflichtende Cloud-Anbindung:',
-          c1List: [
-            'Alle lokalen Modelle: erkennt Ollama-Tags automatisch und importiert lokale .gguf/.bin/.safetensors-Dateien sowie Modelfiles',
-            'Compare-Arena: Prompts sequenziell (VRAM-schonend) oder parallel vergleichen, /api/show-Daten prüfen und tok/s messen',
-            'Isolierte Projekte: eigene rules.md, Ressourcen-Dateien und Drag-and-Drop-Ordner',
-            'Auto-Save, Entwürfe, Live-Kontextmonitor und .json-Dateisync'
+            'Eine modellunabhängige, 100 % lokale KI-Werkbank für alle lokalen Modelle (.gguf, .bin, .safetensors, Modelfile & Ollama). Multi-Modell-Chat, direkter Benchmark-Vergleich, Hyper-Mode-Pipelines mit Desktop-Markdown-Export, Journal & Skills, universelle Dateianhänge und Offline-Betrieb unter Linux, Windows, macOS & Browser/PWA.',
+          whatTitle: '01. Was nimchesko AI studio ist',
+          whatSub: 'Konzept, Zielsetzung und lokale Architektur ohne Cloud-Zwang oder Docker.',
+          whatOverviewTitle: 'Ziel & Philosophie',
+          whatOverviewBody:
+            'nimchesko AI studio ist eine Open-Source-Kommandozentrale für lokale KI-Modelle im minimalistischen Burgunderrot- & Creme-Design mit persischen Architekturmotiven.',
+          whatOverviewList: [
+            'Nicht auf eine Modellfamilie festgelegt: unterstützt Llama, Qwen, DeepSeek, Mistral, Gemma, Phi, Modelfiles und direkte Gewichtsdateien.',
+            '100 % lokal & privat: Chats, Uploads, Projekte und Skills bleiben vollständig auf Ihrem Rechner.',
+            'Kein schwerer Server-Stack: startet als Web-Studio, PWA, .zip-Paket oder nativer Desktop-Installer.'
           ],
-          c2Title: '02. Schnellstart (.zip-Paket)',
-          c2Body: 'nimchesko-ai-studio-app.zip entpacken und ohne Installation starten:',
-          c2Code:
-            '# Windows\nrun-windows.bat\n\n# Linux\nchmod +x run-linux.sh && ./run-linux.sh',
-          c3Title: '03. Ollama & lokale Modelle verbinden',
-          c3Body: 'Starten Sie Ollama mit CORS-Freigabe und laden oder importieren Sie beliebige Modelle:',
-          c3Code:
-            '# Linux / macOS\nOLLAMA_ORIGINS=* ollama serve\n\n# Windows PowerShell\n$env:OLLAMA_ORIGINS="*"; ollama serve\n\nollama pull llama3.2:latest',
-          c4Title: '04. Vergleich & Produktivität',
-          c4Body: 'Werkzeuge für schnelles Benchmarking und tägliche Arbeit:',
-          c4List: [
-            'Lokale Gewichtsdateien direkt per /api/blobs + /api/create an Ollama übertragen',
-            'Vergleichsberichte als Markdown exportieren und Gewinner direkt im Chat fortführen',
-            'Kürzel: Cmd/Ctrl + Enter (Senden), Cmd/Ctrl + N (Neu), Cmd/Ctrl + K (Leeren)',
-            'Burgunderrot & Creme Hell/Dunkel automatisch synchronisiert'
+          whatArchTitle: 'Technische Architektur',
+          whatArchBody: 'Direkte Anbindung an Ihre lokale Ollama-API und Desktop-Ordner:',
+          whatArchList: [
+            'Modellerkennung via /api/tags, Detailprüfung via /api/show, Pulls via /api/pull und Upload lokaler Gewichte via /api/blobs + /api/create.',
+            'Arbeitsbereiche: Chat (Einzel/Multi), Compare Arena, Hyper Mode (Higher -> Lower), Journal & Skills sowie isolierte Projekte.',
+            'Desktop-Export: schreibt Markdown-Dateien direkt nach Desktop/Hyper Mode Markdown Files und Desktop/Journal & Skill Mode.'
           ],
-          c5Title: '05. Desktop & Web nutzen',
-          c5Body: 'Alle Optionen auf einen Blick:',
-          c5List: [
-            'Desktop-Installer (.exe / .deb / .rpm / .AppImage / .pkg) unter GitHub Releases',
-            'Web-Studio direkt im Browser oder als Offline-PWA installierbar',
-            'Quellcode jederzeit über „Zum Haupt-Repo (GitHub)“ öffnen'
+          featTitle: '02. Alle Funktionen im Überblick',
+          featSub: 'Vollständige Funktionsübersicht aller Arbeitsbereiche.',
+          f1Title: 'Beliebige lokale Modelle (Models & Sync)',
+          f1Body: 'Alle lokalen Modelle zentral einbinden:',
+          f1List: [
+            'Alle installierten Ollama-Modelle mit einem Klick automatisch erkennen.',
+            'Lokale .gguf-, .bin- und .safetensors-Dateien direkt nach Ollama hochladen.',
+            'Modelfiles und .json-Profile importieren oder hf.co/...-Modelle laden.'
           ],
-          c6Title: '06. Aus dem Quellcode bauen',
-          c6Body: 'Lokale Entwicklung und Paket-Erstellung:',
-          c6Code:
-            'git clone https://github.com/halfche/nimchesko-aistudio.git\ncd nimchesko-aistudio\nnpm install --legacy-peer-deps\nnpm run build',
-          tableTitle: '07. GitHub Actions CI/CD Release-Formate',
-          tableBody: 'Automatisierte Desktop- und Web-Pakete für alle Systeme:',
-          thOs: 'Plattform',
+          f2Title: 'Multi-Modell-Chat & Pflichtbenennung',
+          f2Body: 'Strukturierte Konversationen mit einem oder mehreren Modellen gleichzeitig:',
+          f2List: [
+            'Mehrere Modelle per Checkbox im selben Chat parallel oder sequenziell befragen.',
+            'Klare Chat-Benennung beim Erstellen oder Senden inklusive Auto-Vorschlag.',
+            'Drag-and-Drop-Ordner und Live-Geschwindigkeitsanzeige (tok/s).'
+          ],
+          f3Title: 'Compare Arena (Modellvergleich)',
+          f3Body: 'Lokale Modelle fair vergleichen und den Gewinner ermitteln:',
+          f3List: [
+            'Sequenzieller (VRAM-schonender) oder paralleler Modus über beliebig viele Modelle.',
+            'Vergleich von tok/s, Latenz, Tokens und Reasoning-Ausgaben.',
+            'Markdown-Export und direkte Weiterführung im Chat.'
+          ],
+          f4Title: 'Hyper Mode (Dual-Modell-Pipeline)',
+          f4Body: 'Kombiniert ein starkes Architekt-Modell (Higher) mit einem schnellen Builder-Modell (Lower):',
+          f4List: [
+            'Benannter Workflow mit Dateianhängen und frei wählbarer Zielsprache.',
+            'Das Higher-Modell entwirft die Spezifikation, das Lower-Modell setzt sie um.',
+            'Speichert fertige .md-Dokumente direkt in Desktop/Hyper Mode Markdown Files.'
+          ],
+          f5Title: 'Journal & Skill Mode (Workflow-Brücken)',
+          f5Body: 'Wiederverwendbare Side-A -> Side-B-Skills erstellen und synchronisieren:',
+          f5List: [
+            'Notizen mit Side A -> Side B-Verknüpfung, Referenz-Links und Dateien anlegen.',
+            'Durch ein lokales Modell als strukturierten Markdown-Skill ausarbeiten lassen.',
+            'In Desktop/Journal & Skill Mode speichern und direkt an Projekte anhängen.'
+          ],
+          f6Title: 'Universelle Datei-Uploads (*/*)',
+          f6Body: 'Nahezu jedes Dateiformat in allen Arbeitsbereichen nutzen:',
+          f6List: [
+            'Quellcode, Markdown, PDF, Office (.docx, .xlsx, .csv), JSON, .zip, Bilder, Audio und Video.',
+            'Automatische Text- und Metadatenanalyse ohne externe Cloud.',
+            'Ordner per Drag & Drop oder über den Anhang-Button hinzufügen.'
+          ],
+          f7Title: 'Isolierte Projekte & Regeln',
+          f7Body: 'Saubere Trennung pro Projekt:',
+          f7List: [
+            'Eigene rules.md, Ressourcen-Dateien und Umgebungsvariablen pro Projekt.',
+            'Individuelle Parameter wie temperature, num_ctx und top_p.',
+            'Konfigurierbare System-Konnektoren und Tool-Schemas.'
+          ],
+          f8Title: 'Sync, Kontextmonitor & Design',
+          f8Body: 'Sichere Datenhaltung und schnelle Bedienung:',
+          f8List: [
+            'Vollständiger .json-Workspace-Sync sowie Import von ChatGPT conversations.json.',
+            'Lokale .json-Spiegelung und Live-Kontextmonitor.',
+            'Kürzel Cmd/Ctrl+Enter, N, K und synchronisiertes Hell/Dunkel-Theme.'
+          ],
+          cmpTitle: '03. Vergleich mit ähnlichen Tools',
+          cmpSub: 'Wie sich nimchesko AI studio von anderen lokalen KI-Werkzeugen unterscheidet.',
+          cmpThCap: 'Funktion',
+          cmpThOurs: 'nimchesko AI studio',
+          cmpThOllama: 'Ollama CLI',
+          cmpThOpenWebUI: 'Open WebUI',
+          cmpThLmStudio: 'LM Studio',
+          cmpThAnything: 'AnythingLLM',
+          cmpThJan: 'Jan / Msty',
+          cmpRows: [
+            ['100 % kostenlos & Open Source', ['yes', 'MIT'], ['yes', 'MIT'], ['part', 'Eigene Lizenz'], ['no', 'Closed Source'], ['yes', 'MIT'], ['part', 'Gemischt']],
+            ['Kein Docker / Server nötig', ['yes', 'Web / Desktop / .zip'], ['yes', 'Nur CLI'], ['no', 'Docker / Python'], ['yes', 'Desktop'], ['part', 'Schwergewicht'], ['yes', 'Desktop']],
+            ['Ollama + direktes .gguf / .safetensors', ['yes', 'Vollständig'], ['yes', 'CLI'], ['part', 'Nur Ollama'], ['yes', 'Integriert'], ['part', 'Indirekt'], ['yes', 'Integriert']],
+            ['Direkter Vergleich aller Modelle (VRAM-sicher)', ['yes', 'Compare-Tab'], ['no', 'Nein'], ['part', 'Split-Ansicht'], ['no', 'Einzeln'], ['no', 'Nein'], ['part', 'Begrenzt']],
+            ['Mehrere Modelle in einem Chat-Verlauf', ['yes', 'Multi-Auswahl'], ['no', 'Nein'], ['part', 'Teilweise'], ['no', 'Einzeln'], ['no', 'Einzeln'], ['no', 'Einzeln']],
+            ['Dual-Modell Hyper Mode + Desktop .md', ['yes', 'Integriert'], ['no', 'Nein'], ['no', 'Nein'], ['no', 'Nein'], ['no', 'Nein'], ['no', 'Nein']],
+            ['Journal & Skill Bridges (Side A -> B)', ['yes', 'Integriert'], ['no', 'Nein'], ['no', 'Nur Prompts'], ['no', 'Nein'], ['part', 'Dokumente'], ['no', 'Nein']],
+            ['Universelle */* Datei-Uploads überall', ['yes', 'Alle Tabs'], ['no', 'Manuell'], ['yes', 'RAG'], ['part', 'Text/Bild'], ['yes', 'RAG'], ['part', 'Begrenzt']],
+            ['.deb / .rpm / .AppImage / .pkg.tar.zst / .exe / .pkg + PWA', ['yes', 'Alle Formate'], ['yes', 'CLI'], ['no', 'Web/Docker'], ['part', 'Auswahl'], ['part', 'Auswahl'], ['part', 'Auswahl']]
+          ],
+          cmpNote:
+            'Fazit: Ollama CLI besitzt keine GUI; Open WebUI richtet sich an Docker-Server; LM Studio & Jan arbeiten meist einzeln pro Chat. nimchesko AI studio kombiniert schlanken Desktop/Web-Betrieb mit Modellvergleich, Hyper-Mode-Pipelines und Skill-Brücken.',
+          instTitle: '04. Installationsanleitung',
+          instSub: 'Ollama mit CORS starten und gewünschtes Paket (.zip, Desktop oder Quellcode) nutzen.',
+          i1Title: 'Schritt A: Ollama mit CORS starten',
+          i1Body: 'Ermöglicht Browser, PWA und Desktop-App Zugriff auf http://localhost:11434:',
+          i1Code:
+            '# Linux / macOS\nOLLAMA_ORIGINS=* ollama serve\n\n# Windows PowerShell\n$env:OLLAMA_ORIGINS="*"; ollama serve\n\nollama pull llama3.2:latest\nollama pull qwen2.5-coder:7b',
+          i2Title: 'Schritt B: Schnellstart (.zip-Paket)',
+          i2Body: 'nimchesko-ai-studio-app.zip entpacken und direkt starten:',
+          i2Code: '# Windows\nrun-windows.bat\n\n# Linux\nchmod +x run-linux.sh && ./run-linux.sh',
+          i3Title: 'Schritt C: Aus Quellcode bauen',
+          i3Body: 'Für Entwicklung oder lokale Paketierung:',
+          i3Code:
+            'git clone https://github.com/halfche/nimchesko-aistudio.git\ncd nimchesko-aistudio\nnpm install --legacy-peer-deps\nnpm run dev\nnpm run build',
+          pkgTableTitle: 'Native Desktop-Installer (GitHub Releases)',
+          pkgTableBody: 'Automatisch gebaute Pakete für alle gängigen Betriebssysteme:',
+          thOs: 'System / Distribution',
           thFmt: 'Format',
           thCmd: 'Installation / Start',
+          useTitle: '05. Schritt-für-Schritt-Bedienung',
+          useSub: 'So nutzen Sie alle Bereiche effektiv im Alltag.',
+          u1Title: 'Modelle verbinden & laden (Models & Sync)',
+          u1Body: 'Ollama prüfen und lokale Modelle hinzufügen:',
+          u1List: [
+            'Verbindung zu http://localhost:11434 in Models & Sync prüfen.',
+            'Mit Auto-Discover alle Ollama-Modelle einlesen oder .gguf/.safetensors direkt hochladen.',
+            'Bei Bedarf beliebige hf.co/...-Tags herunterladen.'
+          ],
+          u2Title: 'Multi-Modell-Chat & Benennung (Chat)',
+          u2Body: 'Klare Namen und parallele Antworten nutzen:',
+          u2List: [
+            'Jeden neuen Chat beim Start benennen (Vorschlag wird automatisch angeboten).',
+            'Ein oder mehrere Modelle auswählen und Dateien (*/*) direkt anhängen.',
+            'Unterhaltungen in Drag-and-Drop-Ordnern sortieren.'
+          ],
+          u3Title: 'Modelle vergleichen (Compare)',
+          u3Body: 'Geschwindigkeit und Qualität objektiv testen:',
+          u3List: [
+            'Modelle auswählen und Sequenziell (VRAM-sparend) oder Parallel starten.',
+            'tok/s, Latenz und Tokenverbrauch vergleichen.',
+            'Ergebnis als Markdown exportieren oder im Chat fortsetzen.'
+          ],
+          u4Title: 'Hyper Mode Pipeline ausführen',
+          u4Body: 'Starkes Planungsmodell mit schnellem Ausführungsmodell koppeln:',
+          u4List: [
+            'Sitzungsname vergeben, Higher- und Lower-Modell auswählen.',
+            'Ausgabesprache (z. B. Englisch, Persisch, Code) festlegen.',
+            'Das Ergebnis landet direkt als .md in Desktop/Hyper Mode Markdown Files.'
+          ],
+          u5Title: 'Journal & Skills verknüpfen',
+          u5Body: 'Notizen in aktive Projektregeln verwandeln:',
+          u5List: [
+            'Skill benennen, Side A -> Side B, Links und Dateien eintragen.',
+            'Vom Modell als Markdown ausarbeiten und in Desktop/Journal & Skill Mode sichern.',
+            'Per Klick an das aktive Projekt anhängen.'
+          ],
+          u6Title: 'Projekte isolieren & sichern',
+          u6Body: 'Langfristige Ordnung im Workspace:',
+          u6List: [
+            'Für jedes Projekt eigene rules.md und Parameter festlegen.',
+            'Bei langen Verläufen den Context Monitor verwenden.',
+            'Regelmäßig über .json Sync sichern oder ChatGPT-Exporte laden.'
+          ],
           footerText: 'nimchesko AI studio · Burgunderrot & Creme Edition · github.com/halfche/nimchesko-aistudio'
         },
+
         es: {
           dir: 'ltr',
           themeLabel: 'Claro / Oscuro',
@@ -760,51 +1477,176 @@
           heroStudio: 'Abrir Web Studio',
           zipBtn: 'Descargar App (.zip)',
           releasesBtn: 'Versiones Desktop',
-          heroTitle: 'nimchesko AI studio — Guía Completa',
+          tocWhat: '1. Qué es',
+          tocFeatures: '2. Funciones',
+          tocCompare: '3. Comparativa',
+          tocInstall: '4. Instalación',
+          tocUsage: '5. Cómo Usar',
+          heroTitle: 'nimchesko AI studio — Descripción, Comparativa y Guía Completa',
           heroSub:
-            'Espacio de trabajo local multiplataforma para todos tus modelos locales (archivos .gguf/.bin/.safetensors, Modelfiles y Ollama), comparación lado a lado y proyectos aislados.',
-          c1Title: '01. Cómo Funciona',
-          c1Body: 'Ejecución 100 % local sin depender de la nube:',
-          c1List: [
-            'Todos los modelos locales: detecta modelos de Ollama o importa archivos .gguf/.bin/.safetensors y Modelfiles',
-            'Pestaña Compare: ejecuta prompts en paralelo o secuencialmente, inspecciona /api/show y compara tok/s',
-            'Proyectos aislados con rules.md, archivos de contexto y carpetas arrastrables',
-            'Autoguardado, borradores, monitor de contexto y sincronización .json'
+            'Un estudio de IA 100 % local y agnóstico de modelo (.gguf, .bin, .safetensors, Modelfile y Ollama). Chatea con varios modelos a la vez, compara lado a lado, encadena modelos en Hyper Mode guardando archivos .md en el Escritorio, crea habilidades en Journal & Skills y trabaja sin conexión en Linux, Windows, macOS o navegador.',
+          whatTitle: '01. Qué es nimchesko AI studio',
+          whatSub: 'Propósito del proyecto y arquitectura local sin depender de la nube ni Docker.',
+          whatOverviewTitle: 'Propósito y Filosofía',
+          whatOverviewBody:
+            'nimchesko AI studio es una plataforma abierta para trabajar con modelos locales de IA usando React, TypeScript, Vite y Electron bajo una estética Borgoña y Crema con motivos arquitectónicos persas.',
+          whatOverviewList: [
+            'Compatible con cualquier modelo local: Llama, Qwen, DeepSeek, Mistral, Gemma, Phi, Modelfiles y pesos locales.',
+            'Privacidad 100 % local: conversaciones, archivos, proyectos y habilidades permanecen en tu equipo.',
+            'Sin servidores complejos: ejecútalo como web estática, PWA, paquete .zip o instalador nativo.'
           ],
-          c2Title: '02. Inicio Rápido (Paquete .zip)',
-          c2Body: 'Extrae nimchesko-ai-studio-app.zip y ejecútalo al instante:',
-          c2Code:
-            '# Windows\nrun-windows.bat\n\n# Linux\nchmod +x run-linux.sh && ./run-linux.sh',
-          c3Title: '03. Conectar Ollama y Archivos Locales',
-          c3Body: 'Inicia Ollama con CORS habilitado y carga cualquier modelo desde Models & Sync:',
-          c3Code:
+          whatArchTitle: 'Arquitectura del Sistema',
+          whatArchBody: 'Conexión directa con Ollama y carpetas locales del Escritorio:',
+          whatArchList: [
+            'Descubre /api/tags, inspecciona con /api/show, descarga etiquetas/hf.co con /api/pull y carga pesos con /api/blobs + /api/create.',
+            'Modos integrados: Chat (uno o varios modelos), Compare, Hyper Mode, Journal & Skills y Proyectos Aislados.',
+            'Guardado automático en Desktop/Hyper Mode Markdown Files y Desktop/Journal & Skill Mode.'
+          ],
+          featTitle: '02. Todas las Funcionalidades',
+          featSub: 'Detalle completo de cada pestaña y herramienta.',
+          f1Title: 'Importar Cualquier Modelo Local',
+          f1Body: 'Gestiona tus modelos sin bloqueos:',
+          f1List: [
+            'Autodetección e importación de modelos Ollama en un clic.',
+            'Carga directa de archivos .gguf, .bin y .safetensors a Ollama.',
+            'Soporte de Modelfile, perfiles .json y descargas hf.co/...'
+          ],
+          f2Title: 'Chat Multimodelo y Nombre Obligatorio',
+          f2Body: 'Organización clara y múltiples modelos por hilo:',
+          f2List: [
+            'Selecciona uno o varios modelos en el mismo chat y compara respuestas.',
+            'Nombre obligatorio al crear o enviar mensajes (con sugerencia automática).',
+            'Carpetas arrastrables y telemetría tok/s en vivo.'
+          ],
+          f3Title: 'Arena de Comparación (Compare)',
+          f3Body: 'Evalúa rendimiento y precisión lado a lado:',
+          f3List: [
+            'Ejecución secuencial (cuida la VRAM) o paralela.',
+            'Compara tok/s, latencia y tokens usados.',
+            'Exporta informes Markdown o continúa cualquier respuesta en el chat.'
+          ],
+          f4Title: 'Hyper Mode (Arquitecto -> Constructor)',
+          f4Body: 'Une un modelo superior para diseñar con otro ágil para ejecutar:',
+          f4List: [
+            'Nombre de sesión obligatorio y soporte para archivos adjuntos.',
+            'Salida Markdown en el idioma elegido (español, inglés, persa, código, etc.).',
+            'Guardado directo en Desktop/Hyper Mode Markdown Files.'
+          ],
+          f5Title: 'Journal & Skills (Puentes Side A -> B)',
+          f5Body: 'Convierte notas y enlaces en habilidades activas:',
+          f5List: [
+            'Registra Side A -> Side B, enlaces de referencia y archivos.',
+            'Sintetiza habilidades Markdown mediante un modelo local.',
+            'Guarda en Desktop/Journal & Skill Mode y sincroniza con tu proyecto.'
+          ],
+          f6Title: 'Carga Universal de Archivos (*/*)',
+          f6Body: 'Adjunta archivos reales en cualquier pestaña:',
+          f6List: [
+            'Código fuente, Markdown, PDF, Office (.docx, .xlsx, .csv), JSON, .zip, imagen, audio y video.',
+            'Extracción automática de texto y metadatos.',
+            'Compatible con carpetas completas por arrastrar y soltar.'
+          ],
+          f7Title: 'Proyectos Aislados y Reglas',
+          f7Body: 'Mantén cada proyecto separado y limpio:',
+          f7List: [
+            'rules.md independiente, archivos de contexto y variables por proyecto.',
+            'Parámetros personalizados (temperature, num_ctx, top_p).',
+            'Conectores de sistema y herramientas configurables.'
+          ],
+          f8Title: 'Sincronización, Contexto y Tema',
+          f8Body: 'Productividad diaria sin pérdida de datos:',
+          f8List: [
+            'Respaldo inteligente .json e importación de ChatGPT conversations.json.',
+            'Monitor de contexto en vivo y autoguardado de borradores.',
+            'Atajos Cmd/Ctrl+Enter, N, K y tema Claro/Oscuro sincronizado.'
+          ],
+          cmpTitle: '03. Comparativa con Herramientas Similares',
+          cmpSub: 'Diferencias frente a otras soluciones locales conocidas.',
+          cmpThCap: 'Capacidad',
+          cmpThOurs: 'nimchesko AI studio',
+          cmpThOllama: 'Ollama CLI',
+          cmpThOpenWebUI: 'Open WebUI',
+          cmpThLmStudio: 'LM Studio',
+          cmpThAnything: 'AnythingLLM',
+          cmpThJan: 'Jan / Msty',
+          cmpRows: [
+            ['100 % Gratis y Código Abierto', ['yes', 'MIT'], ['yes', 'MIT'], ['part', 'Licencia Propia'], ['no', 'Cerrado'], ['yes', 'MIT'], ['part', 'Mixto']],
+            ['Sin Docker ni Servidor Pesado', ['yes', 'Web / Desktop / .zip'], ['yes', 'Solo CLI'], ['no', 'Docker/Python'], ['yes', 'App Desktop'], ['part', 'Pesado'], ['yes', 'App Desktop']],
+            ['Ollama + Carga Directa .gguf', ['yes', 'Completo'], ['yes', 'CLI'], ['part', 'Solo Ollama'], ['yes', 'Integrado'], ['part', 'Indirecto'], ['yes', 'Integrado']],
+            ['Comparativa de Todos los Modelos', ['yes', 'Pestaña Compare'], ['no', 'No'], ['part', 'Dividido'], ['no', 'Uno activo'], ['no', 'No'], ['part', 'Limitado']],
+            ['Varios Modelos en un Mismo Chat', ['yes', 'Multiselección'], ['no', 'No'], ['part', 'Parcial'], ['no', 'No'], ['no', 'No'], ['no', 'No']],
+            ['Hyper Mode Dual + .md en Escritorio', ['yes', 'Integrado'], ['no', 'No'], ['no', 'No'], ['no', 'No'], ['no', 'No'], ['no', 'No']],
+            ['Journal & Skills sincronizables', ['yes', 'Integrado'], ['no', 'No'], ['no', 'Solo prompts'], ['no', 'No'], ['part', 'Documentos'], ['no', 'No']],
+            ['Subida Universal */* en Todo el Estudio', ['yes', 'Todas las pestañas'], ['no', 'Manual'], ['yes', 'RAG'], ['part', 'Limitado'], ['yes', 'RAG'], ['part', 'Limitado']],
+            ['.deb/.rpm/.AppImage/.pkg.tar.zst/.exe/.pkg + PWA', ['yes', 'Todos'], ['yes', 'CLI'], ['no', 'Web/Docker'], ['part', 'Parcial'], ['part', 'Parcial'], ['part', 'Parcial']]
+          ],
+          cmpNote:
+            'Resumen: ideal cuando buscas máxima ligereza sin Docker, comparación directa entre modelos y flujos avanzados como Hyper Mode y Journal & Skills en tu escritorio.',
+          instTitle: '04. Guía Completa de Instalación',
+          instSub: 'Inicia Ollama con CORS y elige tu formato favorito.',
+          i1Title: 'Paso A: Iniciar Ollama con CORS',
+          i1Body: 'Permite conexiones desde navegador, PWA y escritorio a http://localhost:11434:',
+          i1Code:
             '# Linux / macOS\nOLLAMA_ORIGINS=* ollama serve\n\n# Windows PowerShell\n$env:OLLAMA_ORIGINS="*"; ollama serve\n\nollama pull llama3.2:latest',
-          c4Title: '04. Comparación y Productividad',
-          c4Body: 'Diseñado para probar múltiples modelos locales con claridad:',
-          c4List: [
-            'Sube archivos locales directo a Ollama (/api/blobs + /api/create)',
-            'Exporta comparativas en Markdown y continúa cualquier respuesta en el chat',
-            'Atajos: Cmd/Ctrl + Enter (Enviar), Cmd/Ctrl + N (Nuevo), Cmd/Ctrl + K (Limpiar)',
-            'Temas Claro y Oscuro en Borgoña y Crema sincronizados'
-          ],
-          c5Title: '05. Modos de Uso',
-          c5Body: 'Elige cómo prefieres trabajar:',
-          c5List: [
-            'Instaladores de escritorio (.exe / .deb / .rpm / .AppImage / .pkg) en Releases',
-            'Web Studio en tu navegador o como aplicación PWA sin conexión',
-            'Código fuente disponible en el botón Ir al Repo Principal'
-          ],
-          c6Title: '06. Compilar desde el Código Fuente',
-          c6Body: 'Comandos para desarrollo y compilación local:',
-          c6Code:
-            'git clone https://github.com/halfche/nimchesko-aistudio.git\ncd nimchesko-aistudio\nnpm install --legacy-peer-deps\nnpm run build',
-          tableTitle: '07. Formatos de Lanzamiento (CI/CD)',
-          tableBody: 'Todos los paquetes compilados automáticamente en GitHub Releases:',
-          thOs: 'Plataforma',
+          i2Title: 'Paso B: Inicio Instantáneo (.zip)',
+          i2Body: 'Descomprime nimchesko-ai-studio-app.zip y ejecuta:',
+          i2Code: '# Windows\nrun-windows.bat\n\n# Linux\nchmod +x run-linux.sh && ./run-linux.sh',
+          i3Title: 'Paso C: Compilar desde Código Fuente',
+          i3Body: 'Para desarrollo o compilación local:',
+          i3Code:
+            'git clone https://github.com/halfche/nimchesko-aistudio.git\ncd nimchesko-aistudio\nnpm install --legacy-peer-deps\nnpm run dev\nnpm run build',
+          pkgTableTitle: 'Instaladores Nativos de Escritorio',
+          pkgTableBody: 'Disponibles automáticamente en GitHub Releases:',
+          thOs: 'Sistema / Distro',
           thFmt: 'Formato',
-          thCmd: 'Instalación / Uso',
+          thCmd: 'Instalación / Ejecución',
+          useTitle: '05. Guía Paso a Paso de Uso',
+          useSub: 'Cómo aprovechar cada pestaña de nimchesko AI studio.',
+          u1Title: 'Conectar e Importar Modelos',
+          u1Body: 'Configura Ollama o sube tus pesos:',
+          u1List: [
+            'Abre Models & Sync y verifica http://localhost:11434.',
+            'Importa tus etiquetas Ollama o sube archivos .gguf/.safetensors locales.',
+            'Descarga modelos desde Ollama o hf.co/...'
+          ],
+          u2Title: 'Chat Multimodelo con Nombre',
+          u2Body: 'Mantén cada conversación ordenada:',
+          u2List: [
+            'Asigna un nombre al chat antes de enviar.',
+            'Marca uno o varios modelos en el selector.',
+            'Adjunta cualquier tipo de archivo (*/*).'
+          ],
+          u3Title: 'Comparar Modelos (Compare)',
+          u3Body: 'Mide velocidad y calidad real:',
+          u3List: [
+            'Elige Sequential (ahorra VRAM) o Parallel.',
+            'Revisa tok/s, latencia y tokens.',
+            'Exporta en Markdown o continúa en el chat.'
+          ],
+          u4Title: 'Usar Hyper Mode',
+          u4Body: 'Combina un modelo arquitecto y otro ejecutor:',
+          u4List: [
+            'Nombra la sesión y elige modelo Higher + Lower.',
+            'Elige idioma de salida Markdown y adjunta archivos.',
+            'Se guarda en Desktop/Hyper Mode Markdown Files.'
+          ],
+          u5Title: 'Crear Habilidades (Journal & Skills)',
+          u5Body: 'Documenta puentes Side A -> Side B:',
+          u5List: [
+            'Añade enlaces, archivos y flujo.',
+            'Genera la habilidad Markdown en Desktop/Journal & Skill Mode.',
+            'Adjúntala al proyecto activo en un clic.'
+          ],
+          u6Title: 'Proyectos y Sincronización',
+          u6Body: 'Organiza y respalda tu entorno:',
+          u6List: [
+            'Define rules.md y parámetros por proyecto.',
+            'Usa el monitor de contexto cuando crezca la conversación.',
+            'Exporta respaldos .json o importa ChatGPT.'
+          ],
           footerText: 'nimchesko AI studio · Edición Borgoña y Crema · github.com/halfche/nimchesko-aistudio'
         },
+
         fr: {
           dir: 'ltr',
           themeLabel: 'Clair / Sombre',
@@ -814,51 +1656,176 @@
           heroStudio: 'Lancer Web Studio',
           zipBtn: 'Télécharger (.zip)',
           releasesBtn: 'Versions Desktop',
-          heroTitle: 'nimchesko AI studio — Guide Complet',
+          tocWhat: '1. Présentation',
+          tocFeatures: '2. Fonctionnalités',
+          tocCompare: '3. Comparatif',
+          tocInstall: '4. Installation',
+          tocUsage: '5. Mode d’emploi',
+          heroTitle: 'nimchesko AI studio — Présentation, Comparatif & Guide Complet',
           heroSub:
-            'Espace de travail IA local multiplateforme pour tous vos modèles locaux (fichiers .gguf/.bin/.safetensors, Modelfiles et Ollama), comparaison côte à côte et projets isolés.',
-          c1Title: '01. Fonctionnement & Architecture',
-          c1Body: 'Exécution 100 % locale sans dépendance cloud :',
-          c1List: [
-            'Tous les modèles locaux : détection automatique Ollama et import direct de fichiers .gguf/.bin/.safetensors ou Modelfiles',
-            'Onglet Compare : comparez vos prompts en séquentiel ou parallèle, inspectez /api/show et les vitesses tok/s',
-            'Projets isolés avec rules.md, fichiers ressources et dossiers glisser-déposer',
-            'Sauvegarde automatique, moniteur de contexte et synchronisation .json'
+            'Un espace de travail IA 100 % local pour tous vos modèles locaux (.gguf, .bin, .safetensors, Modelfile et Ollama). Chat multi-modèles, comparateur côte à côte, pipelines Hyper Mode avec export Markdown sur le Bureau, Journal & Skills, pièces jointes universelles et mode hors ligne sur Linux, Windows, macOS et navigateur.',
+          whatTitle: '01. Qu’est-ce que nimchesko AI studio ?',
+          whatSub: 'Philosophie locale sans cloud obligatoire ni serveur Docker lourd.',
+          whatOverviewTitle: 'Objectif du Projet',
+          whatOverviewBody:
+            'nimchesko AI studio est un poste de travail open-source développé avec React, TypeScript, Vite et Electron dans un thème Bordeaux & Crème inspiré de l’architecture iranienne.',
+          whatOverviewList: [
+            'Indépendant de toute famille de modèles : Llama, Qwen, DeepSeek, Mistral, Gemma, Phi et poids personnalisés.',
+            'Confidentialité totale : conversations, fichiers, projets et compétences restent en local.',
+            'Léger : fonctionne en web statique, PWA, archive .zip autonome ou application desktop native.'
           ],
-          c2Title: '02. Démarrage Rapide (.zip)',
-          c2Body: 'Extrayez nimchesko-ai-studio-app.zip et lancez directement :',
-          c2Code:
-            '# Windows\nrun-windows.bat\n\n# Linux\nchmod +x run-linux.sh && ./run-linux.sh',
-          c3Title: '03. Connecter Ollama & Fichiers Locaux',
-          c3Body: 'Démarrez Ollama avec CORS activé puis importez vos modèles dans Models & Sync :',
-          c3Code:
+          whatArchTitle: 'Architecture Technique',
+          whatArchBody: 'Connexion directe à Ollama et aux dossiers du Bureau :',
+          whatArchList: [
+            'Détection /api/tags, inspection /api/show, téléchargement /api/pull et envoi /api/blobs + /api/create.',
+            'Espaces dédiés : Chat, Compare, Hyper Mode, Journal & Skills et Projets Isolés.',
+            'Enregistrement automatique vers Desktop/Hyper Mode Markdown Files et Desktop/Journal & Skill Mode.'
+          ],
+          featTitle: '02. Fonctionnalités Complètes',
+          featSub: 'Tour d’horizon des modules de nimchesko AI studio.',
+          f1Title: 'Import de Tout Modèle Local',
+          f1Body: 'Gérez tous vos modèles en un endroit :',
+          f1List: [
+            'Détection et import Ollama en un clic.',
+            'Téléversement direct de fichiers .gguf, .bin et .safetensors.',
+            'Import Modelfile, profils .json et modèles hf.co/...'
+          ],
+          f2Title: 'Chat Multi-Modèles & Nommage Requis',
+          f2Body: 'Conversations structurées et multi-modèles :',
+          f2List: [
+            'Interrogez un ou plusieurs modèles dans le même fil de discussion.',
+            'Nommage explicite obligatoire avec suggestion automatique.',
+            'Dossiers glisser-déposer et mesure tok/s en direct.'
+          ],
+          f3Title: 'Arène de Comparaison (Compare)',
+          f3Body: 'Comparez objectivement vos modèles locaux :',
+          f3List: [
+            'Exécution séquentielle (économe en VRAM) ou parallèle.',
+            'Mesure tok/s, latence, jetons et export Markdown.',
+            'Poursuivez la meilleure réponse directement dans le Chat.'
+          ],
+          f4Title: 'Hyper Mode (Architecte -> Exécutant)',
+          f4Body: 'Associez un modèle supérieur à un modèle rapide :',
+          f4List: [
+            'Session nommée avec pièces jointes universelles.',
+            'Génération Markdown dans la langue souhaitée.',
+            'Sauvegarde dans Desktop/Hyper Mode Markdown Files.'
+          ],
+          f5Title: 'Journal & Skills (Ponts Side A -> B)',
+          f5Body: 'Transformez vos notes en compétences de projet :',
+          f5List: [
+            'Notes Side A -> Side B avec liens et fichiers joints.',
+            'Mise en forme Markdown par le modèle local choisi.',
+            'Sauvegarde dans Desktop/Journal & Skill Mode et liaison au projet actif.'
+          ],
+          f6Title: 'Pièces Jointes Universelles (*/*)',
+          f6Body: 'Ajoutez tout type de fichier dans chaque onglet :',
+          f6List: [
+            'Code, Markdown, PDF, Office (.docx, .xlsx, .csv), JSON, .zip, image, audio, vidéo.',
+            'Analyse locale automatique du texte et des métadonnées.',
+            'Glisser-déposer de dossiers complets.'
+          ],
+          f7Title: 'Projets Isolés & Règles',
+          f7Body: 'Séparez clairement vos environnements :',
+          f7List: [
+            'rules.md, ressources et variables propres à chaque projet.',
+            'Réglages par projet (temperature, num_ctx, top_p).',
+            'Connecteurs système configurables.'
+          ],
+          f8Title: 'Sync, Moniteur de Contexte & Thèmes',
+          f8Body: 'Confort et sécurité au quotidien :',
+          f8List: [
+            'Export/fusion .json et import ChatGPT conversations.json.',
+            'Moniteur de contexte et sauvegarde automatique.',
+            'Raccourcis Cmd/Ctrl+Enter, N, K et thème Clair/Sombre.'
+          ],
+          cmpTitle: '03. Comparatif avec les Outils Similaires',
+          cmpSub: 'Positionnement face aux principaux clients IA locaux.',
+          cmpThCap: 'Critère',
+          cmpThOurs: 'nimchesko AI studio',
+          cmpThOllama: 'Ollama CLI',
+          cmpThOpenWebUI: 'Open WebUI',
+          cmpThLmStudio: 'LM Studio',
+          cmpThAnything: 'AnythingLLM',
+          cmpThJan: 'Jan / Msty',
+          cmpRows: [
+            ['100 % Gratuit & Open Source', ['yes', 'MIT'], ['yes', 'MIT'], ['part', 'Licence perso'], ['no', 'Fermé'], ['yes', 'MIT'], ['part', 'Mixte']],
+            ['Sans Docker ni Serveur Lourd', ['yes', 'Web / Desktop / .zip'], ['yes', 'CLI seul'], ['no', 'Docker/Python'], ['yes', 'Desktop'], ['part', 'Lourd'], ['yes', 'Desktop']],
+            ['Ollama + Upload .gguf direct', ['yes', 'Complet'], ['yes', 'CLI'], ['part', 'Ollama seul'], ['yes', 'Intégré'], ['part', 'Indirect'], ['yes', 'Intégré']],
+            ['Comparateur Multi-Modèles', ['yes', 'Onglet Compare'], ['no', 'Non'], ['part', 'Vue divisée'], ['no', 'Modèle unique'], ['no', 'Non'], ['part', 'Limité']],
+            ['Multi-Modèles dans un même Chat', ['yes', 'Multi-sélection'], ['no', 'Non'], ['part', 'Partiel'], ['no', 'Non'], ['no', 'Non'], ['no', 'Non']],
+            ['Pipeline Hyper Mode + .md Bureau', ['yes', 'Intégré'], ['no', 'Non'], ['no', 'Non'], ['no', 'Non'], ['no', 'Non'], ['no', 'Non']],
+            ['Compétences Journal liées aux Projets', ['yes', 'Intégré'], ['no', 'Non'], ['no', 'Prompts seuls'], ['no', 'Non'], ['part', 'Docs'], ['no', 'Non']],
+            ['Pièces jointes universelles */*', ['yes', 'Partout'], ['no', 'Manuel'], ['yes', 'RAG'], ['part', 'Limité'], ['yes', 'RAG'], ['part', 'Limité']],
+            ['.deb/.rpm/.AppImage/.pkg.tar.zst/.exe/.pkg + PWA', ['yes', 'Tous'], ['yes', 'CLI'], ['no', 'Web/Docker'], ['part', 'Partiel'], ['part', 'Partiel'], ['part', 'Partiel']]
+          ],
+          cmpNote:
+            'Conclusion : léger, sans Docker, idéal pour comparer tous vos modèles locaux et orchestrer Hyper Mode + Journal & Skills.',
+          instTitle: '04. Guide d’Installation Complet',
+          instSub: 'Démarrez Ollama avec CORS puis choisissez votre mode d’installation.',
+          i1Title: 'Étape A : Lancer Ollama avec CORS',
+          i1Body: 'Autorise l’accès navigateur, PWA et desktop sur http://localhost:11434 :',
+          i1Code:
             '# Linux / macOS\nOLLAMA_ORIGINS=* ollama serve\n\n# Windows PowerShell\n$env:OLLAMA_ORIGINS="*"; ollama serve\n\nollama pull llama3.2:latest',
-          c4Title: '04. Comparaison & Productivité',
-          c4Body: 'Des outils pensés pour comparer efficacement vos modèles :',
-          c4List: [
-            'Envoi direct de fichiers locaux vers Ollama (/api/blobs + /api/create)',
-            'Export Markdown des comparaisons et reprise directe dans le chat',
-            'Raccourcis : Cmd/Ctrl + Entrée, Cmd/Ctrl + N, Cmd/Ctrl + K',
-            'Thème Bordeaux & Crème Clair/Sombre synchronisé'
-          ],
-          c5Title: '05. Formats & Accès',
-          c5Body: 'Choisissez le format adapté à votre poste :',
-          c5List: [
-            'Applications desktop (.exe / .deb / .rpm / .AppImage / .pkg) dans GitHub Releases',
-            'Web Studio dans le navigateur ou en mode PWA hors ligne',
-            'Code source accessible via Aller au Dépôt GitHub ci-dessus'
-          ],
-          c6Title: '06. Compiler depuis les Sources',
-          c6Body: 'Commandes pour le développement local :',
-          c6Code:
-            'git clone https://github.com/halfche/nimchesko-aistudio.git\ncd nimchesko-aistudio\nnpm install --legacy-peer-deps\nnpm run build',
-          tableTitle: '07. Formats GitHub Actions CI/CD',
-          tableBody: 'Paquets générés automatiquement dans GitHub Releases :',
+          i2Title: 'Étape B : Lancement Rapide (.zip)',
+          i2Body: 'Extrayez nimchesko-ai-studio-app.zip et lancez :',
+          i2Code: '# Windows\nrun-windows.bat\n\n# Linux\nchmod +x run-linux.sh && ./run-linux.sh',
+          i3Title: 'Étape C : Compiler depuis les Sources',
+          i3Body: 'Commandes de développement et build :',
+          i3Code:
+            'git clone https://github.com/halfche/nimchesko-aistudio.git\ncd nimchesko-aistudio\nnpm install --legacy-peer-deps\nnpm run dev\nnpm run build',
+          pkgTableTitle: 'Installeurs Desktop Natifs (GitHub Releases)',
+          pkgTableBody: 'Paquets générés automatiquement par GitHub Actions :',
           thOs: 'Plateforme',
           thFmt: 'Format',
           thCmd: 'Installation / Lancement',
+          useTitle: '05. Mode d’Emploi Étape par Étape',
+          useSub: 'Maîtriser chaque onglet de nimchesko AI studio.',
+          u1Title: 'Connecter et Importer (Models & Sync)',
+          u1Body: 'Vérifiez Ollama et ajoutez vos modèles :',
+          u1List: [
+            'Contrôlez la connexion http://localhost:11434.',
+            'Importez les tags Ollama ou téléversez vos .gguf/.safetensors.',
+            'Téléchargez des modèles hf.co/... au besoin.'
+          ],
+          u2Title: 'Chat Multi-Modèles et Nommage',
+          u2Body: 'Organisez vos fils de discussion :',
+          u2List: [
+            'Nommez chaque conversation avant l’envoi.',
+            'Cochez un ou plusieurs modèles dans le même chat.',
+            'Joignez tout fichier (*/*).'
+          ],
+          u3Title: 'Comparer les Modèles (Compare)',
+          u3Body: 'Évaluez vitesse et qualité :',
+          u3List: [
+            'Choisissez Séquentiel (VRAM) ou Parallèle.',
+            'Comparez tok/s, latence et jetons.',
+            'Exportez en Markdown ou reprenez dans le Chat.'
+          ],
+          u4Title: 'Pipeline Hyper Mode',
+          u4Body: 'Associez modèle Architecte et modèle Exécutant :',
+          u4List: [
+            'Nommez la session et choisissez Higher + Lower.',
+            'Choisissez la langue Markdown de sortie.',
+            'Enregistrement direct dans Desktop/Hyper Mode Markdown Files.'
+          ],
+          u5Title: 'Journal & Skills',
+          u5Body: 'Créez des ponts Side A -> Side B :',
+          u5List: [
+            'Ajoutez liens, fichiers et description.',
+            'Générez le fichier dans Desktop/Journal & Skill Mode.',
+            'Liez-le au projet actif en un clic.'
+          ],
+          u6Title: 'Projets Isolés & Sync',
+          u6Body: 'Travaillez proprement sans perte de données :',
+          u6List: [
+            'Configurez rules.md et paramètres par projet.',
+            'Surveillez la fenêtre de contexte via Context Monitor.',
+            'Sauvegardez en .json ou importez ChatGPT.'
+          ],
           footerText: 'nimchesko AI studio · Édition Bordeaux & Crème · github.com/halfche/nimchesko-aistudio'
         },
+
         tr: {
           dir: 'ltr',
           themeLabel: 'Açık / Koyu',
@@ -868,49 +1835,173 @@
           heroStudio: 'Web Stüdyoyu Başlat',
           zipBtn: 'İndir (.zip)',
           releasesBtn: 'Masaüstü Sürümleri',
-          heroTitle: 'nimchesko AI studio — Tam Kılavuz',
+          tocWhat: '1. Proje Nedir?',
+          tocFeatures: '2. Özellikler',
+          tocCompare: '3. Araç Karşılaştırması',
+          tocInstall: '4. Kurulum',
+          tocUsage: '5. Kullanım Rehberi',
+          heroTitle: 'nimchesko AI studio — Genel Bakış, Karşılaştırma ve Tam Kılavuz',
           heroSub:
-            'Tüm yerel modeller (.gguf/.bin/.safetensors dosyaları, Modelfile ve Ollama) için yan yana model karşılaştırması, izole proje beyinleri ve masaüstü paketleri sunan yerel yapay zeka stüdyosu.',
-          c1Title: '01. Nasıl Çalışır ve Mimari',
-          c1Body: 'Bulut zorunluluğu olmadan %100 yerel çalışma:',
-          c1List: [
-            'Tüm Yerel Modeller: Ollama modellerini otomatik algılar veya yerel .gguf/.bin/.safetensors ve Modelfile dosyalarını içe aktarır',
-            'Compare Sekmesi: istemleri sıralı veya paralel çalıştırın, /api/show ayrıntılarını ve tok/s hızını kıyaslayın',
-            'İzole Projeler: her proje için ayrı rules.md, kaynak dosyaları ve sürükle-bırak klasörler',
-            'Otomatik kaydetme, canlı bağlam izleyici ve .json dosya eşitleme'
+            'Tüm yerel modeller (.gguf, .bin, .safetensors, Modelfile ve Ollama) için %100 yerel, model bağımsız yapay zeka stüdyosu. Tek sohbette çoklu model çalıştırın, modelleri yan yana kıyaslayın, Hyper Mode ile masaüstüne Markdown taslakları kaydedin, Journal & Skills oluşturun ve her dosya türünü ekleyin.',
+          whatTitle: '01. nimchesko AI studio Nedir?',
+          whatSub: 'Bulut veya Docker zorunluluğu olmadan tamamen yerel çalışma mimarisi.',
+          whatOverviewTitle: 'Projenin Amacı ve Yaklaşımı',
+          whatOverviewBody:
+            'nimchesko AI studio, React, TypeScript, Vite ve Electron ile İran mimari motifli Bordo & Krem arayüzünde geliştirilmiş açık kaynaklı bir yerel yapay zeka çalışma alanıdır.',
+          whatOverviewList: [
+            'Tek bir modele kilitli değildir: Llama, Qwen, DeepSeek, Mistral, Gemma, Phi ve özel yerel ağırlıklarla çalışır.',
+            '%100 gizlilik: tüm sohbetler, dosyalar, projeler ve beceriler bilgisayarınızda kalır.',
+            'Ağır sunucu kurulumu yok: Web Stüdyo, PWA, .zip paketi veya yerel masaüstü kurulumları ile çalışır.'
           ],
-          c2Title: '02. Hızlı Başlangıç (.zip Paketi)',
-          c2Body: 'nimchesko-ai-studio-app.zip dosyasını çıkarın ve hemen çalıştırın:',
-          c2Code:
-            '# Windows\nrun-windows.bat\n\n# Linux\nchmod +x run-linux.sh && ./run-linux.sh',
-          c3Title: '03. Ollama ve Yerel Dosya Bağlantısı',
-          c3Body: 'Ollama’yı CORS izniyle başlatın ve Models & Sync üzerinden modellerinizi ekleyin:',
-          c3Code:
+          whatArchTitle: 'Sistem Mimarisi',
+          whatArchBody: 'Doğrudan yerel Ollama API ve Masaüstü klasörleriyle konuşur:',
+          whatArchList: [
+            '/api/tags keşfi, /api/show inceleme, /api/pull indirme ve /api/blobs + /api/create yükleme.',
+            'Çalışma sekmeleri: Chat (çoklu model), Compare, Hyper Mode, Journal & Skills ve İzole Projeler.',
+            'Desktop/Hyper Mode Markdown Files ve Desktop/Journal & Skill Mode klasörlerine otomatik kayıt.'
+          ],
+          featTitle: '02. Tüm Özellikler',
+          featSub: 'Uygulamadaki tüm araçların ayrıntılı özeti.',
+          f1Title: 'Herhangi Bir Yerel Model İçe Aktarma',
+          f1Body: 'Tüm yerel modellerinizi yönetin:',
+          f1List: [
+            'Ollama modellerini tek tıkla otomatik algılayın.',
+            'Yerel .gguf, .bin ve .safetensors dosyalarını Ollama’ya yükleyin.',
+            'Modelfile, .json profilleri ve hf.co/... indirmelerini kullanın.'
+          ],
+          f2Title: 'Çoklu Model Sohbet ve Zorunlu Adlandırma',
+          f2Body: 'Düzenli ve güçlü sohbet yönetimi:',
+          f2List: [
+            'Aynı sohbette bir veya birden fazla yerel model seçin.',
+            'Zorunlu sohbet adlandırma ve otomatik başlık önerisi.',
+            'Sürükle-bırak klasörler ve canlı tok/s hız göstergesi.'
+          ],
+          f3Title: 'Yan Yana Karşılaştırma (Compare)',
+          f3Body: 'Modelleri gerçek zamanlı kıyaslayın:',
+          f3List: [
+            'VRAM dostu Sıralı veya Paralel çalıştırma.',
+            'tok/s hızı, gecikme ve token sayılarını karşılaştırın.',
+            'Markdown raporu dışa aktarın veya en iyi yanıtı sohbette sürdürün.'
+          ],
+          f4Title: 'Hyper Mode (Üst + Alt Model Hattı)',
+          f4Body: 'Güçlü mimar modeliyle hızlı uygulayıcı modeli birleştirin:',
+          f4List: [
+            'Oturum adı zorunluluğu ve evrensel dosya ekleme.',
+            'Seçilen dilde temiz Markdown teknik doküman üretimi.',
+            'Desktop/Hyper Mode Markdown Files klasörüne otomatik kayıt.'
+          ],
+          f5Title: 'Journal & Skills (Side A -> B Köprüleri)',
+          f5Body: 'Notları ve bağlantıları proje becerilerine dönüştürün:',
+          f5List: [
+            'Side A -> Side B akışı, bağlantılar ve dosya ekleri.',
+            'Yerel model ile Markdown beceri üretimi.',
+            'Desktop/Journal & Skill Mode kaydı ve aktif projeye tek tıkla ekleme.'
+          ],
+          f6Title: 'Evrensel Dosya Yükleme (*/*)',
+          f6Body: 'Tüm sekmelerde her dosya biçimini kullanın:',
+          f6List: [
+            'Kod, Markdown, PDF, Office (.docx, .xlsx, .csv), JSON, .zip, görsel, ses ve video.',
+            'Otomatik metin ve üst veri analizi.',
+            'Sürükle-bırak klasör desteği.'
+          ],
+          f7Title: 'İzole Projeler ve Kurallar',
+          f7Body: 'Projeleri birbirinden temiz biçimde ayırın:',
+          f7List: [
+            'Her proje için bağımsız rules.md, kaynak dosyalar ve ortam değişkenleri.',
+            'Ayrı temperature, num_ctx ve top_p ayarları.',
+            'Özelleştirilebilir sistem bağlayıcıları.'
+          ],
+          f8Title: 'Eşitleme, Bağlam İzleyici ve Tema',
+          f8Body: 'Güvenli ve hızlı iş akışı:',
+          f8List: [
+            '.json yedekleme/birleştirme ve ChatGPT conversations.json içe aktarma.',
+            'Canlı bağlam izleyici ve otomatik taslak kaydı.',
+            'Cmd/Ctrl+Enter, N, K kısayolları ve Açık/Koyu tema.'
+          ],
+          cmpTitle: '03. Benzer Araçlarla Karşılaştırma',
+          cmpSub: 'Popüler yerel yapay zeka araçlarıyla yan yana kıyaslama.',
+          cmpThCap: 'Özellik',
+          cmpThOurs: 'nimchesko AI studio',
+          cmpThOllama: 'Ollama CLI',
+          cmpThOpenWebUI: 'Open WebUI',
+          cmpThLmStudio: 'LM Studio',
+          cmpThAnything: 'AnythingLLM',
+          cmpThJan: 'Jan / Msty',
+          cmpRows: [
+            ['%100 Ücretsiz ve Açık Kaynak', ['yes', 'MIT'], ['yes', 'MIT'], ['part', 'Özel Lisans'], ['no', 'Kapalı'], ['yes', 'MIT'], ['part', 'Karma']],
+            ['Docker / Ağır Sunucu Gerektirmez', ['yes', 'Web/Masaüstü/.zip'], ['yes', 'Sadece CLI'], ['no', 'Docker/Python'], ['yes', 'Masaüstü'], ['part', 'Ağır'], ['yes', 'Masaüstü']],
+            ['Ollama + Doğrudan .gguf Yükleme', ['yes', 'Tam'], ['yes', 'CLI'], ['part', 'Yalnızca Ollama'], ['yes', 'Dahili'], ['part', 'Dolaylı'], ['yes', 'Dahili']],
+            ['Tüm Modelleri Yan Yana Kıyaslama', ['yes', 'Compare Sekmesi'], ['no', 'Yok'], ['part', 'Bölünmüş'], ['no', 'Tek Model'], ['no', 'Yok'], ['part', 'Sınırlı']],
+            ['Tek Sohbette Çoklu Model Yanıtı', ['yes', 'Çoklu Seçim'], ['no', 'Yok'], ['part', 'Kısmi'], ['no', 'Yok'], ['no', 'Yok'], ['no', 'Yok']],
+            ['Hyper Mode Çift Model -> Masaüstü .md', ['yes', 'Dahili'], ['no', 'Yok'], ['no', 'Yok'], ['no', 'Yok'], ['no', 'Yok'], ['no', 'Yok']],
+            ['Journal & Skills Proje Bağlantısı', ['yes', 'Dahili'], ['no', 'Yok'], ['no', 'Sadece İstem'], ['no', 'Yok'], ['part', 'Belgeler'], ['no', 'Yok']],
+            ['Evrensel */* Dosya Yükleme', ['yes', 'Tüm Sekmeler'], ['no', 'Manuel'], ['yes', 'RAG'], ['part', 'Sınırlı'], ['yes', 'RAG'], ['part', 'Sınırlı']],
+            ['.deb/.rpm/.AppImage/.pkg.tar.zst/.exe/.pkg + PWA', ['yes', 'Tümü'], ['yes', 'CLI'], ['no', 'Web/Docker'], ['part', 'Kısmi'], ['part', 'Kısmi'], ['part', 'Kısmi']]
+          ],
+          cmpNote:
+            'Özet: Docker kurmadan hızlı, yerel, çoklu model karşılaştırmalı ve Hyper Mode / Journal iş akışlarına sahip bir stüdyo arıyorsanız nimchesko AI studio öne çıkar.',
+          instTitle: '04. Tam Kurulum Kılavuzu',
+          instSub: 'Ollama CORS ayarını başlatın ve size uygun sürümü seçin.',
+          i1Title: 'Adım A: Ollama’yı CORS İzinli Başlatma',
+          i1Body: 'Tarayıcı, PWA ve masaüstü erişimi için http://localhost:11434 bağlantısını açın:',
+          i1Code:
             '# Linux / macOS\nOLLAMA_ORIGINS=* ollama serve\n\n# Windows PowerShell\n$env:OLLAMA_ORIGINS="*"; ollama serve\n\nollama pull llama3.2:latest',
-          c4Title: '04. Karşılaştırma ve Verimlilik',
-          c4Body: 'Modelleri kıyaslamak ve düzenli çalışmak için:',
-          c4List: [
-            'Yerel ağırlık dosyalarını doğrudan Ollama’ya yükleyin (/api/blobs + /api/create)',
-            'Karşılaştırma sonuçlarını Markdown olarak dışa aktarın ve sohbete devam edin',
-            'Kısayollar: Cmd/Ctrl + Enter (Gönder), Cmd/Ctrl + N (Yeni), Cmd/Ctrl + K (Temizle)',
-            'Uygulama ile senkronize Bordo & Krem Açık/Koyu tema'
-          ],
-          c5Title: '05. Masaüstü ve Web Kullanımı',
-          c5Body: 'Size en uygun çalıştırma yöntemini seçin:',
-          c5List: [
-            'GitHub Releases üzerinden yerel kurulumlar (.exe / .deb / .rpm / .AppImage / .pkg)',
-            'Tarayıcıda Web Stüdyo veya çevrimdışı PWA kurulumu',
-            'Kaynak koda ulaşmak için yukarıdaki Ana GitHub Reposuna Git düğmesine tıklayın'
-          ],
-          c6Title: '06. Kaynaktan Derleme',
-          c6Body: 'Yerel geliştirme ve paketleme komutları:',
-          c6Code:
-            'git clone https://github.com/halfche/nimchesko-aistudio.git\ncd nimchesko-aistudio\nnpm install --legacy-peer-deps\nnpm run build',
-          tableTitle: '07. GitHub Actions CI/CD Çıktı Biçimleri',
-          tableBody: 'Tüm platformlar için otomatik oluşturulan paketler:',
-          thOs: 'Platform',
+          i2Title: 'Adım B: Hızlı Başlatma (.zip Paketi)',
+          i2Body: 'nimchesko-ai-studio-app.zip arşivini çıkarıp çalıştırın:',
+          i2Code: '# Windows\nrun-windows.bat\n\n# Linux\nchmod +x run-linux.sh && ./run-linux.sh',
+          i3Title: 'Adım C: Kaynaktan Derleme',
+          i3Body: 'Geliştirme ve paketleme komutları:',
+          i3Code:
+            'git clone https://github.com/halfche/nimchesko-aistudio.git\ncd nimchesko-aistudio\nnpm install --legacy-peer-deps\nnpm run dev\nnpm run build',
+          pkgTableTitle: 'Yerel Masaüstü Kurulum Paketleri (GitHub Releases)',
+          pkgTableBody: 'GitHub Actions tarafından her sistem için otomatik oluşturulur:',
+          thOs: 'Platform / Dağıtım',
           thFmt: 'Biçim',
           thCmd: 'Kurulum / Çalıştırma',
+          useTitle: '05. Adım Adım Kullanım Kılavuzu',
+          useSub: 'Her sekmeden en yüksek verimi alma adımları.',
+          u1Title: 'Modelleri Bağlama ve Ekleme',
+          u1Body: 'Models & Sync sekmesinden başlayın:',
+          u1List: [
+            'http://localhost:11434 bağlantısını doğrulayın.',
+            'Auto-Discover ile Ollama modellerini alın veya .gguf/.safetensors yükleyin.',
+            'İsterseniz hf.co/... etiketleri çekin.'
+          ],
+          u2Title: 'Çoklu Model Sohbet ve Adlandırma',
+          u2Body: 'Düzenli sohbet akışı:',
+          u2List: [
+            'Her sohbete anlamlı bir ad verin.',
+            'Aynı sohbette birden çok model seçin.',
+            'Her türlü dosyayı (*/*) ekleyin.'
+          ],
+          u3Title: 'Model Karşılaştırma (Compare)',
+          u3Body: 'Hız ve kalite testi:',
+          u3List: [
+            'Sıralı (VRAM korumalı) veya Paralel modu seçin.',
+            'tok/s, gecikme ve tokenları kıyaslayın.',
+            'Markdown dışa aktarın veya seçtiğiniz yanıtı sohbette sürdürün.'
+          ],
+          u4Title: 'Hyper Mode İş Akışı',
+          u4Body: 'Üst ve alt modeli birleştirin:',
+          u4List: [
+            'Oturum adı yazın ve Higher + Lower modellerini seçin.',
+            'Çıktı Markdown dilini seçin.',
+            'Dosya Desktop/Hyper Mode Markdown Files içine kaydedilir.'
+          ],
+          u5Title: 'Journal & Skills Oluşturma',
+          u5Body: 'Tekrar kullanılabilir beceriler yazın:',
+          u5List: [
+            'Side A -> Side B akışı, bağlantı ve dosya ekleyin.',
+            'Desktop/Journal & Skill Mode klasörüne kaydedin.',
+            'Tek tıkla aktif projeye bağlayın.'
+          ],
+          u6Title: 'Projeler ve Yedekleme',
+          u6Body: 'Verilerinizi düzenli ve güvende tutun:',
+          u6List: [
+            'Her proje için rules.md ve parametre tanımlayın.',
+            'Context Monitor ile uzun sohbetleri optimize edin.',
+            '.json eşitleme veya ChatGPT içe aktarmayı kullanın.'
+          ],
           footerText: 'nimchesko AI studio · Bordo & Krem Sürümü · github.com/halfche/nimchesko-aistudio'
         }
       };
@@ -931,11 +2022,38 @@
 
       function setList(id, items) {
         const el = document.getElementById(id);
+        if (!el) return;
         el.innerHTML = '';
         items.forEach((txt) => {
           const li = document.createElement('li');
           li.textContent = txt;
           el.appendChild(li);
+        });
+      }
+
+      function renderComparison(rows) {
+        const tbody = document.getElementById('cmpBody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        rows.forEach((row) => {
+          const tr = document.createElement('tr');
+          const capTd = document.createElement('td');
+          capTd.textContent = row[0];
+          tr.appendChild(capTd);
+
+          for (let i = 1; i < row.length; i++) {
+            const td = document.createElement('td');
+            if (i === 1) td.className = 'col-ours';
+            const [kind, label] = row[i];
+            const span = document.createElement('span');
+            span.className =
+              kind === 'yes' ? 'badge-yes' : kind === 'part' ? 'badge-part' : 'badge-no';
+            const prefix = kind === 'yes' ? '✓ ' : kind === 'part' ? '~ ' : '✕ ';
+            span.textContent = prefix + label;
+            td.appendChild(span);
+            tr.appendChild(td);
+          }
+          tbody.appendChild(tr);
         });
       }
 
@@ -947,39 +2065,111 @@
         const t = COPY[currentLang];
         document.documentElement.lang = currentLang;
         document.documentElement.dir = t.dir;
-        document.getElementById('themeToggle').textContent = t.themeLabel;
-        document.getElementById('navRepoBtn').textContent = t.navRepo;
-        document.getElementById('navStudioBtn').textContent = t.navStudio;
-        document.getElementById('heroRepoBtn').textContent = t.heroRepo;
-        document.getElementById('heroStudioBtn').textContent = t.heroStudio;
-        document.getElementById('zipBtn').textContent = t.zipBtn;
-        document.getElementById('releasesBtn').textContent = t.releasesBtn;
-        document.getElementById('heroTitle').textContent = t.heroTitle;
-        document.getElementById('heroSub').textContent = t.heroSub;
-        document.getElementById('c1Title').textContent = t.c1Title;
-        document.getElementById('c1Body').textContent = t.c1Body;
-        setList('c1List', t.c1List);
-        document.getElementById('c2Title').textContent = t.c2Title;
-        document.getElementById('c2Body').textContent = t.c2Body;
-        document.getElementById('c2Code').textContent = t.c2Code;
-        document.getElementById('c3Title').textContent = t.c3Title;
-        document.getElementById('c3Body').textContent = t.c3Body;
-        document.getElementById('c3Code').textContent = t.c3Code;
-        document.getElementById('c4Title').textContent = t.c4Title;
-        document.getElementById('c4Body').textContent = t.c4Body;
-        setList('c4List', t.c4List);
-        document.getElementById('c5Title').textContent = t.c5Title;
-        document.getElementById('c5Body').textContent = t.c5Body;
-        setList('c5List', t.c5List);
-        document.getElementById('c6Title').textContent = t.c6Title;
-        document.getElementById('c6Body').textContent = t.c6Body;
-        document.getElementById('c6Code').textContent = t.c6Code;
-        document.getElementById('tableTitle').textContent = t.tableTitle;
-        document.getElementById('tableBody').textContent = t.tableBody;
-        document.getElementById('thOs').textContent = t.thOs;
-        document.getElementById('thFmt').textContent = t.thFmt;
-        document.getElementById('thCmd').textContent = t.thCmd;
-        document.getElementById('footerText').textContent = t.footerText;
+
+        const textMap = {
+          themeToggle: t.themeLabel,
+          navRepoBtn: t.navRepo,
+          navStudioBtn: t.navStudio,
+          heroRepoBtn: t.heroRepo,
+          heroStudioBtn: t.heroStudio,
+          zipBtn: t.zipBtn,
+          releasesBtn: t.releasesBtn,
+          tocWhat: t.tocWhat,
+          tocFeatures: t.tocFeatures,
+          tocCompare: t.tocCompare,
+          tocInstall: t.tocInstall,
+          tocUsage: t.tocUsage,
+          heroTitle: t.heroTitle,
+          heroSub: t.heroSub,
+          whatTitle: t.whatTitle,
+          whatSub: t.whatSub,
+          whatOverviewTitle: t.whatOverviewTitle,
+          whatOverviewBody: t.whatOverviewBody,
+          whatArchTitle: t.whatArchTitle,
+          whatArchBody: t.whatArchBody,
+          featTitle: t.featTitle,
+          featSub: t.featSub,
+          f1Title: t.f1Title,
+          f1Body: t.f1Body,
+          f2Title: t.f2Title,
+          f2Body: t.f2Body,
+          f3Title: t.f3Title,
+          f3Body: t.f3Body,
+          f4Title: t.f4Title,
+          f4Body: t.f4Body,
+          f5Title: t.f5Title,
+          f5Body: t.f5Body,
+          f6Title: t.f6Title,
+          f6Body: t.f6Body,
+          f7Title: t.f7Title,
+          f7Body: t.f7Body,
+          f8Title: t.f8Title,
+          f8Body: t.f8Body,
+          cmpTitle: t.cmpTitle,
+          cmpSub: t.cmpSub,
+          cmpThCap: t.cmpThCap,
+          cmpThOurs: t.cmpThOurs,
+          cmpThOllama: t.cmpThOllama,
+          cmpThOpenWebUI: t.cmpThOpenWebUI,
+          cmpThLmStudio: t.cmpThLmStudio,
+          cmpThAnything: t.cmpThAnything,
+          cmpThJan: t.cmpThJan,
+          cmpNote: t.cmpNote,
+          instTitle: t.instTitle,
+          instSub: t.instSub,
+          i1Title: t.i1Title,
+          i1Body: t.i1Body,
+          i1Code: t.i1Code,
+          i2Title: t.i2Title,
+          i2Body: t.i2Body,
+          i2Code: t.i2Code,
+          i3Title: t.i3Title,
+          i3Body: t.i3Body,
+          i3Code: t.i3Code,
+          pkgTableTitle: t.pkgTableTitle,
+          pkgTableBody: t.pkgTableBody,
+          thOs: t.thOs,
+          thFmt: t.thFmt,
+          thCmd: t.thCmd,
+          useTitle: t.useTitle,
+          useSub: t.useSub,
+          u1Title: t.u1Title,
+          u1Body: t.u1Body,
+          u2Title: t.u2Title,
+          u2Body: t.u2Body,
+          u3Title: t.u3Title,
+          u3Body: t.u3Body,
+          u4Title: t.u4Title,
+          u4Body: t.u4Body,
+          u5Title: t.u5Title,
+          u5Body: t.u5Body,
+          u6Title: t.u6Title,
+          u6Body: t.u6Body,
+          footerText: t.footerText
+        };
+
+        Object.entries(textMap).forEach(([id, val]) => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = val;
+        });
+
+        setList('whatOverviewList', t.whatOverviewList);
+        setList('whatArchList', t.whatArchList);
+        setList('f1List', t.f1List);
+        setList('f2List', t.f2List);
+        setList('f3List', t.f3List);
+        setList('f4List', t.f4List);
+        setList('f5List', t.f5List);
+        setList('f6List', t.f6List);
+        setList('f7List', t.f7List);
+        setList('f8List', t.f8List);
+        setList('u1List', t.u1List);
+        setList('u2List', t.u2List);
+        setList('u3List', t.u3List);
+        setList('u4List', t.u4List);
+        setList('u5List', t.u5List);
+        setList('u6List', t.u6List);
+        renderComparison(t.cmpRows);
 
         document.querySelectorAll('.lang-btn').forEach((btn) => {
           btn.classList.toggle('active', btn.getAttribute('data-lang') === currentLang);

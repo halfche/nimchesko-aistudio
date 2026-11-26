@@ -4,29 +4,31 @@
 
 > **Guía HTML Multilingüe (Se abre directamente en el navegador):** **[Abrir guía completa (GitHub Pages)](https://halfche.github.io/nimchesko-aistudio/#es)** · **[Espejo Instantáneo (CDN)](https://raw.githack.com/halfche/nimchesko-aistudio/main/public/guide.html#es)** · **[Web Studio](https://halfche.github.io/nimchesko-aistudio/studio.html)** · **[Releases](https://github.com/halfche/nimchesko-aistudio/releases)**
 
-Espacio de trabajo local multiplataforma para ejecutar, importar y comparar **todos los modelos locales** (desde **archivos locales** como `.gguf`, `.bin`, `.safetensors`, `Modelfile`, `.json` o mediante **Ollama**), diseñado con una estética minimalista en **borgoña y crema** y motivos arquitectónicos persas.
+Espacio de trabajo local 100 % privado para **todos los modelos locales** (`.gguf`, `.bin`, `.safetensors`, `Modelfile`, `.json` o **Ollama**) en estilo **borgoña y crema**, sin Docker ni nube obligatoria.
 
-## Características Principales
+## Características Completas
 
-- **Comparar todos los modelos locales (`Compare`):** Ejecuta prompts en paralelo o secuencialmente, inspecciona detalles (`/api/show`), compara `tok/s`, latencia y tokens, exporta informes Markdown y continúa en el chat.
-- **Importar cualquier modelo local (`Models & Sync`):** Carga archivos locales directamente en Ollama (`/api/blobs` + `/api/create`), importa `Modelfile`/`.json` o descarga etiquetas de Ollama y `hf.co/...` (`/api/pull`), además de sincronizar respaldos `.json` y chats.
-- **Proyectos Aislados y Productividad:** Reglas propias (`rules.md`), carpetas arrastrables, Quick Prompts, monitor de contexto, autoguardado y atajos (`Cmd/Ctrl + Enter`, `Cmd/Ctrl + N`, `Cmd/Ctrl + K`).
-- **Empaquetado Multiplataforma:** Paquete web combinado (`nimchesko-ai-studio-app.zip`) y compilación automática en GitHub Actions CI/CD (`.deb`, `.rpm`, `.pkg`, `.pkg.tar.zst`, `.tar`, `.tar.zst`, `.AppImage`, `.exe`).
+- **Cualquier Modelo Local (`Models & Sync`):** Autodetección `/api/tags`, subida directa `.gguf`/`.bin`/`.safetensors` (`/api/blobs` + `/api/create`) y descargas `hf.co/...`.
+- **Chat Multimodelo y Nombre Obligatorio (`Chat`):** Consulta varios modelos en el mismo hilo, exige nombre descriptivo y organiza en carpetas.
+- **Comparación Lado a Lado (`Compare`):** Modo secuencial (ahorra VRAM) o paralelo con `tok/s`, latencia y exportación Markdown.
+- **Hyper Mode:** Canalización Higher Architect -> Lower Builder con guardado automático `.md` en `Desktop/Hyper Mode Markdown Files`.
+- **Journal & Skills:** Notas `Side A -> Side B`, enlaces y adjuntos guardados en `Desktop/Journal & Skill Mode` y acoplables al proyecto activo.
+- **Subida Universal (`*/*`) y Proyectos Aislados:** Código, PDF, Office, JSON, `.zip`, multimedia, `rules.md`, monitor de contexto y respaldo `.json` / ChatGPT.
+
+## Comparativa con Herramientas Similares
+
+| Capacidad | **nimchesko AI studio** | Ollama CLI | Open WebUI | LM Studio | AnythingLLM | Jan / Msty |
+| --- | --- | --- | --- | --- | --- | --- |
+| Open Source y sin Docker | **Sí (MIT)** | Solo CLI | Docker/Python | Cerrado | Pesado | Mixto |
+| Compare + Chat Multimodelo | **Sí** | No | Parcial | Uno a la vez | No | Limitado |
+| Hyper Mode + Journal & Skills | **Sí** | No | No | No | No | No |
+| `.deb`/`.rpm`/`.AppImage`/`.pkg.tar.zst`/`.exe`/`.pkg` + PWA | **Todos** | CLI | Web/Docker | Parcial | Parcial | Parcial |
 
 ## Inicio Rápido
 
-1. Descarga y extrae **`nimchesko-ai-studio-app.zip`**.
-2. **Windows:** Haz doble clic en `run-windows.bat`. **Linux:** Ejecuta `chmod +x run-linux.sh && ./run-linux.sh`.
-3. Inicia Ollama permitiendo peticiones del navegador:
-   ```bash
-   OLLAMA_ORIGINS=* ollama serve
-   ```
-
-## Compilación Local y GitHub Actions CI/CD
-
 ```bash
-npm install --legacy-peer-deps
-npm run build
+OLLAMA_ORIGINS=* ollama serve
+npm install --legacy-peer-deps && npm run build
 ```
 
-Activa **Read and write permissions** en **Settings → Actions → General → Workflow permissions** para que `.github/workflows/release-desktop.yml` publique automáticamente todos los instaladores en **Releases**.
+También puedes extraer **`nimchesko-ai-studio-app.zip`** (`run-windows.bat` / `./run-linux.sh`) o instalar desde **Releases**.

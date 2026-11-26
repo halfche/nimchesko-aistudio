@@ -53,6 +53,7 @@ rpm:
   fpm:
     - --rpm-compression
     - gzip
+    - --rpm-rpmbuild-define=_build_id_links none
 
 win:
   icon: build/icon.ico
