@@ -39,6 +39,20 @@ linux:
     - target: dir
       arch: [x64]
 
+rpm:
+  depends:
+    - gtk3
+    - libnotify
+    - nss
+    - libXScrnSaver
+    - libXtst
+    - xdg-utils
+    - at-spi2-core
+    - libuuid
+  fpm:
+    - --rpm-compression
+    - xz
+
 win:
   icon: build/icon.ico
   target:

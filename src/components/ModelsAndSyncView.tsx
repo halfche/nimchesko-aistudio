@@ -75,7 +75,7 @@ const POPULAR_OLLAMA_TAGS = [
   'deepseek-r1:14b',
   'mistral:latest',
   'phi4:latest',
-  'gemma4:12b',
+  'codellama:7b',
 ];
 
 function downloadJsonFile(filename: string, data: unknown) {

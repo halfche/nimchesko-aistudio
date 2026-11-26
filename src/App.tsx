@@ -64,6 +64,7 @@ const STORAGE_AUTOSAVE_KEY = 'gemma_studio_autosave_v1';
 const STORAGE_DRAFTS_KEY = 'gemma_studio_drafts_v1';
 const STORAGE_IMPORTED_MODELS_KEY = 'gemma_studio_imported_models_v1';
 const STORAGE_COMPARE_ROUNDS_KEY = 'local_studio_compare_rounds_v1';
+const STORAGE_CLEARED_GEMMA_DEFAULT_KEY = 'local_studio_cleared_gemma_default_v1';
 
 // Legacy v1 keys for smooth one-time migration
 const LEGACY_CONVERSATIONS_KEY = 'gemma_studio_conversations_v1';
@@ -73,27 +74,47 @@ const LEGACY_SKILLS_KEY = 'gemma_studio_skills_v1';
 const LEGACY_CONNECTORS_KEY = 'gemma_studio_connectors_v1';
 
 function loadInitialProjects(): WorkspaceProject[] {
+  const alreadyClearedDefault =
+    localStorage.getItem(STORAGE_CLEARED_GEMMA_DEFAULT_KEY) === 'true';
   try {
     const raw = localStorage.getItem(STORAGE_PROJECTS_KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as WorkspaceProject[];
       if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed.map((proj) => ({
-          ...proj,
-          conversations:
+        if (!alreadyClearedDefault) {
+          localStorage.setItem(STORAGE_CLEARED_GEMMA_DEFAULT_KEY, 'true');
+        }
+        return parsed.map((proj) => {
+          const cleanedDefault =
+            !alreadyClearedDefault && proj.defaultModel === 'gemma4:12b'
+              ? ''
+              : proj.defaultModel || '';
+          const rawConvs =
             Array.isArray(proj.conversations) && proj.conversations.length > 0
               ? proj.conversations
-              : [createConversation(proj.defaultModel || '')],
-          folders: Array.isArray(proj.folders) ? proj.folders : [],
-          contextItems: Array.isArray(proj.contextItems) ? proj.contextItems : [],
-          prompts: Array.isArray(proj.prompts) ? proj.prompts : [],
-          rulesMarkdown: typeof proj.rulesMarkdown === 'string' ? proj.rulesMarkdown : '',
-          rulesEnabled: proj.rulesEnabled ?? true,
-          envVars: Array.isArray(proj.envVars) ? proj.envVars : [],
-          skills: Array.isArray(proj.skills) ? proj.skills : [],
-          connectors: Array.isArray(proj.connectors) ? proj.connectors : [],
-          params: { ...DEFAULT_MODEL_PARAMS, ...(proj.params || {}) },
-        }));
+              : [createConversation(cleanedDefault)];
+          const cleanedConvs = rawConvs.map((c) =>
+            !alreadyClearedDefault &&
+            c.model === 'gemma4:12b' &&
+            (!Array.isArray(c.messages) || c.messages.length === 0)
+              ? { ...c, model: '' }
+              : c
+          );
+          return {
+            ...proj,
+            defaultModel: cleanedDefault,
+            conversations: cleanedConvs,
+            folders: Array.isArray(proj.folders) ? proj.folders : [],
+            contextItems: Array.isArray(proj.contextItems) ? proj.contextItems : [],
+            prompts: Array.isArray(proj.prompts) ? proj.prompts : [],
+            rulesMarkdown: typeof proj.rulesMarkdown === 'string' ? proj.rulesMarkdown : '',
+            rulesEnabled: proj.rulesEnabled ?? true,
+            envVars: Array.isArray(proj.envVars) ? proj.envVars : [],
+            skills: Array.isArray(proj.skills) ? proj.skills : [],
+            connectors: Array.isArray(proj.connectors) ? proj.connectors : [],
+            params: { ...DEFAULT_MODEL_PARAMS, ...(proj.params || {}) },
+          };
+        });
       }
     }
   } catch {
@@ -453,7 +474,9 @@ export default function App() {
   );
 
   useEffect(() => {
-    if (!firstDetectedLocalModel) return;
+    if (diagnostic.status === 'idle' || diagnostic.status === 'checking') {
+      if (!firstDetectedLocalModel) return;
+    }
     const knownNames = new Set<string>([
       ...diagnostic.models.map((m) => m.name),
       ...importedModels.map((m) => m.name),
@@ -462,7 +485,7 @@ export default function App() {
       let changed = false;
       const next = prev.map((proj) => {
         const defaultInvalid =
-          !proj.defaultModel ||
+          (!proj.defaultModel && Boolean(firstDetectedLocalModel)) ||
           (proj.defaultModel === 'gemma4:12b' && !knownNames.has('gemma4:12b'));
         const nextDefault = defaultInvalid
           ? firstDetectedLocalModel
@@ -471,7 +494,7 @@ export default function App() {
         let convChanged = false;
         const nextConversations = proj.conversations.map((conv) => {
           const convNeedsAutoModel =
-            !conv.model ||
+            (!conv.model && Boolean(nextDefault)) ||
             (conv.model === 'gemma4:12b' &&
               conv.messages.length === 0 &&
               !knownNames.has('gemma4:12b'));
@@ -490,7 +513,7 @@ export default function App() {
       });
       return changed ? next : prev;
     });
-  }, [firstDetectedLocalModel, diagnostic.models, importedModels]);
+  }, [firstDetectedLocalModel, diagnostic.status, diagnostic.models, importedModels]);
 
   const updateProject = useCallback(
     (projectId: string, updater: (prev: WorkspaceProject) => WorkspaceProject) => {

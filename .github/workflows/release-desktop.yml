@@ -25,8 +25,10 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Install Linux packaging tools (rpm, zstd)
-        run: sudo apt-get update && sudo apt-get install -y rpm zstd
+      - name: Install Linux packaging tools (rpm, debugedit, xz, zstd)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rpm debugedit xz-utils zstd dpkg-dev
 
       - name: Install web dependencies & build dist
         shell: bash
@@ -36,6 +38,8 @@ jobs:
 
       - name: Install desktop dependencies & build Linux packages
         shell: bash
+        env:
+          DEBUG: electron-builder
         run: |
           npm --prefix desktop install --legacy-peer-deps
           chmod +x desktop/scripts/build-extra-linux-archives.sh
