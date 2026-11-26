@@ -15,12 +15,17 @@ clean_staging() {
 build_rpm_with_native_rpmbuild() {
   local rpm_stage
   rpm_stage="$(mktemp -d)"
+  trap 'rm -rf "${rpm_stage}"' RETURN
 
   mkdir -p "${rpm_stage}/BUILD" "${rpm_stage}/RPMS" "${rpm_stage}/SOURCES" "${rpm_stage}/SPECS" "${rpm_stage}/SRPMS" "${rpm_stage}/BUILDROOT"
 
   local icon_src="${DESKTOP_DIR}/build/icon.png"
   if [[ ! -f "${icon_src}" ]]; then
     icon_src="${ROOT_DIR}/public/pwa-512x512.png"
+  fi
+  if [[ ! -f "${icon_src}" ]]; then
+    echo "Error: No RPM icon found at ${icon_src}" >&2
+    return 1
   fi
 
   local spec_file="${rpm_stage}/SPECS/nimchesko-ai-studio.spec"
@@ -79,6 +84,7 @@ cp "${icon_src}" "%{buildroot}/usr/share/icons/hicolor/512x512/apps/nimchesko-ai
 
 %files
 %defattr(-,root,root,-)
+%attr(4755,root,root) /opt/nimchesko-ai-studio/chrome-sandbox
 /opt/nimchesko-ai-studio
 /usr/bin/nimchesko-ai-studio
 /usr/share/applications/nimchesko-ai-studio.desktop
@@ -95,13 +101,11 @@ EOF
   built_rpm="$(find "${rpm_stage}/RPMS" -type f -name "*.rpm" | head -n 1 || true)"
   if [[ -z "${built_rpm}" || ! -f "${built_rpm}" ]]; then
     echo "Error: native rpmbuild did not produce an .rpm archive." >&2
-    rm -rf "${rpm_stage}"
     return 1
   fi
 
   local dest_rpm="${RELEASE_DIR}/nimchesko-ai-studio-${VERSION}-x86_64.rpm"
   cp -f "${built_rpm}" "${dest_rpm}"
-  rm -rf "${rpm_stage}"
   echo "==> Native rpmbuild succeeded: ${dest_rpm}"
 }
 
@@ -109,6 +113,7 @@ cd "${DESKTOP_DIR}"
 
 echo "==> Cleaning previous release staging..."
 rm -rf "${RELEASE_DIR}"
+mkdir -p "${RELEASE_DIR}"
 npm run prepare:icons
 
 echo "==> Step 1/5: Unpacking Electron Linux directory (dir target)..."
@@ -143,7 +148,7 @@ rm -rf ~/.cache/electron-builder/fpm 2>/dev/null || true
 if npx electron-builder --linux rpm --x64 --prepackaged "${UNPACKED_DIR}" --publish never --config electron-builder.yml; then
   echo "==> electron-builder RPM succeeded."
 else
-  echo "==> electron-builder/fpm RPM failed (common with RPM 4.18+ BUILDROOT on Ubuntu 24.04); switching to native rpmbuild..."
+  echo "==> electron-builder/fpm RPM failed; switching to native rpmbuild..."
   rm -f "${RELEASE_DIR}"/*.rpm
   clean_staging
   build_rpm_with_native_rpmbuild
