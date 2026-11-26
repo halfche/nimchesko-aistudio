@@ -713,8 +713,8 @@
       const REPO_URL = 'https://github.com/halfche/nimchesko-aistudio';
       const RELEASES_URL = 'https://github.com/halfche/nimchesko-aistudio/releases';
       const PAGES_STUDIO_URL = 'https://halfche.github.io/nimchesko-aistudio/studio.html';
-      const RAW_ZIP_URL =
-        'https://github.com/halfche/nimchesko-aistudio/raw/main/public/nimchesko-ai-studio-app.zip';
+      const PAGES_ZIP_URL =
+        'https://halfche.github.io/nimchesko-aistudio/nimchesko-ai-studio-app.zip';
 
       function resolveRuntimeLinks() {
         const host = window.location.hostname || '';
@@ -731,9 +731,9 @@
             : PAGES_STUDIO_URL;
 
         const zipHref =
-          isGithubPages || isLocalServer || proto === 'file:'
+          isGithubPages || isLocalServer
             ? './nimchesko-ai-studio-app.zip'
-            : RAW_ZIP_URL;
+            : PAGES_ZIP_URL;
 
         ['navStudioBtn', 'heroStudioBtn'].forEach((id) => {
           const el = document.getElementById(id);

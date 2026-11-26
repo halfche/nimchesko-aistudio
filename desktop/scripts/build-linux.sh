@@ -87,7 +87,7 @@ EOF
 
   echo "==> Building .rpm via native rpmbuild (${spec_file})..."
   rpmbuild -bb \
-    --target x86_64-linux-gnu \
+    --target x86_64 \
     --define "_topdir ${rpm_stage}" \
     "${spec_file}"
 

@@ -53,7 +53,7 @@ function saveMarkdownToDesktop({ folderName, fileName, content }) {
   fs.mkdirSync(targetDir, { recursive: true });
   const targetFile = path.join(targetDir, safeFile);
   fs.writeFileSync(targetFile, String(content || ''), 'utf8');
-  return { ok: true, dirPath: targetDir, filePath: targetFile };
+  return { ok: true, dirPath: targetDir, folderPath: targetDir, filePath: targetFile };
 }
 
 function readJsonBody(req) {
@@ -196,19 +196,25 @@ ipcMain.handle('desktop:save-markdown', async (_event, payload) => {
 });
 
 ipcMain.handle('desktop:open-folder', async (_event, payload) => {
-  const safeFolder = sanitizeSegment(payload?.folderName, 'Hyper Mode Markdown Files');
+  const requestedFolder = typeof payload === 'string' ? payload : payload?.folderName;
+  const safeFolder = sanitizeSegment(requestedFolder, 'Hyper Mode Markdown Files');
   const targetDir = path.join(getDesktopBaseDir(), safeFolder);
   fs.mkdirSync(targetDir, { recursive: true });
   await shell.openPath(targetDir);
-  return { ok: true, dirPath: targetDir };
+  return { ok: true, dirPath: targetDir, folderPath: targetDir };
 });
 
 ipcMain.handle('desktop:get-paths', async () => {
   const desktopDir = getDesktopBaseDir();
+  const hyperDir = path.join(desktopDir, 'Hyper Mode Markdown Files');
+  const journalDir = path.join(desktopDir, 'Journal & Skill Mode');
   return {
     desktopDir,
-    hyperDir: path.join(desktopDir, 'Hyper Mode Markdown Files'),
-    journalDir: path.join(desktopDir, 'Journal & Skill Mode'),
+    desktopPath: desktopDir,
+    hyperDir,
+    hyperFolder: hyperDir,
+    journalDir,
+    journalFolder: journalDir,
   };
 });
 
