@@ -201,8 +201,14 @@ npx electron-builder --linux AppImage --x64 \
   --prepackaged "${APPIMAGE_IN}" \
   --publish never \
   --config electron-builder.yml \
-  -c.directories.output="${APPIMAGE_OUT}"
-cp -f "${APPIMAGE_OUT}"/*.AppImage "${RELEASE_DIR}/"
+  --config.directories.output="${APPIMAGE_OUT}"
+BUILT_APPIMAGE="$(find "${APPIMAGE_OUT}" -maxdepth 2 -type f -name "*.AppImage" | head -n 1 || true)"
+if [[ -z "${BUILT_APPIMAGE}" || ! -f "${BUILT_APPIMAGE}" ]]; then
+  echo "Error: AppImage was not created in ${APPIMAGE_OUT}" >&2
+  ls -la "${APPIMAGE_OUT}" || true
+  exit 1
+fi
+cp -f "${BUILT_APPIMAGE}" "${RELEASE_DIR}/"
 
 echo "==> Step 4/5: Building .deb in isolated stage directory..."
 DEB_IN="${STAGE_BASE}/deb-in"
@@ -213,8 +219,14 @@ npx electron-builder --linux deb --x64 \
   --prepackaged "${DEB_IN}" \
   --publish never \
   --config electron-builder.yml \
-  -c.directories.output="${DEB_OUT}"
-cp -f "${DEB_OUT}"/*.deb "${RELEASE_DIR}/"
+  --config.directories.output="${DEB_OUT}"
+BUILT_DEB="$(find "${DEB_OUT}" -maxdepth 2 -type f -name "*.deb" | head -n 1 || true)"
+if [[ -z "${BUILT_DEB}" || ! -f "${BUILT_DEB}" ]]; then
+  echo "Error: .deb package was not created in ${DEB_OUT}" >&2
+  ls -la "${DEB_OUT}" || true
+  exit 1
+fi
+cp -f "${BUILT_DEB}" "${RELEASE_DIR}/"
 
 echo "==> Step 5/5: Building .rpm in isolated stage directory with native rpmbuild..."
 build_rpm_with_native_rpmbuild
